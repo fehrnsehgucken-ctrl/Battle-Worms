@@ -7,9 +7,11 @@
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
   html,body { height:100%; overflow:hidden; background:#070b14;
-              font-family:system-ui,sans-serif; color:#fff; user-select:none;
-              touch-action: none; }
+              font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+              color:#fff; user-select:none; touch-action: none; }
   canvas { display:block; }
+
+  /* ---------- HUD ---------- */
   #hud {
     position:fixed; top:14px; left:14px; background:rgba(0,0,0,0.5);
     padding:12px 16px; border-radius:10px; font-size:13px; line-height:1.6;
@@ -21,38 +23,165 @@
   #hud .val { font-weight:600; }
   #status-open { color:#6cf; }
   #status-closed { color:#f88; }
+
+  /* ---------- MENU OVERLAY ---------- */
   #overlay {
-    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-    background:rgba(5,8,16,0.92); z-index:10; backdrop-filter: blur(6px);
+    position:fixed; inset:0; z-index:10; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(circle at 50% 45%, #101a30 0%, #080d1a 55%, #04070d 100%);
   }
   #overlay.hidden { display:none; }
-  .card {
-    background:#0f1626; padding:34px 44px; border-radius:16px; text-align:center;
-    border:1px solid #1f2a44; max-width:440px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+
+  /* animated glow blobs */
+  #overlay::before, #overlay::after {
+    content:''; position:absolute; width:600px; height:600px; border-radius:50%;
+    filter: blur(90px); opacity:0.35; pointer-events:none;
   }
-  .card h1 { margin:0 0 8px; font-size:38px; letter-spacing:2px; }
-  .card h1 span {>< color:#6cfspan; }
-  .card p { color:#8ba class0c5; margin:0 0 20px; font-size:="14px; line-height:1val.6; }
-  ."card p .warn { color:#f88; }
-  .card button {
-    background:#6cf; color:#04182e; border:0; padding:12px 30px;
-    font-size:16px; font-weight:700; border-radius:8px; cursor:pointer;
-    letter-spacing:0.5px; transition:transform .1s, background .15s;
+  #overlay::before {
+    background: radial-gradient(circle, #1f6fa8, transparent 70%);
+    top:-180px; left:-180px;
+    animation: float1 22s ease-in-out infinite;
   }
-  .card button:hover { background:#8df; transform:translateY(-1px); }
-  .hint { margin-top:18px; color:#5a6a85; font-size:12px; line-height:1.7; }
-  .hint b { color:#8ba0c5; font-weight:600; }
+  #overlay::after {
+    background: radial-gradient(circle, #a83060, transparent 70%);
+    bottom:-200px; right:-180px;
+    animation: float2 26s ease-in-out infinite;
+  }
+  @keyframes float1 {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50%     { transform: translate(140px, 80px) scale(1.15); }
+  }
+  @keyframes float2 {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50%     { transform: translate(-120px, -70px) scale(1.2); }
+  }
+
+  /* subtle dot grid */
+  #overlay .dots {
+    position:absolute; inset:0; pointer-events:none; opacity:0.5;
+    background-image: radial-gradient(rgba(120,180,255,0.14) 1px, transparent 1.5px);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 75%);
+  }
+
+  .menu-card {
+    position:relative; z-index:2;
+    padding: clamp(28px, 5vw, 46px) clamp(22px, 5vw, 54px);
+    text-align:center;
+    max-width: 500px;
+    width: calc(100% - 32px);
+  }
+
+  .menu-title {
+    margin: 0;
+    font-size: clamp(42px, 12vw, 68px);
+    font-weight: 900;
+    letter-spacing: -3px;
+    line-height: 1;
+    display: flex;
+    justify-content: center;
+  }
+  .menu-title span {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .menu-title .t1 {
+    background-image: linear-gradient(180deg, #ffffff 0%, #7fd4ff 55%, #2a8dd6 100%);
+    filter: drop-shadow(0 4px 32px rgba(108,204,255,0.5));
+  }
+  .menu-title .t2 {
+    background-image: linear-gradient(180deg, #ffc0c0 0%, #ff5577 55%, #b81e46 100%);
+    filter: drop-shadow(0 4px 32px rgba(255,80,110,0.5));
+  }
+
+  .menu-sub {
+    margin: 10px 0 28px;
+    color: #7d8fb3;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .menu-stats {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+  .stat {
+    flex: 1;
+    background: rgba(120,180,255,0.05);
+    border: 1px solid rgba(120,180,255,0.14);
+    border-radius: 12px;
+    padding: 12px 6px;
+    transition: border-color .2s, background .2s;
+  }
+  .stat:hover { border-color: rgba(120,180,255,0.35); background: rgba(120,180,255,0.09); }
+  .stat-v {
+    font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
+    color: #a8e6ff;
+  }
+  .stat-l {
+    font-size: 9.5px; color: #6a7d9e; text-transform: uppercase;
+    letter-spacing: 1.4px; margin-top: 3px; font-weight: 600;
+  }
+
+  .menu-play {
+    width: 100%;
+    padding: 17px 0;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: #04182e;
+    background: linear-gradient(135deg, #8ee0ff 0%, #4ab5ff 100%);
+    border: 0;
+    border-radius: 14px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform .15s, filter .2s;
+    animation: playPulse 2.6s ease-in-out infinite;
+  }
+  .menu-play::after {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.6) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform .7s;
+  }
+  .menu-play:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+  }
+  .menu-play:hover::after { transform: translateX(120%); }
+  .menu-play:active { transform: translateY(0); }
+  @keyframes playPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(108,204,255,0.55), 0 12px 34px rgba(108,204,255,0.35); }
+    50%     { box-shadow: 0 0 0 16px rgba(108,204,255,0),  0 16px 44px rgba(108,204,255,0.55); }
+  }
+
+  .menu-controls {
+    margin-top: 26px;
+    color: #56678a;
+    font-size: 12px;
+    line-height: 1.9;
+  }
+  .menu-controls b { color: #8ba0c5; font-weight: 600; }
+
+  /* ---------- DEATH OVERLAY ---------- */
   #death {
     position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
     text-align:center; pointer-events:none; display:none; z-index:5;
   }
-  #death h2 { font-size:44px; margin:0 0 6px; color:#f55; text-shadow:0 0 30px #f55; }
-  #death p { color:#fff; font-size:16px; }
+  #death h2 { font-size:44px; margin:0 0 6px; color:#f55; text-shadow:0 0 30px #f55; letter-spacing:4px; }
+  #death p { color:#fff; font-size:14px; letter-spacing:1px; }
 
-  /* ---- Mobile Controls ---- */
+  /* ---------- MOBILE CONTROLS ---------- */
   #boostBtn {
-    position:fixed; bottom:30px; left:30px;   /* <-- LINKS statt rechts */
+    position:fixed; bottom:30px; left:30px;
     width:96px; height:96px; border-radius:50%;
     background:rgba(108,204,255,0.18);
     border:2px solid rgba(108,204,255,0.55);
@@ -77,7 +206,7 @@
   <div class="row"><span class="label">Mass</span><span class="val" id="ui-mass">20</span></div>
   <div class="row"><span class="label">Rank</span><span class="val" id="ui-rank">1/21</span></div>
   <div class="row"><span class="label">Alive</span><span class="val" id="ui-alive">21</span></div>
-  <div class="row"><span class="label">Time</span id="ui-time">0:00</span></div>
+  <div class="row"><span class="label">Time</span><span class="val" id="ui-time">0:00</span></div>
   <div class="row"><span class="label">Status</span><span class="val" id="ui-status"><span id="status-open">Respawn open</span></span></div>
 </div>
 
@@ -89,13 +218,22 @@
 </div>
 
 <div id="overlay">
-  <div class="card" id="card">
-    <h1>Battle<span>-Worms</span></h1>
-    <p>A slither-style battle royale.<br>Grow. Cut off. Survive.<br><span class="warn">Respawn closes after 2:30.</span></p>
-    <button id="startBtn">Start Match</button>
-    <div class="hint">
-      <b>Desktop:</b> Mouse + Click/Space to boost<br>
-      <b>Mobile:</b> Drag anywhere to steer, hold BOOST
+  <div class="dots"></div>
+  <div class="menu-card">
+    <h1 class="menu-title"><span class="t1">Battle</span><span class="t2">-Worms</span></h1>
+    <p class="menu-sub">Slither-style Battle Royale</p>
+
+    <div class="menu-stats">
+      <div class="stat"><div class="stat-v">21</div><div class="stat-l">Worms</div></div>
+      <div class="stat"><div class="stat-v">4:00</div><div class="stat-l">Match</div></div>
+      <div class="stat"><div class="stat-v">2:30</div><div class="stat-l">Respawn ends</div></div>
+    </div>
+
+    <button class="menu-play" id="startBtn">PLAY</button>
+
+    <div class="menu-controls">
+      <div><b>Desktop</b> · Mouse to steer · Click/Space to boost</div>
+      <div><b>Mobile</b> · Drag anywhere · Hold BOOST</div>
     </div>
   </div>
 </div>
@@ -122,7 +260,6 @@ const CFG = {
   bodyRadius: 10,
   collisionRadius: 9,
   respawnDelay: 2.0,
-  spawnInvuln: 2.0,
 };
 
 const BOT_NAMES = ['Rex','Blaze','Venom','Storm','Fang','Nyx','Echo','Ghost','Rogue','Titan',
@@ -181,6 +318,7 @@ const input = {
   boost: false,
   mouseX: window.innerWidth / 2,
   mouseY: window.innerHeight / 2,
+  hasMouse: false,          // <— FIX: erst true nach erster Mausbewegung
   joyActive: false,
   joyId: null,
   joyBaseX: 0, joyBaseY: 0,
@@ -215,8 +353,7 @@ class Worm {
       });
     }
     this.ai = this.isBot ? {
-      target: null,
-      retargetAt: 0,
+      target: null, retargetAt: 0,
       wanderAngle: this.angle,
       boostChance: 0.004 + Math.random() * 0.008,
       aggression: Math.random(),
@@ -227,7 +364,6 @@ class Worm {
 
   update(dt) {
     if (!this.alive) return;
-
     const diff = angleDiff(this.targetAngle, this.angle);
     const maxTurn = CFG.turnRate;
     if (Math.abs(diff) < maxTurn) this.angle = this.targetAngle;
@@ -243,8 +379,7 @@ class Worm {
     for (let i = 1; i < this.segments.length; i++) {
       const prev = this.segments[i - 1];
       const cur = this.segments[i];
-      const dx = prev.x - cur.x;
-      const dy = prev.y - cur.y;
+      const dx = prev.x - cur.x, dy = prev.y - cur.y;
       const d = Math.hypot(dx, dy) || 1;
       if (d > CFG.segSpacing) {
         const t = (d - CFG.segSpacing) / d;
@@ -280,10 +415,8 @@ class Worm {
     for (let i = 0; i < this.segments.length; i += step) {
       const s = this.segments[i];
       state.foods.push({
-        x: s.x + rand(-6, 6),
-        y: s.y + rand(-6, 6),
-        r: 3 + Math.random() * 2,
-        color: this.color,
+        x: s.x + rand(-6, 6), y: s.y + rand(-6, 6),
+        r: 3 + Math.random() * 2, color: this.color,
       });
     }
     this.segments = [];
@@ -411,7 +544,6 @@ function botAI(worm, dt) {
     worm.ai.wanderAngle += rand(-0.1, 0.1);
     worm.targetAngle = worm.ai.wanderAngle;
   }
-
   worm.boosting = Math.random() < worm.ai.boostChance && worm.segments.length > 25;
 }
 
@@ -479,26 +611,28 @@ function update(dt) {
   }
 }
 
+// --- FIX: nur steuern, wenn es echte Eingabe gibt ---
 function playerControl(worm) {
   const h = worm.head;
-  let tx, ty;
 
   if (input.joyActive) {
     const dx = input.joyX - input.joyBaseX;
     const dy = input.joyY - input.joyBaseY;
     const dist = Math.hypot(dx, dy);
-    if (dist / input.joyRadius < input.joyDeadzone) {
-      return;
+    if (dist / input.joyRadius >= input.joyDeadzone) {
+      worm.targetAngle = Math.atan2(dy, dx);
     }
-    tx = h.x + dx;
-    ty = h.y + dy;
-  } else {
+    // sonst: Richtung beibehalten
+  } else if (input.hasMouse) {
     const wx = state.camera.x + (input.mouseX - VW / 2);
     const wy = state.camera.y + (input.mouseY - VH / 2);
-    tx = wx; ty = wy;
+    const dx = wx - h.x, dy = wy - h.y;
+    if (Math.hypot(dx, dy) > 6) {
+      worm.targetAngle = Math.atan2(dy, dx);
+    }
   }
+  // kein Input → aktuelle Richtung bleibt → Wurm läuft einfach weiter
 
-  worm.targetAngle = Math.atan2(ty - h.y, tx - h.x);
   worm.boosting = input.boost && worm.segments.length > 12;
 }
 
@@ -572,7 +706,6 @@ function render() {
   ctx.fillRect(0, 0, VW, VH);
 
   const cam = state.camera;
-
   ctx.save();
   ctx.translate(VW / 2, VH / 2);
   ctx.translate(-cam.x, -cam.y);
@@ -631,7 +764,6 @@ function render() {
   }
 
   ctx.restore();
-
   drawMinimap();
   drawJoystick();
 }
@@ -639,7 +771,6 @@ function render() {
 function drawWorm(worm, isPlayer) {
   const segs = worm.segments;
   if (segs.length < 2) return;
-
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
 
@@ -686,8 +817,8 @@ function drawWorm(worm, isPlayer) {
   ctx.beginPath(); ctx.arc(ex1, ey1, 3, 0, Math.PI * 2); ctx.fill();
   ctx.beginPath(); ctx.arc(ex2, ey2, 3, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = '#000';
-  ctx.beginPath(); ctx.arc(ex1 + Math.cos(worm.angle) * 1, ey1 + Math.sin(worm.angle) * 1, 1.5, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(ex2 + Math.cos(worm.angle) * 1, ey2 + Math.sin(worm.angle) * 1, 1.5, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(ex1 + Math.cos(worm.angle), ey1 + Math.sin(worm.angle), 1.5, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(ex2 + Math.cos(worm.angle), ey2 + Math.sin(worm.angle), 1.5, 0, Math.PI * 2); ctx.fill();
 
   if (!isPlayer) {
     ctx.font = 'bold 11px system-ui';
@@ -706,14 +837,11 @@ function drawMinimap() {
   ctx.strokeStyle = '#2a3552';
   ctx.lineWidth = 1;
   ctx.strokeRect(x, y, size, size);
-
   const s = size / CFG.worldSize;
-
   ctx.beginPath();
   ctx.arc(x + state.zone.x * s, y + state.zone.y * s, state.zone.radius * s, 0, Math.PI * 2);
   ctx.strokeStyle = 'rgba(255,80,110,0.7)';
   ctx.stroke();
-
   for (const w of state.worms) {
     if (!w.alive) continue;
     const px = x + w.head.x * s;
@@ -729,7 +857,6 @@ function drawJoystick() {
   if (!IS_TOUCH || !input.joyActive) return;
   const bx = input.joyBaseX, by = input.joyBaseY;
   const R = input.joyRadius;
-
   ctx.beginPath();
   ctx.arc(bx, by, R, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(255,255,255,0.06)';
@@ -737,13 +864,10 @@ function drawJoystick() {
   ctx.strokeStyle = 'rgba(108,204,255,0.5)';
   ctx.lineWidth = 2;
   ctx.stroke();
-
   const dx = input.joyX - bx, dy = input.joyY - by;
   const d = Math.hypot(dx, dy);
-  const maxD = R;
   let sx = dx, sy = dy;
-  if (d > maxD) { sx = dx / d * maxD; sy = dy / d * maxD; }
-
+  if (d > R) { sx = dx / d * R; sy = dy / d * R; }
   ctx.beginPath();
   ctx.arc(bx + sx, by + sy, R * 0.42, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(108,204,255,0.55)';
@@ -768,16 +892,9 @@ function updateHUD() {
   const alive = state.worms.filter(w => w.alive);
   uiAlive.textContent = alive.length;
   uiTime.textContent = fmtTime(state.time);
-
   const sorted = [...state.worms].filter(w => w.alive)
     .sort((a, b) => b.segments.length - a.segments.length);
-  if (p.alive) {
-    const rank = sorted.indexOf(p) + 1;
-    uiRank.textContent = rank + '/' + (alive.length);
-  } else {
-    uiRank.textContent = '—';
-  }
-
+  uiRank.textContent = p.alive ? (sorted.indexOf(p) + 1) + '/' + alive.length : '—';
   const closed = state.time >= CFG.respawnUntil;
   uiStatus.innerHTML = closed
     ? '<span id="status-closed">No respawn</span>'
@@ -788,7 +905,6 @@ function updateHUD() {
 // MATCH END
 // ============================================================
 const overlay = document.getElementById('overlay');
-const card = document.getElementById('card');
 const death = document.getElementById('death');
 
 function endMatch(alive) {
@@ -809,24 +925,33 @@ function endMatch(alive) {
   const isWinner = winner === state.player;
   let title, text;
   if (isWinner) {
-    title = '<h1>Victory!</h1>';
+    title = 'Victory!';
     text = 'You are the last worm standing.';
   } else if (!playerAlive && state.time < CFG.matchDuration && alive.length > 0) {
-    title = '<h1 style="color:#f88;">Eliminated</h1>';
+    title = 'Eliminated';
     text = `Killed after respawn closed. Winner: <b style="color:${winner.color}">${winner.name}</b>.`;
   } else if (playerAlive) {
-    title = '<h1>Match Over</h1>';
+    title = 'Match Over';
     text = `Time ran out. Winner: <b style="color:${winner.color}">${winner.name}</b> (mass ${winner.segments.length}).`;
   } else {
-    title = '<h1>Match Over</h1>';
+    title = 'Match Over';
     text = `Winner: <b style="color:${winner.color}">${winner.name}</b>.`;
   }
 
-  card.innerHTML = `
-    ${title}
-    <p>${text}</p>
-    <p style="margin-top:6px;font-size:12px;">Your rank: ${rankOf(state.player)} &nbsp;•&nbsp; Mass: ${state.player.segments.length || 0}</p>
-    <button id="againBtn">Play Again</button>
+  overlay.innerHTML = `
+    <div class="dots"></div>
+    <div class="menu-card">
+      <h1 class="menu-title" style="margin-bottom:14px;">
+        <span class="${isWinner ? 't1' : 't2'}">${title}</span>
+      </h1>
+      <p class="menu-sub" style="text-transform:none;letter-spacing:0;">${text}</p>
+      <div class="menu-stats">
+        <div class="stat"><div class="stat-v">${rankOf(state.player)}</div><div class="stat-l">Your rank</div></div>
+        <div class="stat"><div class="stat-v">${state.player.segments.length || 0}</div><div class="stat-l">Your mass</div></div>
+        <div class="stat"><div class="stat-v">${fmtTime(state.time)}</div><div class="stat-l">Duration</div></div>
+      </div>
+      <button class="menu-play" id="againBtn">PLAY AGAIN</button>
+    </div>
   `;
   overlay.classList.remove('hidden');
   document.getElementById('againBtn').onclick = startMatch;
@@ -843,11 +968,12 @@ function rankOf(worm) {
 }
 
 // ============================================================
-// INPUT — MOUSE (desktop)
+// INPUT — MOUSE
 // ============================================================
 canvas.addEventListener('mousemove', e => {
   input.mouseX = e.clientX;
   input.mouseY = e.clientY;
+  input.hasMouse = true;    // <— FIX
 });
 canvas.addEventListener('mousedown', e => { if (e.button === 0) input.boost = true; });
 window.addEventListener('mouseup', () => { input.boost = false; });
@@ -861,7 +987,7 @@ window.addEventListener('keyup', e => {
 });
 
 // ============================================================
-// INPUT — TOUCH (mobile)
+// INPUT — TOUCH
 // ============================================================
 function touchStart(e) {
   for (const t of e.changedTouches) {
@@ -893,13 +1019,11 @@ function touchEnd(e) {
   }
   e.preventDefault();
 }
-
 canvas.addEventListener('touchstart', touchStart, { passive: false });
 canvas.addEventListener('touchmove', touchMove, { passive: false });
 canvas.addEventListener('touchend', touchEnd, { passive: false });
 canvas.addEventListener('touchcancel', touchEnd, { passive: false });
 
-// Boost button
 const boostBtn = document.getElementById('boostBtn');
 function boostOn(e) {
   input.boost = true;
@@ -931,7 +1055,6 @@ function loop(t) {
     update(dt);
     render();
     updateHUD();
-
     const p = state.player;
     if (!p.alive && state.time < CFG.respawnUntil) {
       death.style.display = 'block';
@@ -941,7 +1064,6 @@ function loop(t) {
   } else if (state && state.paused) {
     render();
   }
-
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
@@ -955,6 +1077,7 @@ function startMatch() {
   input.joyActive = false;
   input.joyId = null;
   input.boost = false;
+  input.hasMouse = false;      // Reset — erst nach echter Mausbewegung steuern
   boostBtn.classList.remove('active');
   state = createMatch();
   lastT = performance.now();
