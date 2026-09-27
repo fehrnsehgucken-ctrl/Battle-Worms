@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Battle-Worms</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  html,body { height:100%; overflow:hidden; background:#070b14;
+              font-family:system-ui,sans-serif; color:#fff; user-select:none;
+              touch-action: none; }
+  canvas { display:block; }
+  #hud {
+    position:fixed; top:14px; left:14px; background:rgba(0,0,0,0.5);
+    padding:12px 16px; border-radius:10px; font-size:13px; line-height:1.6;
+    pointer-events:none; min-width:170px; backdrop-filter: blur(4px);
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  #hud .row { display:flex; justify-content:space-between; gap:16px; }
+  #hud .label { color:#7a8db5; font-size:11px; text-transform:uppercase; letter-spacing:1px; }
+  #hud .val { font-weight:600; }
+  #status-open { color:#6cf; }
+  #status-closed { color:#f88; }
+  #overlay {
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    background:rgba(5,8,16,0.92); z-index:10; backdrop-filter: blur(6px);
+  }
+  #overlay.hidden { display:none; }
+  .card {
+    background:#0f1626; padding:34px 44px; border-radius:16px; text-align:center;
+    border:1px solid #1f2a44; max-width:440px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  .card h1 { margin:0 0 8px; font-size:38px; letter-spacing:2px; }
+  .card h1 span {>< color:#6cfspan; }
+  .card p { color:#8ba class0c5; margin:0 0 20px; font-size:="14px; line-height:1val.6; }
+  ."card p .warn { color:#f88; }
+  .card button {
+    background:#6cf; color:#04182e; border:0; padding:12px 30px;
+    font-size:16px; font-weight:700; border-radius:8px; cursor:pointer;
+    letter-spacing:0.5px; transition:transform .1s, background .15s;
+  }
+  .card button:hover { background:#8df; transform:translateY(-1px); }
+  .hint { margin-top:18px; color:#5a6a85; font-size:12px; line-height:1.7; }
+  .hint b { color:#8ba0c5; font-weight:600; }
+  #death {
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    text-align:center; pointer-events:none; display:none; z-index:5;
+  }
+  #death h2 { font-size:44px; margin:0 0 6px; color:#f55; text-shadow:0 0 30px #f55; }
+  #death p { color:#fff; font-size:16px; }
+
+  /* ---- Mobile Controls ---- */
+  #boostBtn {
+    position:fixed; bottom:30px; left:30px;   /* <-- LINKS statt rechts */
+    width:96px; height:96px; border-radius:50%;
+    background:rgba(108,204,255,0.18);
+    border:2px solid rgba(108,204,255,0.55);
+    display:none; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700; letter-spacing:1px; color:#6cf;
+    z-index:8; pointer-events:auto;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 24px rgba(108,204,255,0.25);
+    transition: background .1s, transform .1s;
+  }
+  #boostBtn.active {
+    background:rgba(108,204,255,0.42);
+    transform: scale(0.94);
+  }
+  body.touch #boostBtn { display:flex; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <div class="row"><span class="label">Mass</span><span class="val" id="ui-mass">20</span></div>
+  <div class="row"><span class="label">Rank</span><span class="val" id="ui-rank">1/21</span></div>
+  <div class="row"><span class="label">Alive</span><span class="val" id="ui-alive">21</span></div>
+  <div class="row"><span class="label">Time</span id="ui-time">0:00</span></div>
+  <div class="row"><span class="label">Status</span><span class="val" id="ui-status"><span id="status-open">Respawn open</span></span></div>
+</div>
+
+<div id="boostBtn">BOOST</div>
+
+<div id="death">
+  <h2>ELIMINATED</h2>
+  <p>Respawning…</p>
+</div>
+
+<div id="overlay">
+  <div class="card" id="card">
+    <h1>Battle<span>-Worms</span></h1>
+    <p>A slither-style battle royale.<br>Grow. Cut off. Survive.<br><span class="warn">Respawn closes after 2:30.</span></p>
+    <button id="startBtn">Start Match</button>
+    <div class="hint">
+      <b>Desktop:</b> Mouse + Click/Space to boost<br>
+      <b>Mobile:</b> Drag anywhere to steer, hold BOOST
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const CFG = {
+  worldSize: 4200,
+  zoneStart: 2000,
+  zoneEnd: 180,
+  matchDuration: 4 * 60,
+  respawnUntil: 2.5 * 60,
+  bots: 20,
+  food: 650,
+  segSpacing: 4,
+  speed: 2.3,
+  boostSpeed: 5.0,
+  turnRate: 0.20,
+  startSegments: 20,
+  maxSegments: 260,
+  headRadius: 11,
+  bodyRadius: 10,
+  collisionRadius: 9,
+  respawnDelay: 2.0,
+  spawnInvuln: 2.0,
+};
+
+const BOT_NAMES = ['Rex','Blaze','Venom','Storm','Fang','Nyx','Echo','Ghost','Rogue','Titan',
+  'Viper','Onyx','Cinder','Frost','Karma','Zephyr','Havoc','Pixel','Wraith','Nova'];
+const BOT_COLORS = ['#ff6b6b','#feca57','#48dbfb','#ff9ff3','#54a0ff','#5f27cd','#00d2d3',
+  '#ff9f43','#ee5a6f','#1dd1a1','#f368e0','#ff6348','#2ed573','#ffa502','#7bed9f','#70a1ff',
+  '#ff7f50','#00cec9','#fd79a8','#c8d6e5'];
+
+// ============================================================
+// CANVAS
+// ============================================================
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let VW = 0, VH = 0;
+
+function resize() {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  VW = window.innerWidth;
+  VH = window.innerHeight;
+  canvas.width = VW * dpr;
+  canvas.height = VH * dpr;
+  canvas.style.width = VW + 'px';
+  canvas.style.height = VH + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', () => setTimeout(resize, 100));
+resize();
+
+// ============================================================
+// DEVICE DETECTION
+// ============================================================
+const IS_TOUCH = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+if (IS_TOUCH) document.body.classList.add('touch');
+
+// ============================================================
+// HELPERS
+// ============================================================
+const rand = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+function fmtTime(s) {
+  s = Math.max(0, s);
+  return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+}
+function angleDiff(a, b) {
+  let d = a - b;
+  while (d > Math.PI) d -= Math.PI * 2;
+  while (d < -Math.PI) d += Math.PI * 2;
+  return d;
+}
+
+// ============================================================
+// INPUT STATE
+// ============================================================
+const input = {
+  boost: false,
+  mouseX: window.innerWidth / 2,
+  mouseY: window.innerHeight / 2,
+  joyActive: false,
+  joyId: null,
+  joyBaseX: 0, joyBaseY: 0,
+  joyX: 0, joyY: 0,
+  joyRadius: 70,
+  joyDeadzone: 0.15,
+};
+
+// ============================================================
+// WORM
+// ============================================================
+class Worm {
+  constructor(o) {
+    this.id = o.id;
+    this.name = o.name;
+    this.isBot = !!o.isBot;
+    this.color = o.color;
+    this.alive = true;
+    this.deathTime = -1;
+    this.spawnTime = o.time || 0;
+    this.angle = o.angle ?? Math.random() * Math.PI * 2;
+    this.targetAngle = this.angle;
+    this.boosting = false;
+    this.boostDrain = 0;
+    this.zoneDmg = 0;
+    this.segments = [];
+    const dist = o.startLen ?? CFG.startSegments;
+    for (let i = 0; i < dist; i++) {
+      this.segments.push({
+        x: o.x - Math.cos(this.angle) * i * CFG.segSpacing,
+        y: o.y - Math.sin(this.angle) * i * CFG.segSpacing,
+      });
+    }
+    this.ai = this.isBot ? {
+      target: null,
+      retargetAt: 0,
+      wanderAngle: this.angle,
+      boostChance: 0.004 + Math.random() * 0.008,
+      aggression: Math.random(),
+    } : null;
+  }
+
+  get head() { return this.segments[0]; }
+
+  update(dt) {
+    if (!this.alive) return;
+
+    const diff = angleDiff(this.targetAngle, this.angle);
+    const maxTurn = CFG.turnRate;
+    if (Math.abs(diff) < maxTurn) this.angle = this.targetAngle;
+    else this.angle += Math.sign(diff) * maxTurn;
+
+    const speed = (this.boosting ? CFG.boostSpeed : CFG.speed);
+    const step = speed * dt * 60;
+
+    const head = this.head;
+    head.x += Math.cos(this.angle) * step;
+    head.y += Math.sin(this.angle) * step;
+
+    for (let i = 1; i < this.segments.length; i++) {
+      const prev = this.segments[i - 1];
+      const cur = this.segments[i];
+      const dx = prev.x - cur.x;
+      const dy = prev.y - cur.y;
+      const d = Math.hypot(dx, dy) || 1;
+      if (d > CFG.segSpacing) {
+        const t = (d - CFG.segSpacing) / d;
+        cur.x += dx * t;
+        cur.y += dy * t;
+      }
+    }
+
+    if (this.boosting && this.segments.length > 12) {
+      this.boostDrain += dt;
+      if (this.boostDrain > 0.18) {
+        this.boostDrain = 0;
+        const tail = this.segments[this.segments.length - 1];
+        state.foods.push({ x: tail.x, y: tail.y, r: 2.5, color: this.color });
+        this.segments.pop();
+      }
+    }
+  }
+
+  grow(n) {
+    const target = Math.min(CFG.maxSegments, this.segments.length + n);
+    while (this.segments.length < target) {
+      const last = this.segments[this.segments.length - 1];
+      this.segments.push({ x: last.x, y: last.y });
+    }
+  }
+
+  die() {
+    if (!this.alive) return;
+    this.alive = false;
+    this.deathTime = state.time;
+    const step = Math.max(1, Math.floor(this.segments.length / 40));
+    for (let i = 0; i < this.segments.length; i += step) {
+      const s = this.segments[i];
+      state.foods.push({
+        x: s.x + rand(-6, 6),
+        y: s.y + rand(-6, 6),
+        r: 3 + Math.random() * 2,
+        color: this.color,
+      });
+    }
+    this.segments = [];
+  }
+}
+
+// ============================================================
+// STATE / MATCH
+// ============================================================
+let state = null;
+
+function randomFood() {
+  return {
+    x: Math.random() * CFG.worldSize,
+    y: Math.random() * CFG.worldSize,
+    r: 2 + Math.random() * 2.5,
+    color: Math.random() < 0.5
+      ? `hsl(${Math.floor(Math.random() * 360)},80%,65%)`
+      : '#c8d6e5',
+  };
+}
+
+function createMatch() {
+  const cx = CFG.worldSize / 2;
+  const cy = CFG.worldSize / 2;
+  const worms = [];
+  const foods = [];
+  for (let i = 0; i < CFG.food; i++) foods.push(randomFood());
+
+  const player = new Worm({
+    id: 'player', name: 'You', isBot: false,
+    x: cx + rand(-400, 400), y: cy + rand(-400, 400),
+    color: '#6cf', angle: rand(0, Math.PI * 2),
+    time: 0,
+  });
+  worms.push(player);
+
+  for (let i = 0; i < CFG.bots; i++) {
+    const ang = Math.random() * Math.PI * 2;
+    const r = 600 + Math.random() * 1200;
+    worms.push(new Worm({
+      id: 'bot' + i,
+      name: BOT_NAMES[i % BOT_NAMES.length],
+      isBot: true,
+      x: cx + Math.cos(ang) * r,
+      y: cy + Math.sin(ang) * r,
+      color: BOT_COLORS[i % BOT_COLORS.length],
+      time: 0,
+    }));
+  }
+
+  return {
+    worms, foods,
+    time: 0,
+    player,
+    camera: { x: player.head.x, y: player.head.y },
+    zone: { x: cx, y: cy, radius: CFG.zoneStart },
+    matchOver: false,
+    paused: false,
+  };
+}
+
+// ============================================================
+// BOT AI
+// ============================================================
+function botAI(worm, dt) {
+  const head = worm.head;
+  const zx = state.zone.x, zy = state.zone.y;
+  const dxc = head.x - zx, dyc = head.y - zy;
+  const distC = Math.hypot(dxc, dyc);
+
+  if (distC > state.zone.radius - 180) {
+    worm.targetAngle = Math.atan2(-dyc, -dxc);
+    worm.boosting = worm.segments.length > 30;
+    return;
+  }
+
+  const look = 70;
+  const ax = head.x + Math.cos(worm.angle) * look;
+  const ay = head.y + Math.sin(worm.angle) * look;
+  let danger = false;
+  for (const other of state.worms) {
+    if (other === worm || !other.alive) continue;
+    if (Math.hypot(other.head.x - head.x, other.head.y - head.y) > 300 + other.segments.length * CFG.segSpacing * 0.6)
+      continue;
+    for (let i = 2; i < other.segments.length; i += 3) {
+      const s = other.segments[i];
+      const dx = s.x - ax, dy = s.y - ay;
+      if (dx * dx + dy * dy < 900) { danger = true; break; }
+    }
+    if (danger) break;
+  }
+  if (danger) {
+    worm.targetAngle = worm.angle + (Math.random() < 0.5 ? 1 : -1) * 1.3;
+    worm.boosting = true;
+    return;
+  }
+
+  if (worm.ai.aggression > 0.6 && state.player.alive && worm !== state.player) {
+    const ph = state.player.head;
+    const d = Math.hypot(ph.x - head.x, ph.y - head.y);
+    if (d < 400 && worm.segments.length > state.player.segments.length * 0.8) {
+      const px = ph.x + Math.cos(state.player.angle) * 80;
+      const py = ph.y + Math.sin(state.player.angle) * 80;
+      worm.targetAngle = Math.atan2(py - head.y, px - head.x);
+      worm.boosting = true;
+      return;
+    }
+  }
+
+  worm.ai.retargetAt -= dt;
+  if (worm.ai.retargetAt <= 0 || !worm.ai.target) {
+    let best = null, bestD = Infinity;
+    for (const f of state.foods) {
+      const dx = f.x - head.x, dy = f.y - head.y;
+      const d = dx * dx + dy * dy;
+      if (d < bestD) { bestD = d; best = f; }
+    }
+    worm.ai.target = best;
+    worm.ai.retargetAt = 0.8 + Math.random() * 1.2;
+  }
+  if (worm.ai.target) {
+    worm.targetAngle = Math.atan2(worm.ai.target.y - head.y, worm.ai.target.x - head.x);
+  } else {
+    worm.ai.wanderAngle += rand(-0.1, 0.1);
+    worm.targetAngle = worm.ai.wanderAngle;
+  }
+
+  worm.boosting = Math.random() < worm.ai.boostChance && worm.segments.length > 25;
+}
+
+// ============================================================
+// UPDATE
+// ============================================================
+function update(dt) {
+  state.time += dt;
+
+  const p = clamp(state.time / CFG.matchDuration, 0, 1);
+  state.zone.radius = CFG.zoneStart + (CFG.zoneEnd - CFG.zoneStart) * p;
+
+  for (const worm of state.worms) {
+    if (!worm.alive) {
+      if (worm === state.player &&
+          state.time < CFG.respawnUntil &&
+          state.time - worm.deathTime > CFG.respawnDelay) {
+        respawnPlayer();
+      }
+      continue;
+    }
+
+    if (worm === state.player) playerControl(worm);
+    else botAI(worm, dt);
+
+    worm.update(dt);
+
+    const h = worm.head;
+    if (h.x < 0 || h.x > CFG.worldSize || h.y < 0 || h.y > CFG.worldSize) {
+      worm.die();
+      continue;
+    }
+
+    const dx = h.x - state.zone.x, dy = h.y - state.zone.y;
+    if (Math.hypot(dx, dy) > state.zone.radius) {
+      worm.zoneDmg += dt;
+      if (worm.zoneDmg > 0.2) {
+        worm.zoneDmg = 0;
+        if (worm.segments.length > 3) worm.segments.pop();
+        else worm.die();
+      }
+    } else worm.zoneDmg = 0;
+  }
+
+  checkCollisions();
+  checkFood();
+
+  while (state.foods.length < CFG.food) state.foods.push(randomFood());
+
+  const p2 = state.player;
+  if (p2.alive) {
+    const h = p2.head;
+    state.camera.x += (h.x - state.camera.x) * Math.min(1, 8 * dt);
+    state.camera.y += (h.y - state.camera.y) * Math.min(1, 8 * dt);
+  }
+
+  const alive = state.worms.filter(w => w.alive);
+  const respawnClosed = state.time >= CFG.respawnUntil;
+  const playerOut = !p2.alive && respawnClosed;
+
+  if (!state.matchOver) {
+    if (alive.length <= 1 || state.time >= CFG.matchDuration || playerOut) {
+      endMatch(alive);
+    }
+  }
+}
+
+function playerControl(worm) {
+  const h = worm.head;
+  let tx, ty;
+
+  if (input.joyActive) {
+    const dx = input.joyX - input.joyBaseX;
+    const dy = input.joyY - input.joyBaseY;
+    const dist = Math.hypot(dx, dy);
+    if (dist / input.joyRadius < input.joyDeadzone) {
+      return;
+    }
+    tx = h.x + dx;
+    ty = h.y + dy;
+  } else {
+    const wx = state.camera.x + (input.mouseX - VW / 2);
+    const wy = state.camera.y + (input.mouseY - VH / 2);
+    tx = wx; ty = wy;
+  }
+
+  worm.targetAngle = Math.atan2(ty - h.y, tx - h.x);
+  worm.boosting = input.boost && worm.segments.length > 12;
+}
+
+function checkCollisions() {
+  for (const worm of state.worms) {
+    if (!worm.alive) continue;
+    const h = worm.head;
+    const hR = CFG.collisionRadius;
+    let dead = false;
+    for (const other of state.worms) {
+      if (other === worm || !other.alive) continue;
+      const far = (other.head.x - h.x) ** 2 + (other.head.y - h.y) ** 2;
+      const maxLen = other.segments.length * CFG.segSpacing;
+      if (far > (maxLen + 100) ** 2) continue;
+
+      const hh = Math.hypot(other.head.x - h.x, other.head.y - h.y);
+      if (hh < hR * 2) {
+        if (worm.segments.length <= other.segments.length) { worm.die(); dead = true; break; }
+      }
+      for (let i = 2; i < other.segments.length; i += 2) {
+        const s = other.segments[i];
+        const dx = s.x - h.x, dy = s.y - h.y;
+        if (dx * dx + dy * dy < (hR + CFG.bodyRadius) ** 2) {
+          worm.die(); dead = true; break;
+        }
+      }
+      if (dead) break;
+    }
+  }
+}
+
+function checkFood() {
+  for (const worm of state.worms) {
+    if (!worm.alive) continue;
+    const h = worm.head;
+    const eatR = CFG.headRadius + 4;
+    for (let i = state.foods.length - 1; i >= 0; i--) {
+      const f = state.foods[i];
+      const dx = f.x - h.x, dy = f.y - h.y;
+      if (dx * dx + dy * dy < (eatR + f.r) ** 2) {
+        state.foods.splice(i, 1);
+        worm.grow(1);
+      }
+    }
+  }
+}
+
+function respawnPlayer() {
+  const p = state.player;
+  const ang = Math.random() * Math.PI * 2;
+  const r = Math.random() * state.zone.radius * 0.6;
+  const x = state.zone.x + Math.cos(ang) * r;
+  const y = state.zone.y + Math.sin(ang) * r;
+  const newWorm = new Worm({
+    id: 'player', name: 'You', isBot: false,
+    x, y, color: '#6cf', angle: ang, time: state.time,
+  });
+  const idx = state.worms.indexOf(p);
+  state.worms[idx] = newWorm;
+  state.player = newWorm;
+  state.camera.x = x;
+  state.camera.y = y;
+  document.getElementById('death').style.display = 'none';
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  ctx.fillStyle = '#070b14';
+  ctx.fillRect(0, 0, VW, VH);
+
+  const cam = state.camera;
+
+  ctx.save();
+  ctx.translate(VW / 2, VH / 2);
+  ctx.translate(-cam.x, -cam.y);
+
+  ctx.strokeStyle = '#152042';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(0, 0, CFG.worldSize, CFG.worldSize);
+
+  const gridStep = 200;
+  ctx.strokeStyle = 'rgba(40,60,110,0.25)';
+  ctx.lineWidth = 1;
+  const gx0 = Math.floor((cam.x - VW / 2) / gridStep) * gridStep;
+  const gy0 = Math.floor((cam.y - VH / 2) / gridStep) * gridStep;
+  ctx.beginPath();
+  for (let x = gx0; x < cam.x + VW / 2 + gridStep; x += gridStep) {
+    ctx.moveTo(x, cam.y - VH / 2);
+    ctx.lineTo(x, cam.y + VH / 2);
+  }
+  for (let y = gy0; y < cam.y + VH / 2 + gridStep; y += gridStep) {
+    ctx.moveTo(cam.x - VW / 2, y);
+    ctx.lineTo(cam.x + VW / 2, y);
+  }
+  ctx.stroke();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(cam.x - VW, cam.y - VH, VW * 2, VH * 2);
+  ctx.arc(state.zone.x, state.zone.y, state.zone.radius, 0, Math.PI * 2, true);
+  ctx.fillStyle = 'rgba(255,40,80,0.13)';
+  ctx.fill('evenodd');
+  ctx.restore();
+
+  ctx.beginPath();
+  ctx.arc(state.zone.x, state.zone.y, state.zone.radius, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(255,80,110,0.85)';
+  ctx.lineWidth = 4;
+  ctx.shadowColor = 'rgba(255,60,90,0.8)';
+  ctx.shadowBlur = 20;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  for (const f of state.foods) {
+    if (f.x < cam.x - VW / 2 - 20 || f.x > cam.x + VW / 2 + 20 ||
+        f.y < cam.y - VH / 2 - 20 || f.y > cam.y + VH / 2 + 20) continue;
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+    ctx.fillStyle = f.color;
+    ctx.fill();
+  }
+
+  for (const w of state.worms) {
+    if (!w.alive) continue;
+    if (w.head.x < cam.x - VW / 2 - 200 || w.head.x > cam.x + VW / 2 + 200) continue;
+    if (w.head.y < cam.y - VH / 2 - 200 || w.head.y > cam.y + VH / 2 + 200) continue;
+    drawWorm(w, w === state.player);
+  }
+
+  ctx.restore();
+
+  drawMinimap();
+  drawJoystick();
+}
+
+function drawWorm(worm, isPlayer) {
+  const segs = worm.segments;
+  if (segs.length < 2) return;
+
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  ctx.beginPath();
+  ctx.moveTo(segs[0].x, segs[0].y);
+  for (let i = 1; i < segs.length; i++) ctx.lineTo(segs[i].x, segs[i].y);
+  ctx.lineWidth = CFG.bodyRadius * 2 + (isPlayer ? 10 : 6);
+  ctx.strokeStyle = worm.color + '33';
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(segs[0].x, segs[0].y);
+  for (let i = 1; i < segs.length; i++) ctx.lineTo(segs[i].x, segs[i].y);
+  ctx.lineWidth = CFG.bodyRadius * 2;
+  ctx.strokeStyle = worm.color;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(segs[0].x, segs[0].y);
+  for (let i = 1; i < segs.length; i++) ctx.lineTo(segs[i].x, segs[i].y);
+  ctx.lineWidth = CFG.bodyRadius * 0.7;
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.stroke();
+
+  const h = segs[0];
+  ctx.beginPath();
+  ctx.arc(h.x, h.y, CFG.headRadius, 0, Math.PI * 2);
+  ctx.fillStyle = isPlayer ? '#ffffff' : worm.color;
+  ctx.fill();
+  if (isPlayer) {
+    ctx.strokeStyle = '#6cf';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  const perp = worm.angle + Math.PI / 2;
+  const forward = CFG.headRadius * 0.55;
+  const side = CFG.headRadius * 0.55;
+  const ex1 = h.x + Math.cos(worm.angle) * forward + Math.cos(perp) * side;
+  const ey1 = h.y + Math.sin(worm.angle) * forward + Math.sin(perp) * side;
+  const ex2 = h.x + Math.cos(worm.angle) * forward - Math.cos(perp) * side;
+  const ey2 = h.y + Math.sin(worm.angle) * forward - Math.sin(perp) * side;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(ex1, ey1, 3, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(ex2, ey2, 3, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(ex1 + Math.cos(worm.angle) * 1, ey1 + Math.sin(worm.angle) * 1, 1.5, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(ex2 + Math.cos(worm.angle) * 1, ey2 + Math.sin(worm.angle) * 1, 1.5, 0, Math.PI * 2); ctx.fill();
+
+  if (!isPlayer) {
+    ctx.font = 'bold 11px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fillText(worm.name, h.x, h.y - CFG.headRadius - 6);
+  }
+}
+
+function drawMinimap() {
+  const size = IS_TOUCH ? 100 : 140;
+  const pad = IS_TOUCH ? 14 : 16;
+  const x = VW - size - pad, y = pad;
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(x, y, size, size);
+  ctx.strokeStyle = '#2a3552';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x, y, size, size);
+
+  const s = size / CFG.worldSize;
+
+  ctx.beginPath();
+  ctx.arc(x + state.zone.x * s, y + state.zone.y * s, state.zone.radius * s, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(255,80,110,0.7)';
+  ctx.stroke();
+
+  for (const w of state.worms) {
+    if (!w.alive) continue;
+    const px = x + w.head.x * s;
+    const py = y + w.head.y * s;
+    ctx.beginPath();
+    ctx.arc(px, py, w === state.player ? 3 : 1.5, 0, Math.PI * 2);
+    ctx.fillStyle = w === state.player ? '#fff' : w.color;
+    ctx.fill();
+  }
+}
+
+function drawJoystick() {
+  if (!IS_TOUCH || !input.joyActive) return;
+  const bx = input.joyBaseX, by = input.joyBaseY;
+  const R = input.joyRadius;
+
+  ctx.beginPath();
+  ctx.arc(bx, by, R, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(108,204,255,0.5)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const dx = input.joyX - bx, dy = input.joyY - by;
+  const d = Math.hypot(dx, dy);
+  const maxD = R;
+  let sx = dx, sy = dy;
+  if (d > maxD) { sx = dx / d * maxD; sy = dy / d * maxD; }
+
+  ctx.beginPath();
+  ctx.arc(bx + sx, by + sy, R * 0.42, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(108,204,255,0.55)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(200,240,255,0.9)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+// ============================================================
+// HUD
+// ============================================================
+const uiMass = document.getElementById('ui-mass');
+const uiAlive = document.getElementById('ui-alive');
+const uiTime = document.getElementById('ui-time');
+const uiRank = document.getElementById('ui-rank');
+const uiStatus = document.getElementById('ui-status');
+
+function updateHUD() {
+  const p = state.player;
+  uiMass.textContent = p.alive ? p.segments.length : '—';
+  const alive = state.worms.filter(w => w.alive);
+  uiAlive.textContent = alive.length;
+  uiTime.textContent = fmtTime(state.time);
+
+  const sorted = [...state.worms].filter(w => w.alive)
+    .sort((a, b) => b.segments.length - a.segments.length);
+  if (p.alive) {
+    const rank = sorted.indexOf(p) + 1;
+    uiRank.textContent = rank + '/' + (alive.length);
+  } else {
+    uiRank.textContent = '—';
+  }
+
+  const closed = state.time >= CFG.respawnUntil;
+  uiStatus.innerHTML = closed
+    ? '<span id="status-closed">No respawn</span>'
+    : '<span id="status-open">Respawn open</span>';
+}
+
+// ============================================================
+// MATCH END
+// ============================================================
+const overlay = document.getElementById('overlay');
+const card = document.getElementById('card');
+const death = document.getElementById('death');
+
+function endMatch(alive) {
+  state.matchOver = true;
+  state.paused = true;
+
+  let winner = null;
+  if (alive.length === 1) winner = alive[0];
+  else {
+    let best = null;
+    for (const w of state.worms) {
+      if (!best || w.segments.length > best.segments.length) best = w;
+    }
+    winner = best;
+  }
+
+  const playerAlive = state.player.alive;
+  const isWinner = winner === state.player;
+  let title, text;
+  if (isWinner) {
+    title = '<h1>Victory!</h1>';
+    text = 'You are the last worm standing.';
+  } else if (!playerAlive && state.time < CFG.matchDuration && alive.length > 0) {
+    title = '<h1 style="color:#f88;">Eliminated</h1>';
+    text = `Killed after respawn closed. Winner: <b style="color:${winner.color}">${winner.name}</b>.`;
+  } else if (playerAlive) {
+    title = '<h1>Match Over</h1>';
+    text = `Time ran out. Winner: <b style="color:${winner.color}">${winner.name}</b> (mass ${winner.segments.length}).`;
+  } else {
+    title = '<h1>Match Over</h1>';
+    text = `Winner: <b style="color:${winner.color}">${winner.name}</b>.`;
+  }
+
+  card.innerHTML = `
+    ${title}
+    <p>${text}</p>
+    <p style="margin-top:6px;font-size:12px;">Your rank: ${rankOf(state.player)} &nbsp;•&nbsp; Mass: ${state.player.segments.length || 0}</p>
+    <button id="againBtn">Play Again</button>
+  `;
+  overlay.classList.remove('hidden');
+  document.getElementById('againBtn').onclick = startMatch;
+  death.style.display = 'none';
+  input.boost = false;
+  document.getElementById('boostBtn').classList.remove('active');
+}
+
+function rankOf(worm) {
+  const sorted = [...state.worms].filter(w => w.segments.length > 0)
+    .sort((a, b) => b.segments.length - a.segments.length);
+  const i = sorted.indexOf(worm);
+  return i < 0 ? '—' : (i + 1);
+}
+
+// ============================================================
+// INPUT — MOUSE (desktop)
+// ============================================================
+canvas.addEventListener('mousemove', e => {
+  input.mouseX = e.clientX;
+  input.mouseY = e.clientY;
+});
+canvas.addEventListener('mousedown', e => { if (e.button === 0) input.boost = true; });
+window.addEventListener('mouseup', () => { input.boost = false; });
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space') { input.boost = true; e.preventDefault(); }
+});
+window.addEventListener('keyup', e => {
+  if (e.code === 'Space') input.boost = false;
+});
+
+// ============================================================
+// INPUT — TOUCH (mobile)
+// ============================================================
+function touchStart(e) {
+  for (const t of e.changedTouches) {
+    if (input.joyActive) continue;
+    input.joyActive = true;
+    input.joyId = t.identifier;
+    input.joyBaseX = t.clientX;
+    input.joyBaseY = t.clientY;
+    input.joyX = t.clientX;
+    input.joyY = t.clientY;
+  }
+  e.preventDefault();
+}
+function touchMove(e) {
+  for (const t of e.changedTouches) {
+    if (t.identifier === input.joyId) {
+      input.joyX = t.clientX;
+      input.joyY = t.clientY;
+    }
+  }
+  e.preventDefault();
+}
+function touchEnd(e) {
+  for (const t of e.changedTouches) {
+    if (t.identifier === input.joyId) {
+      input.joyActive = false;
+      input.joyId = null;
+    }
+  }
+  e.preventDefault();
+}
+
+canvas.addEventListener('touchstart', touchStart, { passive: false });
+canvas.addEventListener('touchmove', touchMove, { passive: false });
+canvas.addEventListener('touchend', touchEnd, { passive: false });
+canvas.addEventListener('touchcancel', touchEnd, { passive: false });
+
+// Boost button
+const boostBtn = document.getElementById('boostBtn');
+function boostOn(e) {
+  input.boost = true;
+  boostBtn.classList.add('active');
+  e.preventDefault();
+  e.stopPropagation();
+}
+function boostOff(e) {
+  input.boost = false;
+  boostBtn.classList.remove('active');
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+}
+boostBtn.addEventListener('touchstart', boostOn, { passive: false });
+boostBtn.addEventListener('touchend', boostOff, { passive: false });
+boostBtn.addEventListener('touchcancel', boostOff, { passive: false });
+boostBtn.addEventListener('mousedown', boostOn);
+boostBtn.addEventListener('mouseup', boostOff);
+boostBtn.addEventListener('mouseleave', boostOff);
+
+// ============================================================
+// LOOP
+// ============================================================
+let lastT = performance.now();
+function loop(t) {
+  const dt = Math.min(0.05, (t - lastT) / 1000);
+  lastT = t;
+
+  if (state && !state.paused) {
+    update(dt);
+    render();
+    updateHUD();
+
+    const p = state.player;
+    if (!p.alive && state.time < CFG.respawnUntil) {
+      death.style.display = 'block';
+    } else {
+      death.style.display = 'none';
+    }
+  } else if (state && state.paused) {
+    render();
+  }
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// ============================================================
+// START
+// ============================================================
+function startMatch() {
+  overlay.classList.add('hidden');
+  death.style.display = 'none';
+  input.joyActive = false;
+  input.joyId = null;
+  input.boost = false;
+  boostBtn.classList.remove('active');
+  state = createMatch();
+  lastT = performance.now();
+}
+
+document.getElementById('startBtn').onclick = startMatch;
+</script>
+</body>
+</html>
