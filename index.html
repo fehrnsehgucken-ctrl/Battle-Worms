@@ -481,7 +481,7 @@ const CFG = {
   suddenDeathDuration: 30,
   zoneRegrowDuration: 5,
   bots: 50,
-  food: 16000,                  // ★ 16000
+  food: 16000,
   segSpacing: 4,
   speed: 2.3,
   boostSpeed: 5.0,
@@ -501,7 +501,7 @@ const CFG = {
   outlineWidth: 2.2,
   zoneOffCenterMax: 0.30,
   foodGridCell: 600,
-  foodRefillPerFrame: 400,      // ★ Refill gedrosselt — verhindert Spike
+  foodRefillPerFrame: 400,
 };
 
 const BOT_NAMES = ['Rex','Blaze','Venom','Storm','Fang','Nyx','Echo','Ghost','Rogue','Titan',
@@ -618,10 +618,10 @@ const PRESET_WORMS = [
 ];
 const QUICK_OUTLINES = ['#0a0e1a','#000000','#2a2a3a','#ffffff','#e0e6f5','#5a1a2a','#1a3a2a','#3a2a1a'];
 
-// ★ Rank-Farben für Minimap (Körper)
-const MM_RANK_COLORS = ['#ffd479', '#a78bfa', '#7bffa8'];   // Gold, Lila, Grün
-// ★ Rank-Farben für Nametags (Sekundär 2 = Lila, 3 = Blau)
-const NT_RANK_COLORS = [null, '#ffffff', '#c9a3ff', '#7fbfff'];  // idx 0 unused
+// ★ Rank-Farben für Minimap (Körper): Gold / Lila / Blau
+const MM_RANK_COLORS = ['#ffd479', '#a78bfa', '#7fbfff'];
+// ★ Rank-Farben für Nametags: 1 = Weiß, 2 = Lila, 3 = Blau
+const NT_RANK_COLORS = [null, '#ffffff', '#c9a3ff', '#7fbfff'];
 
 // ============================================================
 // CANVAS
@@ -1161,16 +1161,14 @@ function scoreDirection(worm, ang, nearby, nearestFood, nearestFoodD) {
 function update(dt) {
   state.time += dt;
 
-  // ★ Intermission: zählt hoch, startet neue Runde — DAS ist der Bug-Fix
   if (state.intermission) {
     state.intermissionElapsed += dt;
     if (state.intermissionElapsed >= CFG.intermissionDuration) {
       startNewRound();
     }
-    return;  // während Intermission keine weitere Spiel-Logik
+    return;
   }
 
-  // Zonen-Update
   if (state.zoneRegrowing) {
     state.zoneRegrowT = Math.min(1, state.zoneRegrowT + dt / CFG.zoneRegrowDuration);
     state.zone.radius = CFG.zoneMin + (CFG.zoneStart - CFG.zoneMin) * state.zoneRegrowT;
@@ -1190,7 +1188,6 @@ function update(dt) {
 
   state.roundElapsed += dt;
 
-  // Spatial Grid
   rebuildFoodGrid();
 
   for (const worm of state.worms) {
@@ -1231,13 +1228,11 @@ function update(dt) {
   checkFood();
   updateParticles(dt);
 
-  // ★ Refill gedrosselt (max foodRefillPerFrame pro Frame)
   if (state.foods.length < CFG.food) {
     const need = Math.min(CFG.food - state.foods.length, CFG.foodRefillPerFrame);
     for (let i = 0; i < need; i++) state.foods.push(randomFood());
   }
 
-  // Bot-Respawn
   if (state.roundElapsed < CFG.respawnUntil) {
     for (let i = 0; i < state.worms.length; i++) {
       const w = state.worms[i];
@@ -1252,7 +1247,6 @@ function update(dt) {
     }
   }
 
-  // Kamera
   const p2 = state.player;
   if (p2.alive) {
     state.camera.freeCamActive = false;
@@ -1268,7 +1262,6 @@ function update(dt) {
   }
   state.camera.zoom += (state.camera.targetZoom - state.camera.zoom) * Math.min(1, 8 * dt);
 
-  // Rundenlogik
   if (!state.matchOver) {
     const alive = state.worms.filter(w => w.alive);
 
@@ -1404,7 +1397,6 @@ function startNewRound() {
   const finalCenter = pickFinalZoneCenter();
   const newWorms = [];
 
-  // ★ WICHTIG: Zone ZUERST zurücksetzen, damit findSafeSpawn() im neuen großen Kreis arbeitet
   state.zone.radius = CFG.zoneStart;
   state.zone.cx0 = cx; state.zone.cy0 = cy;
   state.zone.cx1 = finalCenter.x; state.zone.cy1 = finalCenter.y;
@@ -1565,7 +1557,7 @@ dsNameInput.addEventListener('touchstart', e => e.stopPropagation(), { passive: 
 // RENDER
 // ============================================================
 function render() {
-  computeRanks();  // ★ Top 3 markieren
+  computeRanks();
   const cam = state.camera;
   const zoom = cam.zoom;
   const visW = VW / zoom, visH = VH / zoom;
@@ -1743,7 +1735,6 @@ function drawWorm(worm, isPlayer, zoom) {
     ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.fill();
   }
 
-  // ★ Nametag mit Rank-Farbe (2. = Lila, 3. = Blau, sonst + 1. = Weiß)
   if (!isPlayer && zoom > 0.32) {
     const labelY = h.y - hr - 7;
     const fs = Math.max(10, 11 / Math.sqrt(zoom));
@@ -1773,13 +1764,11 @@ function drawMinimap() {
   ctx.save();
   roundRect(x, y, size, size, r); ctx.clip();
 
-  // Zone
   ctx.beginPath();
   ctx.arc(x + state.zone.x * s, y + state.zone.y * s, state.zone.radius * s, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(255,60,100,0.08)'; ctx.fill();
   ctx.strokeStyle = 'rgba(255,90,130,0.75)'; ctx.lineWidth = 1.2; ctx.stroke();
 
-  // ★ Top-3-Würmer: kompletter Körper als Polyline
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   for (const w of state.worms) {
@@ -1797,14 +1786,12 @@ function drawMinimap() {
     }
     ctx.stroke();
 
-    // Kopf-Punkt
     ctx.beginPath();
     ctx.arc(x + segs[0].x * s, y + segs[0].y * s, 3.2, 0, Math.PI * 2);
     ctx.fillStyle = col; ctx.fill();
     ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 1; ctx.stroke();
   }
 
-  // Spieler-Pfeil (immer sichtbar wenn am Leben)
   if (state.player.alive) {
     const px = x + state.player.head.x * s;
     const py = y + state.player.head.y * s;
