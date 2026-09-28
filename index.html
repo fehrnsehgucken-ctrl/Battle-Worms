@@ -15,7 +15,7 @@
     position:fixed; top:14px; left:14px;
     background: linear-gradient(160deg, rgba(20,30,55,0.7), rgba(10,16,32,0.65));
     padding:12px 16px; border-radius:14px; font-size:13px; line-height:1.6;
-    pointer-events:none; min-width:180px;
+    pointer-events:none; min-width:200px;
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     border:1px solid rgba(120,180,255,0.14);
     box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
@@ -26,10 +26,10 @@
   #ui-mass { color:#8ee0ff; }
   #ui-rank { color:#ffd479; }
   #ui-alive { color:#7bffa8; }
+  #ui-time { color:#a8e6ff; }
   #status-open { color:#6cf; }
   #status-closed { color:#f88; }
 
-  /* Leaderboard */
   #leaderboard {
     position: fixed; top: 180px; right: 18px; width: 200px;
     background: linear-gradient(160deg, rgba(20,30,55,0.78), rgba(10,16,32,0.72));
@@ -59,7 +59,6 @@
   #leaderboard .lb-count { color: #8ee0ff; font-weight: 800; font-variant-numeric: tabular-nums; font-size: 13px; min-width: 20px; text-align: right; }
   #leaderboard .lb-empty { color: #56678a; font-size: 12px; font-style: italic; padding: 4px 0; }
 
-  /* Victory / Draw Banner */
   #victoryBanner {
     position: fixed; top: 22px; left: 50%;
     transform: translate(-50%, -140px);
@@ -82,7 +81,6 @@
     text-transform: uppercase; font-weight: 700;
   }
 
-  /* Sudden Death Timer */
   #suddenDeath {
     position: fixed; top: 16%; left: 50%;
     transform: translateX(-50%);
@@ -203,7 +201,7 @@
   }
   #customizeBtn:hover { transform: translateY(-2px); border-color: rgba(140,210,255,0.6); }
   #customizeBtn svg { width: 16px; height: 16px; }
-  #customizeBtn .swatch { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 0 12px currentColor; }
+  #customizeBtn .swatch { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); }
 
   #customize {
     position: fixed; inset: 0; z-index: 12; overflow: hidden;
@@ -238,24 +236,34 @@
     display: flex; align-items: center; gap: 10px; }
   .cz-section-title::after { content:''; flex: 1; height: 1px;
     background: linear-gradient(90deg, rgba(120,180,255,0.2), transparent); }
+  .cz-name-wrap { margin-bottom: 4px; }
+  #czNameInput {
+    width: 100%; padding: 12px 16px;
+    background: rgba(0,0,0,0.28);
+    border: 1px solid rgba(120,180,255,0.22);
+    border-radius: 12px; color: #d8ecff;
+    font-size: 15px; font-weight: 700; font-family: inherit;
+    outline: none; transition: border-color .2s, background .2s;
+  }
+  #czNameInput::placeholder { color: #4f5e7e; font-weight: 500; }
+  #czNameInput:focus { border-color: rgba(140,210,255,0.7); background: rgba(0,0,0,0.4); }
   .cz-presets { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 10px; }
   .cz-preset { aspect-ratio: 1; border-radius: 14px;
     border: 2px solid rgba(255,255,255,0.10); cursor: pointer; position: relative;
-    transition: transform .15s, border-color .2s;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.35); }
+    transition: transform .15s, border-color .2s; }
   .cz-preset:hover { transform: translateY(-2px) scale(1.04); border-color: rgba(255,255,255,0.35); }
   .cz-preset.selected { border-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(140,210,255,0.5), 0 0 24px rgba(108,204,255,0.6); }
+    box-shadow: 0 0 0 3px rgba(140,210,255,0.5); }
   .cz-preset.selected::after { content:'✓'; position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
     font-size: 20px; font-weight: 900; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.7); }
   .cz-color-wrap { position: relative; border-radius: 12px; overflow: hidden;
     border: 1px solid rgba(120,180,255,0.22); background: rgba(0,0,0,0.25); cursor: pointer; }
-  #czColorInput { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; }
+  #czColorInput, #czOutlineInput { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; }
   .cz-color-preview { display: flex; align-items: center; justify-content: center;
     gap: 12px; padding: 16px; pointer-events: none; }
   .cz-color-dot { width: 32px; height: 32px; border-radius: 50%;
-    box-shadow: 0 0 18px currentColor; border: 2px solid rgba(255,255,255,0.7); }
+    border: 2px solid rgba(255,255,255,0.7); }
   .cz-color-hex { font-family: ui-monospace, monospace;
     font-size: 15px; font-weight: 700; letter-spacing: 1px; color: #d8ecff; }
   .cz-preset-colors { display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
@@ -278,18 +286,37 @@
   #deathScreen.on { display: flex; }
   #deathScreen .ds-card {
     pointer-events: auto; touch-action: manipulation;
-    background: linear-gradient(160deg, rgba(35,20,35,0.88), rgba(15,10,25,0.92));
+    background: linear-gradient(160deg, rgba(35,20,35,0.9), rgba(15,10,25,0.94));
     border: 1px solid rgba(255,90,120,0.35);
-    border-radius: 22px; padding: 22px 44px 26px;
+    border-radius: 22px; padding: 18px 40px 24px;
     text-align: center; backdrop-filter: blur(14px);
-    box-shadow: 0 24px 80px rgba(0,0,0,0.7), 0 0 60px rgba(255,60,90,0.20);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.7);
     animation: dsIn .45s cubic-bezier(.2,.9,.3,1.3);
     max-width: 440px; width: 100%;
   }
   @keyframes dsIn { from { opacity: 0; transform: translateY(40px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .ds-name-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px; padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,90,120,0.15);
+  }
+  .ds-name-row label {
+    font-size: 10px; color: #8a94b0; font-weight: 800;
+    letter-spacing: 1.5px; text-transform: uppercase;
+  }
+  .ds-name-row input {
+    flex: 1; padding: 7px 12px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,90,120,0.25);
+    border-radius: 9px;
+    color: #d8ecff; font-family: inherit; font-size: 13px; font-weight: 700;
+    outline: none; transition: border-color .2s;
+    min-width: 0;
+  }
+  .ds-name-row input:focus { border-color: rgba(255,120,150,0.8); }
   #deathScreen .ds-label { color: #ff6b8a; font-size: 11px; letter-spacing: 4px;
-    text-transform: uppercase; font-weight: 700; margin-bottom: 8px; }
-  #deathScreen .ds-name { font-size: clamp(28px, 7vw, 44px);
+    text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
+  #deathScreen .ds-name { font-size: clamp(26px, 7vw, 40px);
     font-weight: 900; letter-spacing: -1.2px; margin-bottom: 20px; line-height: 1.05; }
   #deathScreen .ds-btn {
     width: 100%; padding: 16px 0; font-size: 16px; font-weight: 800; letter-spacing: 4px;
@@ -323,7 +350,7 @@
     #customizeBtn { bottom: 18px; left: 18px; padding: 10px 16px 10px 14px; font-size: 11px; }
     .cz-card { padding: 20px 18px 22px; }
     #deathScreen { padding: 0 12px 24px; }
-    #deathScreen .ds-card { padding: 20px 26px 22px; }
+    #deathScreen .ds-card { padding: 14px 26px 20px; }
     #leaderboard { top: 132px; right: 14px; width: 160px; }
   }
 </style>
@@ -346,9 +373,9 @@
 
 <div id="hud">
   <div class="row"><span class="label">Mass</span><span class="val" id="ui-mass">20</span></div>
-  <div class="row"><span class="label">Rank</span><span class="val" id="ui-rank">1/21</span></div>
-  <div class="row"><span class="label">Alive</span><span class="val" id="ui-alive">21</span></div>
-  <div class="row"><span class="label">Time</span><span class="val" id="ui-time">0:00</span></div>
+  <div class="row"><span class="label">Rank</span><span class="val" id="ui-rank">1/51</span></div>
+  <div class="row"><span class="label">Alive</span><span class="val" id="ui-alive">51</span></div>
+  <div class="row"><span class="label" id="ui-time-label">Zone closes</span><span class="val" id="ui-time">4:00</span></div>
   <div class="row"><span class="label">Round</span><span class="val" id="ui-round">1</span></div>
   <div class="row"><span class="label">Status</span><span class="val" id="ui-status"><span id="status-open">Respawn open</span></span></div>
 </div>
@@ -362,6 +389,10 @@
 
 <div id="deathScreen">
   <div class="ds-card">
+    <div class="ds-name-row">
+      <label>Your name</label>
+      <input type="text" id="dsNameInput" maxlength="14" placeholder="You">
+    </div>
     <div class="ds-label">Killed by</div>
     <div class="ds-name" id="dsName">—</div>
     <button class="ds-btn" id="dsRespawn">RESPAWN</button>
@@ -373,7 +404,7 @@
     <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
   </svg>
   <span>Customize</span>
-  <span class="swatch" id="czBtnSwatch" style="background:#6ccfff; color:#6ccfff;"></span>
+  <span class="swatch" id="czBtnSwatch" style="background:#6ccfff;"></span>
 </button>
 
 <div id="overlay">
@@ -382,7 +413,7 @@
     <h1 class="menu-title"><span class="t1">Battle</span><span class="t2">-Worms</span></h1>
     <p class="menu-sub">Slither-style Battle Royale</p>
     <div class="menu-stats">
-      <div class="stat"><div class="stat-v">21</div><div class="stat-l">Worms</div></div>
+      <div class="stat"><div class="stat-v">51</div><div class="stat-l">Worms</div></div>
       <div class="stat"><div class="stat-v">4:00</div><div class="stat-l">Match</div></div>
       <div class="stat"><div class="stat-v">2:30</div><div class="stat-l">Respawn ends</div></div>
     </div>
@@ -398,18 +429,32 @@
   <div class="cz-card">
     <div class="cz-header"><h2>Customize Worm</h2><button class="cz-close" id="czClose">✕</button></div>
     <div class="cz-preview"><canvas id="czCanvas" width="380" height="120"></canvas></div>
-    <div class="cz-section-title">Presets</div>
+
+    <div class="cz-section-title">Name</div>
+    <div class="cz-name-wrap">
+      <input type="text" id="czNameInput" maxlength="14" placeholder="Enter your name" autocomplete="off">
+    </div>
+
+    <div class="cz-section-title">Body Color</div>
     <div class="cz-presets" id="czPresets"></div>
-    <div class="cz-section-title">Custom Color</div>
-    <div class="cz-color-wrap">
+    <div class="cz-color-wrap" style="margin-top:10px;">
       <input type="color" id="czColorInput" value="#6ccfff">
       <div class="cz-color-preview">
-        <div class="cz-color-dot" id="czColorDot" style="background:#6ccfff; color:#6ccfff;"></div>
+        <div class="cz-color-dot" id="czColorDot" style="background:#6ccfff;"></div>
         <div class="cz-color-hex" id="czColorHex">#6CCFFF</div>
       </div>
     </div>
-    <div class="cz-section-title">Quick Colors</div>
-    <div class="cz-preset-colors" id="czQuickColors"></div>
+
+    <div class="cz-section-title">Outline Color</div>
+    <div class="cz-preset-colors" id="czOutlineQuick"></div>
+    <div class="cz-color-wrap">
+      <input type="color" id="czOutlineInput" value="#0a0e1a">
+      <div class="cz-color-preview">
+        <div class="cz-color-dot" id="czOutlineDot" style="background:#0a0e1a;"></div>
+        <div class="cz-color-hex" id="czOutlineHex">#0A0E1A</div>
+      </div>
+    </div>
+
     <div class="cz-actions">
       <button class="cz-btn ghost" id="czReset">Reset</button>
       <button class="cz-btn primary" id="czSave">Save</button>
@@ -422,20 +467,21 @@
 // CONFIG
 // ============================================================
 const CFG = {
-  worldSize: 4200,
-  zoneStart: 1600,
-  zoneMin: 700,               // Zone schrumpft nur bis hierhin (2 große Würmer passen rein)
+  worldSize: 16800,
+  zoneStart: 6400,
+  zoneMin: 175,
   matchDuration: 4 * 60,
   respawnUntil: 2.5 * 60,
   intermissionDuration: 5,
-  suddenDeathDuration: 30,    // Sudden-Death-Timer
-  zoneRegrowDuration: 5,      // Zone wächst in dieser Zeit zurück
-  bots: 20,
-  food: 650,
+  suddenDeathDuration: 30,
+  zoneRegrowDuration: 5,
+  bots: 50,
+  food: 2600,
   segSpacing: 4,
   speed: 2.3,
   boostSpeed: 5.0,
-  turnRate: 0.20,
+  turnRate: 0.36,
+  turnSizePenalty: 0.60,
   startSegments: 20,
   maxSegments: 260,
   headRadius: 11,
@@ -443,10 +489,18 @@ const CFG = {
   collisionRadius: 9,
   maxParticles: 320,
   deathZoomMargin: 200,
+  safeSpawnDist: 350,
+  botRespawnDelay: 2.0,
+  botRespawnJitter: 2.0,
+  deathDropCount: 40,
+  outlineWidth: 2.2,
 };
 
 const BOT_NAMES = ['Rex','Blaze','Venom','Storm','Fang','Nyx','Echo','Ghost','Rogue','Titan',
-  'Viper','Onyx','Cinder','Frost','Karma','Zephyr','Havoc','Pixel','Wraith','Nova'];
+  'Viper','Onyx','Cinder','Frost','Karma','Zephyr','Havoc','Pixel','Wraith','Nova',
+  'Sable','Drift','Jinx','Rune','Saber','Talon','Umbra','Vortex','Warden','Xeno',
+  'Yara','Zenith','Ace','Bolt','Cobra','Dusk','Ember','Flux','Grit','Helix',
+  'Iris','Jolt','Krait','Lynx','Mirage','Nitro','Ozone','Prism','Quake','Rift'];
 const BOT_COLORS = ['#ff6b6b','#feca57','#48dbfb','#ff9ff3','#54a0ff','#5f27cd','#00d2d3',
   '#ff9f43','#ee5a6f','#1dd1a1','#f368e0','#ff6348','#2ed573','#ffa502','#7bed9f','#70a1ff',
   '#ff7f50','#00cec9','#fd79a8','#c8d6e5'];
@@ -466,16 +520,39 @@ function pickFoodTier() {
 }
 
 // ============================================================
-// PLAYER COLOR
+// PLAYER COLOR / NAME / OUTLINE
 // ============================================================
 const PLAYER_COLOR_KEY = 'battle-worms-color';
+const PLAYER_NAME_KEY = 'battle-worms-name';
+const PLAYER_OUTLINE_KEY = 'battle-worms-outline';
 const DEFAULT_PLAYER_COLOR = '#6ccfff';
+const DEFAULT_PLAYER_NAME = 'You';
+const DEFAULT_PLAYER_OUTLINE = '#0a0e1a';
+
 let playerColor = localStorage.getItem(PLAYER_COLOR_KEY) || DEFAULT_PLAYER_COLOR;
+let playerName = localStorage.getItem(PLAYER_NAME_KEY) || DEFAULT_PLAYER_NAME;
+let playerOutline = localStorage.getItem(PLAYER_OUTLINE_KEY) || DEFAULT_PLAYER_OUTLINE;
+
 function setPlayerColor(hex, save) {
   playerColor = hex;
   if (save) localStorage.setItem(PLAYER_COLOR_KEY, hex);
   const sw = document.getElementById('czBtnSwatch');
-  if (sw) { sw.style.background = hex; sw.style.color = hex; }
+  if (sw) sw.style.background = hex;
+}
+function setPlayerName(name, save) {
+  name = (name || '').trim().slice(0, 14) || DEFAULT_PLAYER_NAME;
+  playerName = name;
+  if (save) localStorage.setItem(PLAYER_NAME_KEY, name);
+  const a = document.getElementById('czNameInput');
+  const b = document.getElementById('dsNameInput');
+  if (a && a.value !== name) a.value = name;
+  if (b && b.value !== name) b.value = name;
+  if (state && state.player && state.player.alive) state.player.name = name;
+}
+function setPlayerOutline(hex, save) {
+  playerOutline = hex;
+  if (save) localStorage.setItem(PLAYER_OUTLINE_KEY, hex);
+  if (state && state.player && state.player.alive) state.player.outlineColor = hex;
 }
 
 // ============================================================
@@ -531,12 +608,7 @@ const PRESET_WORMS = [
   { name: 'Toxic', color: '#c9ff44' }, { name: 'Magenta', color: '#ff3fc7' },
   { name: 'Cyan', color: '#3fe8ff' }, { name: 'Obsidian', color: '#1a2238' },
 ];
-const QUICK_COLORS = [
-  '#ffffff','#d8ecff','#8ee0ff','#4ab5ff','#2a8dd6','#1a5f8f',
-  '#7bffa8','#2ed573','#00d2d3','#3fe8ff','#63e8ff','#5ab8ff',
-  '#ffd479','#ffcc44','#ff9a5b','#ff8a4a','#ff6348','#ff5577',
-  '#ff44aa','#ff6ec7','#a78bfa','#5f27cd','#e0e6f5','#c8d6e5',
-];
+const QUICK_OUTLINES = ['#0a0e1a','#000000','#2a2a3a','#ffffff','#e0e6f5','#5a1a2a','#1a3a2a','#3a2a1a'];
 
 // ============================================================
 // CANVAS
@@ -561,6 +633,11 @@ if (IS_TOUCH) document.body.classList.add('touch');
 const rand = (a, b) => a + Math.random() * (b - a);
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 function fmtTime(s) { s = Math.max(0, s); return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'); }
+function fmtShort(s) {
+  s = Math.max(0, s);
+  if (s >= 60) return Math.floor(s / 60) + ':' + String(Math.ceil(s % 60)).padStart(2, '0');
+  return Math.ceil(s) + 's';
+}
 function angleDiff(a, b) { let d = a - b; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; return d; }
 function parseHex(h) {
   h = h.replace('#','');
@@ -597,9 +674,12 @@ const input = {
 class Worm {
   constructor(o) {
     this.id = o.id; this.name = o.name; this.isBot = !!o.isBot;
-    this.color = o.color; this.alive = true;
+    this.color = o.color;
+    this.outlineColor = o.outlineColor || mixColors(this.color, '#000000', 0.65);
+    this.alive = true;
     this.deathTime = -1; this.spawnTime = o.time || 0;
     this.killer = null;
+    this.respawnAt = null;
     this.angle = o.angle ?? Math.random() * Math.PI * 2;
     this.targetAngle = this.angle;
     this.boosting = false; this.boostDrain = 0;
@@ -623,10 +703,12 @@ class Worm {
   get head() { return this.segments[0]; }
   update(dt) {
     if (!this.alive) return;
+    const sizeMult = 1 - (this.segments.length / CFG.maxSegments) * CFG.turnSizePenalty;
+    const maxTurn = CFG.turnRate * sizeMult * dt * 60;
     const diff = angleDiff(this.targetAngle, this.angle);
-    const maxTurn = CFG.turnRate;
     if (Math.abs(diff) < maxTurn) this.angle = this.targetAngle;
     else this.angle += Math.sign(diff) * maxTurn;
+
     const speed = (this.boosting ? CFG.boostSpeed : CFG.speed);
     const step = speed * dt * 60;
     const head = this.head;
@@ -646,7 +728,9 @@ class Worm {
       if (this.boostDrain > 0.18) {
         this.boostDrain = 0;
         const tail = this.segments[this.segments.length - 1];
-        state.foods.push(makeFood(tail.x, tail.y, this.color));
+        const sizeT = Math.min(1, this.segments.length / CFG.maxSegments);
+        const trailR = 2.5 + sizeT * 4.0;
+        state.foods.push(makeFood(tail.x, tail.y, this.color, { grow: 1, r: trailR }));
         this.segments.pop();
       }
       if (Math.random() < 0.7) {
@@ -668,17 +752,33 @@ class Worm {
     this.alive = false;
     this.deathTime = state.roundElapsed;
     this.killer = killer ?? null;
-    const step = Math.max(1, Math.floor(this.segments.length / 30));
-    for (let i = 0; i < this.segments.length; i += step) {
+    if (this.isBot && state.roundElapsed < CFG.respawnUntil) {
+      this.respawnAt = Math.min(
+        state.roundElapsed + CFG.botRespawnDelay + Math.random() * CFG.botRespawnJitter,
+        CFG.respawnUntil - 0.1
+      );
+    }
+    const totalMass = this.segments.length;
+    const dropCount = Math.min(CFG.deathDropCount, Math.max(1, totalMass));
+    const baseGrow = Math.floor(totalMass / dropCount);
+    const remainder = totalMass - baseGrow * dropCount;
+
+    const particleStep = Math.max(1, Math.floor(totalMass / 30));
+    for (let i = 0; i < totalMass; i += particleStep) {
       const s = this.segments[i];
       const ang = Math.random() * Math.PI * 2;
       const sp = rand(1, 4);
       spawnParticle(s.x, s.y, this.color, Math.cos(ang) * sp, Math.sin(ang) * sp,
         rand(0.6, 1.3), rand(2, 4), 1);
     }
-    for (let i = 0; i < this.segments.length; i += step) {
-      const s = this.segments[i];
-      state.foods.push(makeFood(s.x + rand(-8, 8), s.y + rand(-8, 8), this.color, 1));
+
+    const segStep = totalMass / dropCount;
+    for (let i = 0; i < dropCount; i++) {
+      const segIdx = Math.min(totalMass - 1, Math.floor(i * segStep));
+      const s = this.segments[segIdx];
+      const grow = baseGrow + (i < remainder ? 1 : 0);
+      if (grow <= 0) continue;
+      state.foods.push(makeFood(s.x + rand(-8, 8), s.y + rand(-8, 8), this.color, { grow }));
     }
     this.segments = [];
   }
@@ -688,14 +788,28 @@ class Worm {
 // FOOD / PARTICLES
 // ============================================================
 let foodId = 0;
-function makeFood(x, y, forcedColor, big) {
-  const tier = big ? FOOD_TIERS[3] : pickFoodTier();
-  const color = forcedColor || tier.palette[Math.floor(Math.random() * tier.palette.length)];
-  const r = big ? rand(3, 4) : rand(tier.minR, tier.maxR);
+function makeFood(x, y, forcedColor, opts) {
+  opts = opts || {};
+  let grow, r, glow, ring, color;
+
+  if (opts.grow != null) {
+    grow = opts.grow;
+    r = (opts.r != null) ? opts.r : (2.0 + Math.pow(grow, 0.7) * 1.7);
+    glow = 0.8 + Math.min(4, Math.pow(grow, 0.6) * 1.1);
+    ring = grow >= 8 ? 3 : grow >= 5 ? 2 : grow >= 2 ? 1 : 0;
+    color = forcedColor || '#8ee0ff';
+  } else {
+    const tier = pickFoodTier();
+    r = rand(tier.minR, tier.maxR);
+    glow = tier.glow;
+    grow = tier.grow;
+    ring = tier.ring;
+    color = forcedColor || tier.palette[Math.floor(Math.random() * tier.palette.length)];
+  }
+
   return {
     id: foodId++, x, y, baseR: r, color,
-    glow: tier.glow, grow: big ? 2 : tier.grow,
-    ring: big ? 1 : tier.ring,
+    glow, grow, ring,
     phase: Math.random() * Math.PI * 2,
     shakeAmp: rand(0.4, 1.2) * (r * 0.14),
     shakeSpeed: rand(2, 3.6),
@@ -711,11 +825,13 @@ function spawnParticle(x, y, color, vx, vy, life, size, drag) {
 }
 function updateParticles(dt) {
   const arr = state.particles;
+  const dtf = dt * 60;
   for (let i = arr.length - 1; i >= 0; i--) {
     const p = arr[i];
-    p.x += p.vx; p.y += p.vy;
-    p.vx *= Math.pow(p.drag, dt * 60);
-    p.vy *= Math.pow(p.drag, dt * 60);
+    p.x += p.vx * dtf;
+    p.y += p.vy * dtf;
+    p.vx *= Math.pow(p.drag, dtf);
+    p.vy *= Math.pow(p.drag, dtf);
     p.life -= dt;
     if (p.life <= 0) arr.splice(i, 1);
   }
@@ -737,10 +853,39 @@ let state = null;
 
 function makePlayerWorm(x, y, angle) {
   return new Worm({
-    id: 'player', name: 'You', isBot: false,
-    x, y, color: playerColor, angle,
+    id: 'player', name: playerName, isBot: false,
+    x, y, color: playerColor, outlineColor: playerOutline, angle,
     time: state ? state.roundElapsed : 0,
   });
+}
+
+function findSafeSpawn(avoidList) {
+  const list = avoidList || state.worms;
+  const minDist = Math.min(CFG.safeSpawnDist, state.zone.radius * 1.0);
+  const minDist2 = minDist * minDist;
+  let best = null, bestMinD2 = -1;
+
+  for (let attempt = 0; attempt < 14; attempt++) {
+    const ang = Math.random() * Math.PI * 2;
+    const r = Math.sqrt(Math.random()) * state.zone.radius * 0.85;
+    const x = state.zone.x + Math.cos(ang) * r;
+    const y = state.zone.y + Math.sin(ang) * r;
+
+    let minD2 = Infinity;
+    for (const w of list) {
+      if (!w || !w.alive) continue;
+      const segs = w.segments;
+      for (let i = 0; i < segs.length; i += 3) {
+        const s = segs[i];
+        const dx = s.x - x, dy = s.y - y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < minD2) minD2 = d2;
+      }
+    }
+    if (minD2 >= minDist2) return { x, y, ang };
+    if (minD2 > bestMinD2) { bestMinD2 = minD2; best = { x, y, ang }; }
+  }
+  return best || { x: state.zone.x, y: state.zone.y, ang: Math.random() * Math.PI * 2 };
 }
 
 function createMatch() {
@@ -748,17 +893,28 @@ function createMatch() {
   const cy = CFG.worldSize / 2;
   const worms = [], foods = [];
   for (let i = 0; i < CFG.food; i++) foods.push(randomFood());
-  const player = makePlayerWorm(cx + rand(-250, 250), cy + rand(-250, 250), rand(0, Math.PI * 2));
+
+  const tempState = {
+    worms, foods, particles: [],
+    zone: { x: cx, y: cy, radius: CFG.zoneStart },
+  };
+  const savedState = state;
+  state = tempState;
+
+  const spawnP = findSafeSpawn();
+  const player = makePlayerWorm(spawnP.x, spawnP.y, spawnP.ang);
   worms.push(player);
+
   for (let i = 0; i < CFG.bots; i++) {
-    const ang = Math.random() * Math.PI * 2;
-    const r = Math.random() * (CFG.zoneStart * 0.8);
+    const spawn = findSafeSpawn(worms);
     worms.push(new Worm({
       id: 'bot' + i, name: BOT_NAMES[i % BOT_NAMES.length], isBot: true,
-      x: cx + Math.cos(ang) * r, y: cy + Math.sin(ang) * r,
+      x: spawn.x, y: spawn.y, angle: spawn.ang,
       color: BOT_COLORS[i % BOT_COLORS.length], time: 0,
     }));
   }
+  state = savedState;
+
   return {
     worms, foods, particles: [],
     time: 0,
@@ -787,6 +943,7 @@ function botAI(worm, dt) {
   ai.retargetAt -= dt;
   if (ai.retargetAt <= 0) {
     ai.retargetAt = 0.06 + Math.random() * 0.06;
+
     const nearby = [];
     for (const other of state.worms) {
       if (other === worm || !other.alive) continue;
@@ -794,13 +951,22 @@ function botAI(worm, dt) {
       const reach = 400 + other.segments.length * CFG.segSpacing;
       if (d < reach) nearby.push({ worm: other, dist: d });
     }
-    const N = 21, spread = Math.PI * 1.0;
+
+    let nearestFood = null, nfd2 = Infinity;
+    for (const f of state.foods) {
+      const dx = f.x - head.x, dy = f.y - head.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 < nfd2) { nfd2 = d2; nearestFood = f; }
+    }
+    const nearestFoodD = Math.sqrt(nfd2);
+
+    const N = 21, spread = Math.PI * 2;
     let bestScore = -Infinity, bestAngle = worm.angle, bestSafety = 0;
     for (let i = 0; i < N; i++) {
       const offset = (i / (N - 1) - 0.5) * spread;
       const ang = worm.angle + offset;
-      const { total, safety } = scoreDirection(worm, ang, nearby);
-      const turnCost = Math.abs(offset) * 10;
+      const { total, safety } = scoreDirection(worm, ang, nearby, nearestFood, nearestFoodD);
+      const turnCost = Math.abs(offset) * 3;
       const s = total - turnCost;
       if (s > bestScore) { bestScore = s; bestAngle = ang; bestSafety = safety; }
     }
@@ -813,11 +979,13 @@ function botAI(worm, dt) {
   else if (ai.aggression > 0.6 && mass > 35 && Math.random() < 0.006) worm.boosting = true;
   else worm.boosting = false;
 }
-function scoreDirection(worm, ang, nearby) {
+
+function scoreDirection(worm, ang, nearby, nearestFood, nearestFoodD) {
   const head = worm.head, ai = worm.ai;
   const dx = Math.cos(ang), dy = Math.sin(ang);
   const lookAhead = 160;
   let safety = 0, food = 0, attack = 0;
+
   for (let t = 25; t <= lookAhead; t += 25) {
     const px = head.x + dx * t, py = head.y + dy * t;
     const w = 1 - t / (lookAhead + 40);
@@ -827,6 +995,7 @@ function scoreDirection(worm, ang, nearby) {
     const outsideBy = zd - state.zone.radius;
     if (outsideBy > -90) safety -= (outsideBy + 90) * 1.6 * w;
   }
+
   const dangerR = CFG.bodyRadius + CFG.collisionRadius + 4;
   const dangerR2 = dangerR * dangerR;
   for (const { worm: other } of nearby) {
@@ -838,19 +1007,33 @@ function scoreDirection(worm, ang, nearby) {
       const proj = rx * dx + ry * dy;
       if (proj < 0 || proj > lookAhead) continue;
       const perp = rx * dy - ry * dx;
-      if (perp * perp < dangerR2) { const w = 1 - proj / lookAhead; safety -= w * w * 500 * ai.caution; }
+      if (perp * perp < dangerR2) {
+        const w = 1 - proj / lookAhead;
+        safety -= w * w * 500 * ai.caution;
+      }
     }
   }
+
+  if (nearestFood && nearestFoodD < 170) {
+    const fAng = Math.atan2(nearestFood.y - head.y, nearestFood.x - head.x);
+    const delta = angleDiff(ang, fAng);
+    const align = Math.max(0, Math.cos(delta));
+    const prox = 1 - nearestFoodD / 170;
+    food += align * align * prox * 100;
+  }
+
   const foodReach = lookAhead * 1.4;
   for (const f of state.foods) {
+    if (f === nearestFood) continue;
     const rx = f.x - head.x, ry = f.y - head.y;
     const proj = rx * dx + ry * dy;
     if (proj < 0 || proj > foodReach) continue;
     const perp = Math.abs(rx * dy - ry * dx);
     if (perp > 55) continue;
     const w = 1 - proj / foodReach;
-    food += w * 18 * ai.foodFocus * (f.grow || 1);
+    food += w * 14 * ai.foodFocus * (f.grow || 1);
   }
+
   if (ai.aggression > 0.45) {
     for (const { worm: other, dist } of nearby) {
       if (dist > 450) continue;
@@ -877,7 +1060,6 @@ function scoreDirection(worm, ang, nearby) {
 function update(dt) {
   state.time += dt;
 
-  // ---- Zonenradius ----
   if (state.zoneRegrowing) {
     state.zoneRegrowT = Math.min(1, state.zoneRegrowT + dt / CFG.zoneRegrowDuration);
     state.zone.radius = CFG.zoneMin + (CFG.zoneStart - CFG.zoneMin) * state.zoneRegrowT;
@@ -892,10 +1074,8 @@ function update(dt) {
     state.zone.radius = CFG.zoneStart + (CFG.zoneMin - CFG.zoneStart) * state.zoneShrinkT;
   }
 
-  // ---- Rundenzeit ----
   if (!state.intermission) state.roundElapsed += dt;
 
-  // ---- Wurm-Update ----
   for (const worm of state.worms) {
     if (!worm.alive) continue;
 
@@ -916,7 +1096,6 @@ function update(dt) {
       const zdx = h.x - state.zone.x, zdy = h.y - state.zone.y;
       const dC = Math.sqrt(zdx * zdx + zdy * zdy);
       const overshoot = dC - state.zone.radius;
-      // Kein Zonenschaden während Regrow
       if (overshoot > 0 && !state.zoneRegrowing) {
         worm.outside = true;
         worm.zoneDmg += dt;
@@ -942,7 +1121,20 @@ function update(dt) {
   updateParticles(dt);
   while (state.foods.length < CFG.food) state.foods.push(randomFood());
 
-  // ---- Kamera ----
+  if (!state.intermission && state.roundElapsed < CFG.respawnUntil) {
+    for (let i = 0; i < state.worms.length; i++) {
+      const w = state.worms[i];
+      if (w.alive || !w.isBot) continue;
+      if (w.respawnAt == null || state.roundElapsed < w.respawnAt) continue;
+      const spawn = findSafeSpawn();
+      state.worms[i] = new Worm({
+        id: w.id, name: w.name, isBot: true,
+        x: spawn.x, y: spawn.y, angle: spawn.ang,
+        color: w.color, time: state.roundElapsed,
+      });
+    }
+  }
+
   const p2 = state.player;
   if (p2.alive) {
     const h = p2.head;
@@ -956,18 +1148,15 @@ function update(dt) {
   }
   state.camera.zoom += (state.camera.targetZoom - state.camera.zoom) * Math.min(1, 3 * dt);
 
-  // ---- Rundenlogik ----
   if (!state.matchOver && !state.intermission) {
     const alive = state.worms.filter(w => w.alive);
 
-    // Sudden-Death-Start
     const zoneAtMin = state.zone.radius <= CFG.zoneMin + 2 && !state.zoneRegrowing;
     if (!state.suddenDeathActive && alive.length === 2 && zoneAtMin) {
       state.suddenDeathActive = true;
       state.suddenDeathTime = CFG.suddenDeathDuration;
     }
 
-    // Sudden-Death-Tick
     if (state.suddenDeathActive) {
       if (alive.length < 2) {
         state.suddenDeathActive = false;
@@ -978,7 +1167,6 @@ function update(dt) {
       }
     }
 
-    // Rundenende
     if (alive.length <= 1) {
       const winner = alive.length === 1 ? alive[0] : null;
       endRound(winner);
@@ -1040,7 +1228,7 @@ function checkFood() {
       if (dx * dx + dy * dy < rr * rr) {
         state.foods.splice(i, 1);
         worm.grow(f.grow);
-        const n = 2 + f.grow;
+        const n = 2 + Math.min(8, f.grow);
         for (let k = 0; k < n; k++) {
           const ang = Math.random() * Math.PI * 2;
           const sp = rand(0.5, 2);
@@ -1054,14 +1242,11 @@ function checkFood() {
 
 function respawnPlayer() {
   const p = state.player;
-  const ang = Math.random() * Math.PI * 2;
-  const r = Math.random() * state.zone.radius * 0.5;
-  const x = state.zone.x + Math.cos(ang) * r;
-  const y = state.zone.y + Math.sin(ang) * r;
-  const newWorm = makePlayerWorm(x, y, ang);
+  const spawn = findSafeSpawn();
+  const newWorm = makePlayerWorm(spawn.x, spawn.y, spawn.ang);
   state.worms[state.worms.indexOf(p)] = newWorm;
   state.player = newWorm;
-  state.camera.x = x; state.camera.y = y;
+  state.camera.x = spawn.x; state.camera.y = spawn.y;
   state.camera.targetZoom = 1;
   hideDeathScreen();
 }
@@ -1097,20 +1282,18 @@ function startNewRound() {
   }
 
   if (!(keepWinner && winner === state.player)) {
-    const ang = Math.random() * Math.PI * 2;
-    const r = Math.random() * CFG.zoneStart * 0.4;
-    const newPlayer = makePlayerWorm(cx + Math.cos(ang) * r, cy + Math.sin(ang) * r, ang);
+    const spawn = findSafeSpawn(newWorms);
+    const newPlayer = makePlayerWorm(spawn.x, spawn.y, spawn.ang);
     newWorms.push(newPlayer);
     state.player = newPlayer;
   }
 
   for (let i = 0; i < CFG.bots; i++) {
-    const ang = Math.random() * Math.PI * 2;
-    const r = Math.random() * (CFG.zoneStart * 0.8);
+    const spawn = findSafeSpawn(newWorms);
     newWorms.push(new Worm({
       id: 'bot' + state.round + '-' + i,
       name: BOT_NAMES[i % BOT_NAMES.length], isBot: true,
-      x: cx + Math.cos(ang) * r, y: cy + Math.sin(ang) * r,
+      x: spawn.x, y: spawn.y, angle: spawn.ang,
       color: BOT_COLORS[i % BOT_COLORS.length], time: 0,
     }));
   }
@@ -1140,26 +1323,22 @@ function startNewRound() {
   if (rl) rl.textContent = state.round;
 }
 
-// ---- DRAW (Unentschieden) ----
 function triggerDraw() {
   state.suddenDeathActive = false;
   state.suddenDeathTime = 0;
   state.zoneRegrowing = true;
   state.zoneRegrowT = 0;
-  state.roundElapsed = 0;      // Timer zurück → Respawn wieder 2.5min offen
+  state.roundElapsed = 0;
 
-  // Alle toten Bots wiederbeleben (Spieler bleibt tot bis er selbst klickt)
   for (let i = 0; i < state.worms.length; i++) {
     const w = state.worms[i];
     if (w.alive) continue;
     if (w === state.player) continue;
-    const ang = Math.random() * Math.PI * 2;
-    const r = Math.random() * CFG.zoneStart * 0.5;
+    const spawn = findSafeSpawn();
     state.worms[i] = new Worm({
       id: w.id, name: w.name, isBot: true,
-      x: state.zone.x + Math.cos(ang) * r,
-      y: state.zone.y + Math.sin(ang) * r,
-      color: w.color, angle: ang, time: 0,
+      x: spawn.x, y: spawn.y, angle: spawn.ang,
+      color: w.color, time: 0,
     });
   }
 
@@ -1174,12 +1353,12 @@ const vbMainEl = document.getElementById('vbMain');
 const vbSubEl = document.getElementById('vbSub');
 
 function showVictoryBanner(winner) {
-  vbMainEl.innerHTML = `<span style="color:${winner.color}; text-shadow: 0 0 18px ${hexAlpha(winner.color, 0.75)}">${escapeHtml(winner.name)}</span> won the round!`;
+  vbMainEl.innerHTML = `<span style="color:${winner.color}">${escapeHtml(winner.name)}</span> won the round!`;
   vbSubEl.textContent = `Next round in ${CFG.intermissionDuration}…`;
   victoryBannerEl.classList.add('on');
 }
 function showDrawBanner() {
-  vbMainEl.innerHTML = `<span style="color:#8ee0ff; text-shadow: 0 0 18px rgba(108,204,255,0.8)">Draw!</span> Both survivors held out`;
+  vbMainEl.innerHTML = `<span style="color:#8ee0ff">Draw!</span> Both survivors held out`;
   vbSubEl.textContent = `Zone resetting · Respawn enabled`;
   victoryBannerEl.classList.add('on');
   setTimeout(() => {
@@ -1194,6 +1373,7 @@ function hideVictoryBanner() { victoryBannerEl.classList.remove('on'); }
 const deathScreenEl = document.getElementById('deathScreen');
 const dsNameEl = document.getElementById('dsName');
 const dsRespawnBtn = document.getElementById('dsRespawn');
+const dsNameInput = document.getElementById('dsNameInput');
 
 function showDeathScreen() {
   const p = state.player;
@@ -1206,6 +1386,7 @@ function showDeathScreen() {
   dsNameEl.textContent = name;
   dsNameEl.style.color = color;
   dsNameEl.style.textShadow = `0 0 30px ${hexAlpha(color, 0.7)}, 0 0 8px ${hexAlpha(color, 0.5)}`;
+  dsNameInput.value = playerName;
   deathScreenEl.classList.add('on');
   document.body.classList.add('dead');
   input.boost = false;
@@ -1225,8 +1406,25 @@ dsRespawnBtn.addEventListener('click', () => {
   respawnPlayer();
 });
 
+// Name input on death screen
+dsNameInput.addEventListener('input', e => {
+  const cleaned = e.target.value.replace(/\s{2,}/g, ' ').slice(0, 14);
+  if (cleaned !== e.target.value) e.target.value = cleaned;
+  setPlayerName(cleaned, false);
+});
+dsNameInput.addEventListener('blur', () => {
+  const v = (dsNameInput.value || '').trim() || DEFAULT_PLAYER_NAME;
+  dsNameInput.value = v;
+  setPlayerName(v, true);
+});
+dsNameInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); dsNameInput.blur(); }
+});
+dsNameInput.addEventListener('click', e => e.stopPropagation());
+dsNameInput.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+
 // ============================================================
-// RENDER (vom vorherigen Stand — unverändert)
+// RENDER
 // ============================================================
 function render() {
   const cam = state.camera;
@@ -1303,11 +1501,10 @@ function drawZone(cam, visW, visH, zoom) {
   ctx.beginPath(); ctx.arc(z.x, z.y, z.radius, 0, Math.PI * 2);
   ctx.strokeStyle = `rgba(255,90,130,${0.9 * pulse})`;
   ctx.lineWidth = 5 / zoom;
-  ctx.shadowColor = `rgba(255,60,100,${0.9 * pulse})`; ctx.shadowBlur = 28 * pulse / zoom;
   ctx.stroke();
   ctx.beginPath(); ctx.arc(z.x, z.y, z.radius - 6 / zoom, 0, Math.PI * 2);
   ctx.strokeStyle = `rgba(255,180,200,${0.35 * pulse})`;
-  ctx.lineWidth = 1.5 / zoom; ctx.shadowBlur = 0; ctx.stroke();
+  ctx.lineWidth = 1.5 / zoom; ctx.stroke();
 }
 
 function drawFood(cam, visW, visH) {
@@ -1339,79 +1536,98 @@ function drawFood(cam, visW, visH) {
   }
 }
 
+// ★ Neuer Wurm-Look: kein Glow, kein Taper, dünne Outline, flaches abgerundetes Ende
 function drawWorm(worm, isPlayer, zoom) {
   const segs = worm.segments;
   if (segs.length < 2) return;
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
   const outsideFlash = worm.outside ? 0.5 + 0.5 * Math.sin(state.time * 20) : 0;
   const bodyColor = worm.outside ? mixColors(worm.color, '#ff2040', outsideFlash * 0.85) : worm.color;
+  const outlineColor = worm.outlineColor || '#0a0e1a';
   const h = segs[0], N = segs.length;
-  const fadeLen = Math.min(34, Math.floor(N * 0.3));
-  const fadeStart = N - fadeLen;
-  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
-  ctx.lineWidth = CFG.bodyRadius * 2 + 2;
-  ctx.beginPath(); ctx.moveTo(segs[0].x + 2, segs[0].y + 3);
-  for (let i = 1; i < N; i++) ctx.lineTo(segs[i].x + 2, segs[i].y + 3);
-  ctx.stroke();
-  ctx.strokeStyle = hexAlpha(bodyColor, 0.16);
-  ctx.lineWidth = CFG.bodyRadius * 2 + (isPlayer ? 22 : 16);
-  ctx.beginPath(); ctx.moveTo(segs[0].x, segs[0].y);
+  const outlineW = CFG.outlineWidth;
+
+  // 1. Outline-Stroke für gesamten Körper (breiterer Stroke, gerundete Kappen)
+  ctx.strokeStyle = outlineColor;
+  ctx.lineWidth = CFG.bodyRadius * 2 + outlineW * 2;
+  ctx.beginPath();
+  ctx.moveTo(segs[0].x, segs[0].y);
   for (let i = 1; i < N; i++) ctx.lineTo(segs[i].x, segs[i].y);
   ctx.stroke();
+
+  // 2. Body-Stroke (volle Farbe, gerade Linie, stumpfes rundes Ende via lineCap)
   ctx.strokeStyle = bodyColor;
   ctx.lineWidth = CFG.bodyRadius * 2;
-  ctx.beginPath(); ctx.moveTo(segs[0].x, segs[0].y);
-  for (let i = 1; i <= fadeStart; i++) ctx.lineTo(segs[i].x, segs[i].y);
+  ctx.beginPath();
+  ctx.moveTo(segs[0].x, segs[0].y);
+  for (let i = 1; i < N; i++) ctx.lineTo(segs[i].x, segs[i].y);
   ctx.stroke();
-  for (let i = fadeStart; i < N; i++) {
-    const t = (i - fadeStart) / Math.max(1, fadeLen);
-    const alpha = 1 - t;
-    const r = CFG.bodyRadius * (1 - t * 0.65);
-    ctx.fillStyle = hexAlpha(bodyColor, alpha);
-    ctx.beginPath(); ctx.arc(segs[i].x, segs[i].y, r, 0, Math.PI * 2); ctx.fill();
+
+  // 3. Segment-Rippen (dünne Querlinien wie im Referenzbild)
+  if (zoom > 0.32 && N > 6) {
+    ctx.strokeStyle = hexAlpha(outlineColor, 0.42);
+    ctx.lineWidth = 1.1;
+    const r = CFG.bodyRadius * 0.9;
+    for (let i = 4; i < N - 1; i += 4) {
+      const s = segs[i];
+      const prev = segs[i - 1];
+      const ang = Math.atan2(s.y - prev.y, s.x - prev.x) + Math.PI / 2;
+      const cx = Math.cos(ang), cy = Math.sin(ang);
+      ctx.beginPath();
+      ctx.moveTo(s.x + cx * r, s.y + cy * r);
+      ctx.lineTo(s.x - cx * r, s.y - cy * r);
+      ctx.stroke();
+    }
   }
-  ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-  ctx.lineWidth = CFG.bodyRadius * 0.85;
-  ctx.beginPath(); ctx.moveTo(segs[0].x, segs[0].y);
-  for (let i = 1; i <= fadeStart; i++) ctx.lineTo(segs[i].x, segs[i].y);
-  ctx.stroke();
-  const hg = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, CFG.headRadius * 2.6);
-  hg.addColorStop(0, hexAlpha(bodyColor, 0.55));
-  hg.addColorStop(1, hexAlpha(bodyColor, 0));
-  ctx.fillStyle = hg;
-  ctx.beginPath(); ctx.arc(h.x, h.y, CFG.headRadius * 2.6, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(h.x, h.y, CFG.headRadius, 0, Math.PI * 2);
-  if (isPlayer) {
-    const headG = ctx.createRadialGradient(h.x - 3, h.y - 3, 1, h.x, h.y, CFG.headRadius);
-    headG.addColorStop(0, '#ffffff');
-    headG.addColorStop(0.7, mixColors(bodyColor, '#ffffff', 0.55));
-    headG.addColorStop(1, bodyColor);
-    ctx.fillStyle = headG;
-  } else ctx.fillStyle = bodyColor;
+
+  // 4. Kopf: Outline-Kreis + Füllung (keine Glow, kein Gradient mehr)
+  const hr = CFG.headRadius;
+  ctx.beginPath();
+  ctx.arc(h.x, h.y, hr + outlineW, 0, Math.PI * 2);
+  ctx.fillStyle = outlineColor;
   ctx.fill();
-  if (isPlayer) { ctx.strokeStyle = bodyColor; ctx.lineWidth = 2; ctx.stroke(); }
-  const eyeBack = CFG.headRadius * 0.2, eyeSide = CFG.headRadius * 0.55;
-  const eyeR = CFG.headRadius * 0.36, pupilR = eyeR * 0.55;
+  ctx.beginPath();
+  ctx.arc(h.x, h.y, hr, 0, Math.PI * 2);
+  ctx.fillStyle = bodyColor;
+  ctx.fill();
+
+  // 5. Augen
+  const eyeBack = hr * 0.18, eyeSide = hr * 0.58;
+  const eyeR = hr * 0.42, pupilR = eyeR * 0.6;
   const perp = worm.angle + Math.PI / 2;
+  const eyeOutline = outlineColor;
+
   for (const sgn of [-1, 1]) {
     const ex = h.x + Math.cos(worm.angle) * eyeBack + Math.cos(perp) * eyeSide * sgn;
     const ey = h.y + Math.sin(worm.angle) * eyeBack + Math.sin(perp) * eyeSide * sgn;
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath(); ctx.arc(ex, ey, eyeR, 0, Math.PI * 2); ctx.fill();
+    // Augen-Outline
+    ctx.beginPath(); ctx.arc(ex, ey, eyeR + 1.2, 0, Math.PI * 2);
+    ctx.fillStyle = eyeOutline; ctx.fill();
+    // Weiße Sclera
+    ctx.beginPath(); ctx.arc(ex, ey, eyeR, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff'; ctx.fill();
+    // Pupille
     const px = ex + Math.cos(worm.angle) * eyeR * 0.35;
     const py = ey + Math.sin(worm.angle) * eyeR * 0.35;
-    ctx.fillStyle = '#0a0e1a';
-    ctx.beginPath(); ctx.arc(px, py, pupilR, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.beginPath(); ctx.arc(px - pupilR * 0.35, py - pupilR * 0.35, pupilR * 0.4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(px, py, pupilR, 0, Math.PI * 2);
+    ctx.fillStyle = '#0a0e1a'; ctx.fill();
+    // Glanzpunkt
+    ctx.beginPath(); ctx.arc(px - pupilR * 0.35, py - pupilR * 0.35, pupilR * 0.42, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.fill();
   }
-  if (!isPlayer && zoom > 0.35) {
-    ctx.font = `bold ${Math.max(10, 11 / Math.sqrt(zoom))}px system-ui`;
+
+  // 6. Namens-Label für Bots
+  if (!isPlayer && zoom > 0.32) {
+    const labelY = h.y - hr - 7;
+    const fs = Math.max(10, 11 / Math.sqrt(zoom));
+    ctx.font = `bold ${fs}px system-ui`;
     ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillText(worm.name, h.x + 1, h.y - CFG.headRadius - 4);
-    ctx.fillStyle = 'rgba(255,255,255,0.75)';
-    ctx.fillText(worm.name, h.x, h.y - CFG.headRadius - 5);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(0,0,0,0.75)';
+    ctx.strokeText(worm.name, h.x, labelY);
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.fillText(worm.name, h.x, labelY);
   }
 }
 
@@ -1443,7 +1659,6 @@ function drawMinimap() {
     const a = state.player.angle;
     ctx.save();
     ctx.translate(px, py); ctx.rotate(a);
-    ctx.shadowColor = state.player.color; ctx.shadowBlur = 8;
     ctx.beginPath();
     ctx.moveTo(6, 0); ctx.lineTo(-4, -4); ctx.lineTo(-2, 0); ctx.lineTo(-4, 4);
     ctx.closePath();
@@ -1472,9 +1687,7 @@ function drawJoystick() {
   ctx.fillStyle = grd;
   ctx.beginPath(); ctx.arc(bx, by, R, 0, Math.PI * 2); ctx.fill();
   ctx.strokeStyle = 'rgba(140,210,255,0.6)'; ctx.lineWidth = 2;
-  ctx.shadowColor = 'rgba(108,204,255,0.6)'; ctx.shadowBlur = 12;
   ctx.beginPath(); ctx.arc(bx, by, R, 0, Math.PI * 2); ctx.stroke();
-  ctx.shadowBlur = 0;
   const dx = input.joyX - bx, dy = input.joyY - by;
   const d = Math.hypot(dx, dy);
   let sx = dx, sy = dy;
@@ -1493,6 +1706,7 @@ function drawJoystick() {
 const uiMass = document.getElementById('ui-mass');
 const uiAlive = document.getElementById('ui-alive');
 const uiTime = document.getElementById('ui-time');
+const uiTimeLabel = document.getElementById('ui-time-label');
 const uiRank = document.getElementById('ui-rank');
 const uiStatus = document.getElementById('ui-status');
 const zoneWarn = document.getElementById('zoneWarn');
@@ -1505,11 +1719,33 @@ function updateHUD() {
   uiMass.textContent = p.alive ? p.segments.length : '—';
   const alive = state.worms.filter(w => w.alive);
   uiAlive.textContent = alive.length;
-  uiTime.textContent = fmtTime(state.roundElapsed);
+
+  let timeLabel, timeValue;
+  if (state.intermission) {
+    const remaining = Math.max(0, CFG.intermissionDuration - state.intermissionElapsed);
+    timeLabel = 'Next round';
+    timeValue = fmtShort(remaining);
+  } else if (state.zoneRegrowing) {
+    const remaining = Math.max(0, CFG.zoneRegrowDuration * (1 - state.zoneRegrowT));
+    timeLabel = 'Zone regrow';
+    timeValue = fmtShort(remaining);
+  } else if (state.suddenDeathActive) {
+    timeLabel = 'Sudden death';
+    timeValue = Math.max(0, Math.ceil(state.suddenDeathTime)) + 's';
+  } else if (state.zoneShrinkT < 1) {
+    const remaining = Math.max(0, CFG.matchDuration * (1 - state.zoneShrinkT));
+    timeLabel = 'Zone closes';
+    timeValue = fmtTime(remaining);
+  } else {
+    timeLabel = 'Zone';
+    timeValue = 'Final';
+  }
+  uiTimeLabel.textContent = timeLabel;
+  uiTime.textContent = timeValue;
+
   const sorted = [...state.worms].filter(w => w.alive).sort((a, b) => b.segments.length - a.segments.length);
   uiRank.textContent = p.alive ? (sorted.indexOf(p) + 1) + '/' + alive.length : '—';
 
-  // Sudden-Death-Timer
   if (state.suddenDeathActive) {
     suddenDeathEl.classList.add('on');
     sdTimerEl.textContent = Math.max(0, Math.ceil(state.suddenDeathTime));
@@ -1517,7 +1753,6 @@ function updateHUD() {
     suddenDeathEl.classList.remove('on');
   }
 
-  // Status
   if (state.intermission) {
     uiStatus.innerHTML = '<span id="status-closed">Intermission</span>';
     zoneWarn.classList.remove('on'); zoneText.classList.remove('on');
@@ -1603,42 +1838,65 @@ const czClose = document.getElementById('czClose');
 const czSave = document.getElementById('czSave');
 const czReset = document.getElementById('czReset');
 const czPresets = document.getElementById('czPresets');
-const czQuickColors = document.getElementById('czQuickColors');
+const czOutlineQuick = document.getElementById('czOutlineQuick');
 const czColorInput = document.getElementById('czColorInput');
 const czColorDot = document.getElementById('czColorDot');
 const czColorHex = document.getElementById('czColorHex');
+const czOutlineInput = document.getElementById('czOutlineInput');
+const czOutlineDot = document.getElementById('czOutlineDot');
+const czOutlineHex = document.getElementById('czOutlineHex');
+const czNameInput = document.getElementById('czNameInput');
 const czCanvas = document.getElementById('czCanvas');
 const czCtx = czCanvas.getContext('2d');
-let czTempColor = playerColor, czAnimId = null, czStartTime = 0;
+
+let czTempColor = playerColor;
+let czTempOutline = playerOutline;
+let czTempName = playerName;
+let czAnimId = null, czStartTime = 0;
 
 PRESET_WORMS.forEach(preset => {
   const el = document.createElement('button');
   el.className = 'cz-preset';
-  el.style.background = `radial-gradient(circle at 35% 30%, ${mixColors(preset.color, '#ffffff', 0.5)}, ${preset.color} 65%, ${mixColors(preset.color, '#000000', 0.35)})`;
+  el.style.background = preset.color;
   el.dataset.color = preset.color;
   el.addEventListener('click', () => { czTempColor = preset.color; updateCzUI(); });
   czPresets.appendChild(el);
 });
-QUICK_COLORS.forEach(c => {
+QUICK_OUTLINES.forEach(c => {
   const el = document.createElement('button');
   el.className = 'cz-quick-color';
   el.style.background = c;
-  el.addEventListener('click', () => { czTempColor = c; updateCzUI(); });
-  czQuickColors.appendChild(el);
+  el.addEventListener('click', () => { czTempOutline = c; updateCzUI(); });
+  czOutlineQuick.appendChild(el);
 });
+
 function updateCzUI() {
   [...czPresets.children].forEach(el => {
     el.classList.toggle('selected', el.dataset.color.toLowerCase() === czTempColor.toLowerCase());
   });
   czColorInput.value = czTempColor;
   czColorDot.style.background = czTempColor;
-  czColorDot.style.color = czTempColor;
   czColorHex.textContent = czTempColor.toUpperCase();
+
+  czOutlineInput.value = czTempOutline;
+  czOutlineDot.style.background = czTempOutline;
+  czOutlineHex.textContent = czTempOutline.toUpperCase();
+
+  if (czNameInput && czNameInput.value !== czTempName) czNameInput.value = czTempName;
 }
 czColorInput.addEventListener('input', e => { czTempColor = e.target.value; updateCzUI(); });
+czOutlineInput.addEventListener('input', e => { czTempOutline = e.target.value; updateCzUI(); });
+czNameInput.addEventListener('input', e => {
+  czTempName = e.target.value.replace(/\s{2,}/g, ' ').slice(0, 14);
+  if (czTempName !== e.target.value) e.target.value = czTempName;
+});
 
 function openCustomize() {
-  czTempColor = playerColor; updateCzUI();
+  czTempColor = playerColor;
+  czTempOutline = playerOutline;
+  czTempName = playerName;
+  czNameInput.value = playerName;
+  updateCzUI();
   customizeEl.classList.add('on');
   czStartTime = performance.now();
   if (czAnimId) cancelAnimationFrame(czAnimId);
@@ -1650,8 +1908,18 @@ function closeCustomize() {
 }
 customizeBtn.addEventListener('click', openCustomize);
 czClose.addEventListener('click', closeCustomize);
-czSave.addEventListener('click', () => { setPlayerColor(czTempColor, true); closeCustomize(); });
-czReset.addEventListener('click', () => { czTempColor = DEFAULT_PLAYER_COLOR; updateCzUI(); });
+czSave.addEventListener('click', () => {
+  setPlayerColor(czTempColor, true);
+  setPlayerOutline(czTempOutline, true);
+  setPlayerName(czTempName, true);
+  closeCustomize();
+});
+czReset.addEventListener('click', () => {
+  czTempColor = DEFAULT_PLAYER_COLOR;
+  czTempOutline = DEFAULT_PLAYER_OUTLINE;
+  czTempName = DEFAULT_PLAYER_NAME;
+  updateCzUI();
+});
 window.addEventListener('keydown', e => {
   if (e.key === 'Escape' && customizeEl.classList.contains('on')) closeCustomize();
 });
@@ -1661,6 +1929,8 @@ function animateCzPreview() {
   drawCzPreview(t);
   czAnimId = requestAnimationFrame(animateCzPreview);
 }
+
+// ★ Preview im neuen Look (kein Glow, kein Taper, Outline)
 function drawCzPreview(t) {
   const w = czCanvas.width, h = czCanvas.height;
   czCtx.clearRect(0, 0, w, h);
@@ -1668,59 +1938,77 @@ function drawCzPreview(t) {
   bg.addColorStop(0, 'rgba(120,180,255,0.06)');
   bg.addColorStop(1, 'rgba(120,180,255,0)');
   czCtx.fillStyle = bg; czCtx.fillRect(0, 0, w, h);
-  const segments = 28, segLen = 5.5, baseY = h / 2, amp = 14, wave = t * 1.6;
-  const headX = w / 2 + 40;
+
+  const segments = 30, segLen = 5.5, baseY = h / 2, amp = 14, wave = t * 1.6;
+  const headX = w / 2 + 50;
   const pts = [];
   for (let i = 0; i < segments; i++)
     pts.push({ x: headX - i * segLen, y: baseY + Math.sin(wave - i * 0.34) * amp });
+
   const bodyR = 12;
+  const outlineW = CFG.outlineWidth;
   czCtx.lineCap = 'round'; czCtx.lineJoin = 'round';
-  czCtx.strokeStyle = hexAlpha(czTempColor, 0.18);
-  czCtx.lineWidth = bodyR * 2 + 22;
+
+  // Outline-Stroke
+  czCtx.strokeStyle = czTempOutline;
+  czCtx.lineWidth = bodyR * 2 + outlineW * 2;
   czCtx.beginPath(); czCtx.moveTo(pts[0].x, pts[0].y);
   for (let i = 1; i < pts.length; i++) czCtx.lineTo(pts[i].x, pts[i].y);
   czCtx.stroke();
+
+  // Body-Stroke
   czCtx.strokeStyle = czTempColor;
   czCtx.lineWidth = bodyR * 2;
   czCtx.beginPath(); czCtx.moveTo(pts[0].x, pts[0].y);
   for (let i = 1; i < pts.length; i++) czCtx.lineTo(pts[i].x, pts[i].y);
   czCtx.stroke();
-  czCtx.strokeStyle = 'rgba(255,255,255,0.24)';
-  czCtx.lineWidth = bodyR * 0.85;
-  czCtx.beginPath(); czCtx.moveTo(pts[0].x, pts[0].y);
-  for (let i = 1; i < pts.length; i++) czCtx.lineTo(pts[i].x, pts[i].y);
-  czCtx.stroke();
+
+  // Rippen
+  czCtx.strokeStyle = hexAlpha(czTempOutline, 0.42);
+  czCtx.lineWidth = 1.1;
+  for (let i = 4; i < pts.length - 1; i += 4) {
+    const s = pts[i], prev = pts[i - 1];
+    const ang = Math.atan2(s.y - prev.y, s.x - prev.x) + Math.PI / 2;
+    const cx = Math.cos(ang), cy = Math.sin(ang);
+    const rr = bodyR * 0.9;
+    czCtx.beginPath();
+    czCtx.moveTo(s.x + cx * rr, s.y + cy * rr);
+    czCtx.lineTo(s.x - cx * rr, s.y - cy * rr);
+    czCtx.stroke();
+  }
+
+  // Kopf
   const headPt = pts[0];
   const angle = Math.atan2(headPt.y - pts[1].y, headPt.x - pts[1].x);
-  const hg = czCtx.createRadialGradient(headPt.x, headPt.y, 0, headPt.x, headPt.y, bodyR * 2.4);
-  hg.addColorStop(0, hexAlpha(czTempColor, 0.5));
-  hg.addColorStop(1, hexAlpha(czTempColor, 0));
-  czCtx.fillStyle = hg;
-  czCtx.beginPath(); czCtx.arc(headPt.x, headPt.y, bodyR * 2.4, 0, Math.PI * 2); czCtx.fill();
-  const headGrad = czCtx.createRadialGradient(headPt.x - 3, headPt.y - 3, 1, headPt.x, headPt.y, bodyR * 1.15);
-  headGrad.addColorStop(0, '#ffffff');
-  headGrad.addColorStop(0.7, mixColors(czTempColor, '#ffffff', 0.55));
-  headGrad.addColorStop(1, czTempColor);
-  czCtx.fillStyle = headGrad;
-  czCtx.beginPath(); czCtx.arc(headPt.x, headPt.y, bodyR * 1.15, 0, Math.PI * 2); czCtx.fill();
-  czCtx.strokeStyle = czTempColor; czCtx.lineWidth = 2; czCtx.stroke();
-  const eyeBack = bodyR * 0.2, eyeSide = bodyR * 0.55, eyeR = bodyR * 0.38, pupilR = eyeR * 0.55;
+  const hr = bodyR + 1;
+  czCtx.beginPath(); czCtx.arc(headPt.x, headPt.y, hr + outlineW, 0, Math.PI * 2);
+  czCtx.fillStyle = czTempOutline; czCtx.fill();
+  czCtx.beginPath(); czCtx.arc(headPt.x, headPt.y, hr, 0, Math.PI * 2);
+  czCtx.fillStyle = czTempColor; czCtx.fill();
+
+  // Augen
+  const eyeBack = hr * 0.18, eyeSide = hr * 0.58;
+  const eyeR = hr * 0.42, pupilR = eyeR * 0.6;
   const perp = angle + Math.PI / 2;
   for (const sgn of [-1, 1]) {
     const ex = headPt.x + Math.cos(angle) * eyeBack + Math.cos(perp) * eyeSide * sgn;
     const ey = headPt.y + Math.sin(angle) * eyeBack + Math.sin(perp) * eyeSide * sgn;
-    czCtx.fillStyle = '#ffffff';
-    czCtx.beginPath(); czCtx.arc(ex, ey, eyeR, 0, Math.PI * 2); czCtx.fill();
+    czCtx.beginPath(); czCtx.arc(ex, ey, eyeR + 1.2, 0, Math.PI * 2);
+    czCtx.fillStyle = czTempOutline; czCtx.fill();
+    czCtx.beginPath(); czCtx.arc(ex, ey, eyeR, 0, Math.PI * 2);
+    czCtx.fillStyle = '#ffffff'; czCtx.fill();
     const px = ex + Math.cos(angle) * eyeR * 0.35;
     const py = ey + Math.sin(angle) * eyeR * 0.35;
-    czCtx.fillStyle = '#0a0e1a';
-    czCtx.beginPath(); czCtx.arc(px, py, pupilR, 0, Math.PI * 2); czCtx.fill();
-    czCtx.fillStyle = 'rgba(255,255,255,0.9)';
-    czCtx.beginPath(); czCtx.arc(px - pupilR * 0.35, py - pupilR * 0.35, pupilR * 0.4, 0, Math.PI * 2); czCtx.fill();
+    czCtx.beginPath(); czCtx.arc(px, py, pupilR, 0, Math.PI * 2);
+    czCtx.fillStyle = '#0a0e1a'; czCtx.fill();
+    czCtx.beginPath(); czCtx.arc(px - pupilR * 0.35, py - pupilR * 0.35, pupilR * 0.42, 0, Math.PI * 2);
+    czCtx.fillStyle = 'rgba(255,255,255,0.95)'; czCtx.fill();
   }
 }
 
 setPlayerColor(playerColor, false);
+setPlayerName(playerName, false);
+setPlayerOutline(playerOutline, false);
 updateCzUI();
 renderLeaderboard();
 
