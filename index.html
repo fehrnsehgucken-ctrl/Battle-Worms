@@ -12,7 +12,9 @@
   canvas { display:block; }
 
   #timerHud {
-    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    position: fixed; top: 10px; left: 50%;
+    transform: translateX(-50%);
+    zoom: 0.65;
     z-index: 4; text-align: center; pointer-events: none;
     padding: 8px 28px;
     min-width: 150px;
@@ -37,13 +39,19 @@
     text-shadow: 0 0 22px rgba(255,60,90,0.8);
     animation: timerPulse 0.8s ease-in-out infinite;
   }
+  #timerHud.restart #timerLabel { color: #ffd479; letter-spacing: 3.5px; }
+  #timerHud.restart #timerValue {
+    color: #ffd479;
+    text-shadow: 0 0 24px rgba(255,200,80,0.75);
+  }
   @keyframes timerPulse {
     0%,100% { transform: scale(1); opacity: 1; }
     50%     { transform: scale(1.06); opacity: 0.85; }
   }
 
   #leaderboard {
-    position: fixed; top: 16px; left: 16px; width: 250px;
+    position: fixed; top: 10px; left: 10px; width: 250px;
+    zoom: 0.65;
     z-index: 3; pointer-events: none;
     padding: 10px 12px 12px;
     background: linear-gradient(160deg, rgba(20,30,55,0.82), rgba(10,16,32,0.76));
@@ -71,8 +79,8 @@
     font-variant-numeric: tabular-nums;
   }
   #leaderboard .lb-row.r1 .lb-rank { color: #ffd479; }
-  #leaderboard .lb-row.r2 .lb-rank { color: #d8d8e0; }
-  #leaderboard .lb-row.r3 .lb-rank { color: #cd9f6b; }
+  #leaderboard .lb-row.r2 .lb-rank { color: #a78bfa; }
+  #leaderboard .lb-row.r3 .lb-rank { color: #7fbfff; }
   #leaderboard .lb-color {
     width: 9px; height: 9px; border-radius: 50%;
     flex-shrink: 0; box-shadow: 0 0 6px currentColor;
@@ -83,8 +91,8 @@
     font-size: 12px;
   }
   #leaderboard .lb-row.r1 .lb-name { color: #ffe9b8; }
-  #leaderboard .lb-row.r2 .lb-name { color: #e8e8f0; }
-  #leaderboard .lb-row.r3 .lb-name { color: #e0c29a; }
+  #leaderboard .lb-row.r2 .lb-name { color: #c9a3ff; }
+  #leaderboard .lb-row.r3 .lb-name { color: #a0d4ff; }
   #leaderboard .lb-row.self { background: rgba(140,210,255,0.10); }
   #leaderboard .lb-row.self .lb-name { color: #8ee0ff; font-weight: 800; }
   #leaderboard .lb-count {
@@ -113,7 +121,8 @@
   }
 
   #statsHud {
-    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+    position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+    zoom: 0.65;
     display: flex; gap: 10px;
     z-index: 4; pointer-events: none;
   }
@@ -138,6 +147,8 @@
   .stat-value.kills { color: #ff9a5b; }
   .stat-value.rank  { color: #ffd479; }
   .stat-value.alive { color: #7bffa8; }
+  .stat-value.respawn-open   { color: #7bffa8; font-size: 14px; }
+  .stat-value.respawn-closed { color: #ff5577; font-size: 14px; }
 
   #victoryBanner {
     position: fixed; top: 22px; left: 50%;
@@ -164,6 +175,7 @@
   #suddenDeath {
     position: fixed; top: 22%; left: 50%;
     transform: translateX(-50%);
+    zoom: 0.65;
     z-index: 9; text-align: center;
     display: none; pointer-events: none;
   }
@@ -268,7 +280,8 @@
   .menu-controls b { color: #8ba0c5; font-weight: 600; }
 
   #customizeBtn {
-    position: fixed; bottom: 26px; left: 26px; z-index: 11;
+    position: fixed; bottom: 17px; left: 17px; z-index: 11;
+    zoom: 0.65;
     padding: 12px 22px 12px 18px;
     background: linear-gradient(160deg, rgba(30,45,80,0.85), rgba(15,22,42,0.85));
     border: 1px solid rgba(120,180,255,0.28);
@@ -339,7 +352,7 @@
     font-size: 20px; font-weight: 900; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.7); }
   .cz-color-wrap { position: relative; border-radius: 12px; overflow: hidden;
     border: 1px solid rgba(120,180,255,0.22); background: rgba(0,0,0,0.25); cursor: pointer; }
-  #czColorInput, #czOutlineInput { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; }
+  #czColorInput, #czOutlineInput, #czBoostGlowInput { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; }
   .cz-color-preview { display: flex; align-items: center; justify-content: center;
     gap: 12px; padding: 16px; pointer-events: none; }
   .cz-color-dot { width: 32px; height: 32px; border-radius: 50%;
@@ -418,7 +431,8 @@
   }
 
   #boostBtn {
-    position:fixed; bottom:30px; left:30px; width:96px; height:96px; border-radius:50%;
+    position:fixed; bottom:20px; left:20px; width:96px; height:96px; border-radius:50%;
+    zoom: 0.65;
     background:radial-gradient(circle at 35% 30%, rgba(140,220,255,0.35), rgba(108,204,255,0.15));
     border:2px solid rgba(108,204,255,0.6);
     display:none; align-items:center; justify-content:center;
@@ -431,25 +445,12 @@
   body.dead #boostBtn { display: none !important; }
 
   @media (max-width: 640px) {
-    #customizeBtn { bottom: 132px; left: 16px; padding: 10px 16px 10px 14px; font-size: 11px; }
+    #customizeBtn { bottom: 100px; left: 16px; }
     .cz-card { padding: 20px 18px 22px; }
     #deathScreen { padding: 0 12px 24px; }
     #deathScreen .ds-card { padding: 14px 26px 20px; }
-    #leaderboard { width: 200px; padding: 8px 10px 10px; top: 12px; left: 12px; }
-    #leaderboard .lb-title { font-size: 9px; letter-spacing: 1.6px; margin-bottom: 6px; padding-bottom: 5px; }
-    #leaderboard .lb-row { font-size: 11px; padding: 2.5px 3px; gap: 5px; }
-    #leaderboard .lb-name { font-size: 10.5px; }
-    #leaderboard .lb-count { font-size: 10.5px; min-width: 24px; }
-    #leaderboard .lb-sieges { font-size: 10px; min-width: 22px; }
-    #leaderboard .lb-rank { font-size: 10.5px; width: 13px; }
-    #leaderboard .lb-color { width: 8px; height: 8px; }
-    #timerHud { top: 12px; padding: 6px 20px; min-width: 120px; }
-    #timerLabel { font-size: 8.5px; letter-spacing: 1.8px; }
-    #timerValue { font-size: 24px; }
-    #statsHud { bottom: 12px; gap: 7px; }
-    .stat-box { min-width: 68px; padding: 6px 10px; }
-    .stat-label { font-size: 8px; letter-spacing: 1.4px; }
-    .stat-value { font-size: 16px; }
+    #statsHud { gap: 6px; bottom: 10px; }
+    .stat-box { min-width: 76px; padding: 6px 10px; }
   }
 </style>
 </head>
@@ -495,6 +496,10 @@
   <div class="stat-box">
     <div class="stat-label">Kills</div>
     <div class="stat-value kills" id="ui-kills">0</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Respawn</div>
+    <div class="stat-value respawn-open" id="ui-respawn">OPEN</div>
   </div>
 </div>
 
@@ -569,6 +574,16 @@
       </div>
     </div>
 
+    <div class="cz-section-title">Boost Glow</div>
+    <div class="cz-preset-colors" id="czBoostGlowQuick"></div>
+    <div class="cz-color-wrap">
+      <input type="color" id="czBoostGlowInput" value="#ffffff">
+      <div class="cz-color-preview">
+        <div class="cz-color-dot" id="czBoostGlowDot" style="background:#ffffff;"></div>
+        <div class="cz-color-hex" id="czBoostGlowHex">#FFFFFF</div>
+      </div>
+    </div>
+
     <div class="cz-actions">
       <button class="cz-btn ghost" id="czReset">Reset</button>
       <button class="cz-btn primary" id="czSave">Save</button>
@@ -583,7 +598,7 @@
 const CFG = {
   worldSize: 16800,
   zoneStart: 6400,
-  zoneMin: 382,
+  zoneMin: 478,
   matchDuration: 4 * 60,
   respawnUntil: 2.5 * 60,
   intermissionDuration: 5,
@@ -616,6 +631,11 @@ const CFG = {
   mmUpdateInterval: 10,
   mmFadeDuration: 1.25,
   mmViewFactor: 1.35,
+  suddenDeathMaxAlive: 3,
+  zoneDmgPerTick: 15,
+  zoneDmgIntervalShrink: 1.0,
+  zoneDmgIntervalFinal: 0.5,
+  boostFlashInterval: 0.5,
 };
 
 const BOT_NAMES = ['Rex','Blaze','Venom','Storm','Fang','Nyx','Echo','Ghost','Rogue','Titan',
@@ -642,18 +662,21 @@ function pickFoodTier() {
 }
 
 // ============================================================
-// PLAYER COLOR / NAME / OUTLINE
+// PLAYER COLOR / NAME / OUTLINE / BOOST GLOW
 // ============================================================
 const PLAYER_COLOR_KEY = 'battle-worms-color';
 const PLAYER_NAME_KEY = 'battle-worms-name';
 const PLAYER_OUTLINE_KEY = 'battle-worms-outline';
+const PLAYER_BOOST_GLOW_KEY = 'battle-worms-boost-glow';
 const DEFAULT_PLAYER_COLOR = '#6ccfff';
 const DEFAULT_PLAYER_NAME = 'You';
 const DEFAULT_PLAYER_OUTLINE = '#0a0e1a';
+const DEFAULT_PLAYER_BOOST_GLOW = '#ffffff';
 
 let playerColor = localStorage.getItem(PLAYER_COLOR_KEY) || DEFAULT_PLAYER_COLOR;
 let playerName = localStorage.getItem(PLAYER_NAME_KEY) || DEFAULT_PLAYER_NAME;
 let playerOutline = localStorage.getItem(PLAYER_OUTLINE_KEY) || DEFAULT_PLAYER_OUTLINE;
+let playerBoostGlow = localStorage.getItem(PLAYER_BOOST_GLOW_KEY) || DEFAULT_PLAYER_BOOST_GLOW;
 
 function setPlayerColor(hex, save) {
   playerColor = hex;
@@ -675,6 +698,11 @@ function setPlayerOutline(hex, save) {
   playerOutline = hex;
   if (save) localStorage.setItem(PLAYER_OUTLINE_KEY, hex);
   if (state && state.player && state.player.alive) state.player.outlineColor = hex;
+}
+function setPlayerBoostGlow(hex, save) {
+  playerBoostGlow = hex;
+  if (save) localStorage.setItem(PLAYER_BOOST_GLOW_KEY, hex);
+  if (state && state.player && state.player.alive) state.player.boostGlow = hex;
 }
 
 // ============================================================
@@ -709,6 +737,7 @@ const PRESET_WORMS = [
   { name: 'Cyan', color: '#3fe8ff' }, { name: 'Obsidian', color: '#1a2238' },
 ];
 const QUICK_OUTLINES = ['#0a0e1a','#000000','#2a2a3a','#ffffff','#e0e6f5','#5a1a2a','#1a3a2a','#3a2a1a'];
+const QUICK_BOOST_GLOWS = ['#ffffff','#ffd479','#8ee0ff','#7bffa8','#ff6ec7','#a78bfa','#ff5577','#5de2c4'];
 
 const MM_RANK_COLORS = ['#ffd479', '#a78bfa', '#7fbfff'];
 const NT_RANK_COLORS = [null, '#ffffff', '#c9a3ff', '#7fbfff'];
@@ -827,7 +856,6 @@ const freeCam = {
   touchPrevX: 0, touchPrevY: 0, pinchPrevDist: 0,
 };
 
-// ★ Zentraler Reset, verhindert stale Joystick/Boost-Zustände überall
 function resetInputState() {
   input.boost = false;
   input.joyActive = false;
@@ -846,6 +874,7 @@ class Worm {
     this.id = o.id; this.name = o.name; this.isBot = !!o.isBot;
     this.color = o.color;
     this.outlineColor = o.outlineColor || mixColors(this.color, '#000000', 0.65);
+    this.boostGlow = o.boostGlow || mixColors(this.color, '#ffffff', 0.6);
     this.alive = true;
     this.deathTime = -1; this.spawnTime = o.time || 0;
     this.killer = null;
@@ -1038,7 +1067,8 @@ function isPlayerDead() {
 function makePlayerWorm(x, y, angle) {
   return new Worm({
     id: 'player', name: playerName, isBot: false,
-    x, y, color: playerColor, outlineColor: playerOutline, angle,
+    x, y, color: playerColor, outlineColor: playerOutline,
+    boostGlow: playerBoostGlow, angle,
     time: state ? state.roundElapsed : 0,
   });
 }
@@ -1103,10 +1133,13 @@ function createMatch() {
 
   for (let i = 0; i < CFG.bots; i++) {
     const spawn = findSafeSpawn(worms);
+    const c = BOT_COLORS[i % BOT_COLORS.length];
     worms.push(new Worm({
       id: 'bot' + i, name: BOT_NAMES[i % BOT_NAMES.length], isBot: true,
       x: spawn.x, y: spawn.y, angle: spawn.ang,
-      color: BOT_COLORS[i % BOT_COLORS.length], time: 0,
+      color: c,
+      boostGlow: mixColors(c, '#ffffff', 0.6),
+      time: 0,
     }));
   }
   state = savedState;
@@ -1289,27 +1322,32 @@ function update(dt) {
 
   if (state.intermission) {
     state.intermissionElapsed += dt;
+    const p = Math.min(1, state.intermissionElapsed / CFG.intermissionDuration);
+    state.zone.radius = lerp(CFG.zoneMin, CFG.zoneStart, p);
+    state.zone.x = lerp(state.zone.cx1, state.zone.cx0, p);
+    state.zone.y = lerp(state.zone.cy1, state.zone.cy0, p);
+
     if (state.intermissionElapsed >= CFG.intermissionDuration) {
       startNewRound();
-    }
-    return;
-  }
-
-  if (state.zoneRegrowing) {
-    state.zoneRegrowT = Math.min(1, state.zoneRegrowT + dt / CFG.zoneRegrowDuration);
-    state.zone.radius = CFG.zoneMin + (CFG.zoneStart - CFG.zoneMin) * state.zoneRegrowT;
-    const p = 1 - state.zoneRegrowT;
-    state.zone.x = state.zone.cx0 + (state.zone.cx1 - state.zone.cx0) * p;
-    state.zone.y = state.zone.cy0 + (state.zone.cy1 - state.zone.cy0) * p;
-    if (state.zoneRegrowT >= 1) {
-      state.zoneRegrowing = false;
-      state.zoneShrinkT = 0;
+      return;
     }
   } else {
-    state.zoneShrinkT = Math.min(1, state.zoneShrinkT + dt / CFG.matchDuration);
-    state.zone.radius = lerp(CFG.zoneStart, CFG.zoneMin, state.zoneShrinkT);
-    state.zone.x = lerp(state.zone.cx0, state.zone.cx1, state.zoneShrinkT);
-    state.zone.y = lerp(state.zone.cy0, state.zone.cy1, state.zoneShrinkT);
+    if (state.zoneRegrowing) {
+      state.zoneRegrowT = Math.min(1, state.zoneRegrowT + dt / CFG.zoneRegrowDuration);
+      state.zone.radius = CFG.zoneMin + (CFG.zoneStart - CFG.zoneMin) * state.zoneRegrowT;
+      const p = 1 - state.zoneRegrowT;
+      state.zone.x = state.zone.cx0 + (state.zone.cx1 - state.zone.cx0) * p;
+      state.zone.y = state.zone.cy0 + (state.zone.cy1 - state.zone.cy0) * p;
+      if (state.zoneRegrowT >= 1) {
+        state.zoneRegrowing = false;
+        state.zoneShrinkT = 0;
+      }
+    } else {
+      state.zoneShrinkT = Math.min(1, state.zoneShrinkT + dt / CFG.matchDuration);
+      state.zone.radius = lerp(CFG.zoneStart, CFG.zoneMin, state.zoneShrinkT);
+      state.zone.x = lerp(state.zone.cx0, state.zone.cx1, state.zoneShrinkT);
+      state.zone.y = lerp(state.zone.cy0, state.zone.cy1, state.zoneShrinkT);
+    }
   }
 
   state.roundElapsed += dt;
@@ -1350,29 +1388,40 @@ function update(dt) {
     if (h.x < 0 || h.x > CFG.worldSize || h.y < 0 || h.y > CFG.worldSize) {
       worm.die('WALL'); continue;
     }
-    const zdx = h.x - state.zone.x, zdy = h.y - state.zone.y;
-    const dC = Math.sqrt(zdx * zdx + zdy * zdy);
-    const overshoot = dC - state.zone.radius;
-    if (overshoot > 0 && !state.zoneRegrowing) {
-      worm.outside = true;
-      worm.zoneDmg += dt;
-      const interval = overshoot > 200 ? 0.08 : overshoot > 60 ? 0.12 : 0.16;
-      if (worm.zoneDmg >= interval) {
-        worm.zoneDmg = 0;
-        const baseDrop = Math.max(1, Math.floor(worm.segments.length * 0.04));
-        const depthBonus = overshoot > 200 ? 3 : overshoot > 60 ? 2 : 1;
-        const drop = baseDrop + depthBonus;
-        if (worm.segments.length <= 6) worm.die('ZONE');
-        else for (let k = 0; k < drop && worm.segments.length > 5; k++) {
-          const tail = worm.segments[worm.segments.length - 1];
-          spawnParticle(tail.x, tail.y, '#ff5577', rand(-1,1), rand(-1,1), 0.5, 2.5, 0.85);
-          worm.segments.pop();
+
+    if (!state.intermission && !state.zoneRegrowing) {
+      const zdx = h.x - state.zone.x, zdy = h.y - state.zone.y;
+      const dC = Math.sqrt(zdx * zdx + zdy * zdy);
+      const overshoot = dC - state.zone.radius;
+      if (overshoot > 0) {
+        worm.outside = true;
+        worm.zoneDmg += dt;
+        const zoneAtMin = state.zone.radius <= CFG.zoneMin + 2;
+        const interval = zoneAtMin ? CFG.zoneDmgIntervalFinal : CFG.zoneDmgIntervalShrink;
+        if (worm.zoneDmg >= interval) {
+          worm.zoneDmg = 0;
+          const drop = CFG.zoneDmgPerTick;
+          if (worm.segments.length <= drop) {
+            worm.die('ZONE');
+          } else {
+            for (let k = 0; k < drop; k++) {
+              const tail = worm.segments[worm.segments.length - 1];
+              if (!tail) break;
+              spawnParticle(tail.x, tail.y, '#ff5577', rand(-1,1), rand(-1,1), 0.5, 2.5, 0.85);
+              worm.segments.pop();
+            }
+          }
         }
-      }
-    } else { worm.outside = false; worm.zoneDmg = 0; }
+      } else { worm.outside = false; worm.zoneDmg = 0; }
+    } else {
+      worm.outside = false;
+      worm.zoneDmg = 0;
+    }
   }
 
-  checkCollisions();
+  if (!state.intermission) {
+    checkCollisions();
+  }
   checkFood();
   updateParticles(dt);
 
@@ -1381,16 +1430,18 @@ function update(dt) {
     for (let i = 0; i < need; i++) state.foods.push(randomFood());
   }
 
-  if (state.roundElapsed < CFG.respawnUntil) {
+  if (!state.intermission && state.roundElapsed < CFG.respawnUntil) {
     for (let i = 0; i < state.worms.length; i++) {
       const w = state.worms[i];
       if (w.alive || !w.isBot) continue;
       if (w.respawnAt == null || state.roundElapsed < w.respawnAt) continue;
       const spawn = findSafeSpawn();
+      const c = w.color;
       state.worms[i] = new Worm({
         id: w.id, name: w.name, isBot: true,
         x: spawn.x, y: spawn.y, angle: spawn.ang,
-        color: w.color, time: state.roundElapsed,
+        color: c, boostGlow: mixColors(c, '#ffffff', 0.6),
+        time: state.roundElapsed,
       });
     }
   }
@@ -1410,11 +1461,12 @@ function update(dt) {
   }
   state.camera.zoom += (state.camera.targetZoom - state.camera.zoom) * Math.min(1, 8 * dt);
 
-  if (!state.matchOver) {
+  if (!state.matchOver && !state.intermission) {
     const alive = state.worms.filter(w => w.alive);
 
     const zoneAtMin = state.zone.radius <= CFG.zoneMin + 2 && !state.zoneRegrowing;
-    if (!state.suddenDeathActive && alive.length === 2 && zoneAtMin) {
+    if (!state.suddenDeathActive && zoneAtMin &&
+        alive.length >= 2 && alive.length <= CFG.suddenDeathMaxAlive) {
       state.suddenDeathActive = true;
       state.suddenDeathTime = CFG.suddenDeathDuration;
     }
@@ -1431,11 +1483,6 @@ function update(dt) {
 
     if (alive.length <= 1) {
       const winner = alive.length === 1 ? alive[0] : null;
-      endRound(winner);
-    } else if (!state.suddenDeathActive && !state.zoneRegrowing &&
-               state.roundElapsed >= CFG.matchDuration && alive.length > 2) {
-      const winner = state.worms.reduce((a, b) =>
-        (a.segments.length >= b.segments.length ? a : b));
       endRound(winner);
     }
   }
@@ -1543,7 +1590,6 @@ function endRound(winner) {
     showVictoryBanner(winner);
   }
   hideDeathScreen();
-  resetInputState();  // ★ FIX: sauberer Reset bei Rundenende
 }
 
 function startNewRound() {
@@ -1577,11 +1623,14 @@ function startNewRound() {
 
   for (let i = 0; i < CFG.bots; i++) {
     const spawn = findSafeSpawn(newWorms);
+    const c = BOT_COLORS[i % BOT_COLORS.length];
     newWorms.push(new Worm({
       id: 'bot' + state.round + '-' + i,
       name: BOT_NAMES[i % BOT_NAMES.length], isBot: true,
       x: spawn.x, y: spawn.y, angle: spawn.ang,
-      color: BOT_COLORS[i % BOT_COLORS.length], time: 0,
+      color: c,
+      boostGlow: mixColors(c, '#ffffff', 0.6),
+      time: 0,
     }));
   }
 
@@ -1609,7 +1658,7 @@ function startNewRound() {
     state.camera.freeCamActive = true;
   }
 
-  resetInputState();  // ★ FIX: Input zwischen Runden zurücksetzen
+  resetInputState();
 
   hideVictoryBanner();
   hideDeathScreen();
@@ -1627,10 +1676,12 @@ function triggerDraw() {
     if (w.alive) continue;
     if (w === state.player) continue;
     const spawn = findSafeSpawn();
+    const c = w.color;
     state.worms[i] = new Worm({
       id: w.id, name: w.name, isBot: true,
       x: spawn.x, y: spawn.y, angle: spawn.ang,
-      color: w.color, time: 0,
+      color: c, boostGlow: mixColors(c, '#ffffff', 0.6),
+      time: 0,
     });
   }
 
@@ -1646,12 +1697,12 @@ const vbSubEl = document.getElementById('vbSub');
 
 function showVictoryBanner(winner) {
   vbMainEl.innerHTML = `<span style="color:${winner.color}">${escapeHtml(winner.name)}</span> won the round!`;
-  vbSubEl.textContent = `Next round in ${CFG.intermissionDuration}…`;
+  vbSubEl.textContent = `Restart in ${CFG.intermissionDuration}…`;
   victoryBannerEl.classList.add('on');
 }
 function showDrawBanner() {
-  vbMainEl.innerHTML = `<span style="color:#8ee0ff">Draw!</span> Both survivors held out`;
-  vbSubEl.textContent = `Zone resetting · Respawn enabled`;
+  vbMainEl.innerHTML = `<span style="color:#8ee0ff">Draw!</span> Survivors held out`;
+  vbSubEl.textContent = `Zone resetting · Survivors keep their worms`;
   victoryBannerEl.classList.add('on');
   setTimeout(() => {
     if (!state || !state.intermission) victoryBannerEl.classList.remove('on');
@@ -1827,74 +1878,225 @@ function drawFood(cam, visW, visH) {
   });
 }
 
+// ============================================================
+// ★★★ NEUER WORM-LOOK ★★★
+// Glatte Bézier-Kurve, 3D-Schattierung, sanfte Specular-Highlights,
+// Belly-Scales, randlos abgerundeter Schwanz (kein Fade), polierte Augen.
+// ============================================================
 function drawWorm(worm, isPlayer, zoom) {
   const segs = worm.segments;
   if (segs.length < 2) return;
-  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
-  const outsideFlash = worm.outside ? 0.5 + 0.5 * Math.sin(state.time * 20) : 0;
-  const bodyColor = worm.outside ? mixColors(worm.color, '#ff2040', outsideFlash * 0.85) : worm.color;
-  const outlineColor = worm.outlineColor || '#0a0e1a';
   const h = segs[0], N = segs.length;
-  const outlineW = CFG.outlineWidth;
   const bodyR = wormBodyRadius(worm);
   const headR = wormHeadRadius(worm);
+  const outlineColor = worm.outlineColor || '#0a0e1a';
+  const outlineW = CFG.outlineWidth;
 
-  ctx.strokeStyle = outlineColor;
-  ctx.lineWidth = bodyR * 2 + outlineW * 2;
-  ctx.beginPath();
-  ctx.moveTo(segs[0].x, segs[0].y);
-  for (let i = 1; i < N; i++) ctx.lineTo(segs[i].x, segs[i].y);
-  ctx.stroke();
+  const outsideFlash = worm.outside ? 0.5 + 0.5 * Math.sin(state.time * 20) : 0;
+  const bodyColor = worm.outside
+    ? mixColors(worm.color, '#ff2040', outsideFlash * 0.85)
+    : worm.color;
 
-  ctx.strokeStyle = bodyColor;
-  ctx.lineWidth = bodyR * 2;
-  ctx.beginPath();
-  ctx.moveTo(segs[0].x, segs[0].y);
-  for (let i = 1; i < N; i++) ctx.lineTo(segs[i].x, segs[i].y);
-  ctx.stroke();
+  // Abgeleitete Schattierungen
+  const shadowColor   = mixColors(bodyColor, '#000000', 0.50);
+  const deepShadow    = mixColors(bodyColor, '#000000', 0.75);
+  const lightColor    = mixColors(bodyColor, '#ffffff', 0.50);
+  const specularColor = mixColors(bodyColor, '#ffffff', 0.90);
 
-  if (zoom > 0.32 && N > 6) {
-    ctx.strokeStyle = hexAlpha(outlineColor, 0.42);
-    ctx.lineWidth = 1.1;
-    const rr = bodyR * 0.9;
-    for (let i = 4; i < N - 1; i += 4) {
-      const s = segs[i];
-      const prev = segs[i - 1];
-      const ang = Math.atan2(s.y - prev.y, s.x - prev.x) + Math.PI / 2;
-      const cx = Math.cos(ang), cy = Math.sin(ang);
-      ctx.beginPath();
-      ctx.moveTo(s.x + cx * rr, s.y + cy * rr);
-      ctx.lineTo(s.x - cx * rr, s.y - cy * rr);
-      ctx.stroke();
+  // ────────────────────────────────────────────────────────
+  // Glatter Körper-Pfad (quadratische Bézier-Splines durch alle Segmente)
+  // ────────────────────────────────────────────────────────
+  const path = new Path2D();
+  path.moveTo(segs[0].x, segs[0].y);
+  if (N >= 3) {
+    for (let i = 1; i < N - 1; i++) {
+      const xc = (segs[i].x + segs[i + 1].x) * 0.5;
+      const yc = (segs[i].y + segs[i + 1].y) * 0.5;
+      path.quadraticCurveTo(segs[i].x, segs[i].y, xc, yc);
     }
+    path.lineTo(segs[N - 1].x, segs[N - 1].y);
+  } else {
+    path.lineTo(segs[N - 1].x, segs[N - 1].y);
   }
 
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  // ────────────────────────────────────────────────────────
+  // 0. BOOST GLOW (unter allem)
+  // ────────────────────────────────────────────────────────
+  if (worm.boosting && worm.alive) {
+    const flashRaw = 0.5 + 0.5 * Math.sin(state.time * Math.PI * 2 / CFG.boostFlashInterval);
+    const flashAmt = Math.pow(flashRaw, 4);
+    const bc = worm.boostGlow || '#ffffff';
+    ctx.strokeStyle = hexAlpha(bc, 0.15 + 0.55 * flashAmt);
+    ctx.lineWidth = bodyR * 2 + outlineW * 2 + 8 + 18 * flashAmt;
+    ctx.stroke(path);
+    ctx.beginPath();
+    ctx.arc(h.x, h.y, headR + outlineW + 6 + 12 * flashAmt, 0, Math.PI * 2);
+    ctx.fillStyle = hexAlpha(bc, 0.10 + 0.5 * flashAmt);
+    ctx.fill();
+  }
+
+  // ────────────────────────────────────────────────────────
+  // 1. ÄUßERE OUTLINE (dunkel, breiteste Schicht)
+  // ────────────────────────────────────────────────────────
+  ctx.strokeStyle = outlineColor;
+  ctx.lineWidth = bodyR * 2 + outlineW * 2 + 2;
+  ctx.stroke(path);
+
+  // ────────────────────────────────────────────────────────
+  // 2. SCHATTEN-Schicht (nach unten-rechts versetzt)
+  // ────────────────────────────────────────────────────────
+  ctx.save();
+  ctx.translate(bodyR * 0.10, bodyR * 0.22);
+  ctx.strokeStyle = deepShadow;
+  ctx.lineWidth = bodyR * 2 + outlineW * 1.6;
+  ctx.stroke(path);
+  ctx.restore();
+
+  // ────────────────────────────────────────────────────────
+  // 3. BASIS-KÖRPER
+  // ────────────────────────────────────────────────────────
+  ctx.strokeStyle = bodyColor;
+  ctx.lineWidth = bodyR * 2 + outlineW * 0.4;
+  ctx.stroke(path);
+
+  // ────────────────────────────────────────────────────────
+  // 4. LICHT-Schicht (nach oben-links versetzt)
+  // ────────────────────────────────────────────────────────
+  ctx.save();
+  ctx.translate(-bodyR * 0.22, -bodyR * 0.28);
+  ctx.strokeStyle = hexAlpha(lightColor, 0.80);
+  ctx.lineWidth = bodyR * 1.15;
+  ctx.stroke(path);
+  ctx.restore();
+
+  // ────────────────────────────────────────────────────────
+  // 5. SPECULAR-HIGHLIGHT (dünn, obere Kante)
+  // ────────────────────────────────────────────────────────
+  ctx.save();
+  ctx.translate(-bodyR * 0.32, -bodyR * 0.40);
+  ctx.strokeStyle = hexAlpha(specularColor, 0.90);
+  ctx.lineWidth = Math.max(1.2, bodyR * 0.28);
+  ctx.stroke(path);
+  ctx.restore();
+
+  // ────────────────────────────────────────────────────────
+  // 6. BELLY-RIPPLES (kleine dunkle Schuppen, gebündelt als ein Stroke)
+  // ────────────────────────────────────────────────────────
+  if (zoom > 0.30 && N > 8) {
+    const step = Math.max(3, Math.floor(N / 42));
+    const ripplePath = new Path2D();
+    for (let i = step; i < N - 1; i += step) {
+      const s = segs[i];
+      const prev = segs[i - 1];
+      const ang = Math.atan2(s.y - prev.y, s.x - prev.x);
+      const perp = ang + Math.PI / 2;
+      const cx = Math.cos(perp), cy = Math.sin(perp);
+      const r0 = bodyR * 0.34;
+      const r1 = bodyR * 0.62;
+      ripplePath.moveTo(s.x + cx * r0, s.y + cy * r0);
+      ripplePath.lineTo(s.x + cx * r1, s.y + cy * r1);
+    }
+    ctx.save();
+    ctx.translate(bodyR * 0.05, bodyR * 0.16);
+    ctx.strokeStyle = hexAlpha(deepShadow, 0.55);
+    ctx.lineWidth = Math.max(1.0, bodyR * 0.13);
+    ctx.lineCap = 'round';
+    ctx.stroke(ripplePath);
+    ctx.restore();
+  }
+
+  // ────────────────────────────────────────────────────────
+  // 7. KOPF (mit Outline + Gradient)
+  // ────────────────────────────────────────────────────────
+  // Äußerer Outline-Ring
   ctx.beginPath();
-  ctx.arc(h.x, h.y, headR + outlineW, 0, Math.PI * 2);
-  ctx.fillStyle = outlineColor; ctx.fill();
+  ctx.arc(h.x, h.y, headR + outlineW + 1, 0, Math.PI * 2);
+  ctx.fillStyle = outlineColor;
+  ctx.fill();
+
+  // Basis-Kopf
+  ctx.beginPath();
+  ctx.arc(h.x, h.y, headR + outlineW * 0.6, 0, Math.PI * 2);
+  ctx.fillStyle = bodyColor;
+  ctx.fill();
+
+  // Kopf-Radialgradient (Lichtquelle oben links)
+  const headGrad = ctx.createRadialGradient(
+    h.x - headR * 0.38, h.y - headR * 0.42, headR * 0.12,
+    h.x, h.y, headR * 1.05
+  );
+  headGrad.addColorStop(0, mixColors(bodyColor, '#ffffff', 0.78));
+  headGrad.addColorStop(0.45, bodyColor);
+  headGrad.addColorStop(1, shadowColor);
   ctx.beginPath();
   ctx.arc(h.x, h.y, headR, 0, Math.PI * 2);
-  ctx.fillStyle = bodyColor; ctx.fill();
+  ctx.fillStyle = headGrad;
+  ctx.fill();
 
-  const eyeBack = headR * 0.18, eyeSide = headR * 0.58;
-  const eyeR = headR * 0.42, pupilR = eyeR * 0.6;
+  // Kopf-Specular-Highlight
+  ctx.beginPath();
+  ctx.arc(h.x - headR * 0.32, h.y - headR * 0.38, headR * 0.32, 0, Math.PI * 2);
+  ctx.fillStyle = hexAlpha(specularColor, 0.55);
+  ctx.fill();
+
+  // ────────────────────────────────────────────────────────
+  // 8. AUGEN (Sclera mit Gradient, dunkle Pupille, 2 Glints)
+  // ────────────────────────────────────────────────────────
+  const eyeBack = headR * 0.20, eyeSide = headR * 0.60;
+  const eyeR = headR * 0.46, pupilR = eyeR * 0.55;
   const perp = worm.angle + Math.PI / 2;
+
   for (const sgn of [-1, 1]) {
     const ex = h.x + Math.cos(worm.angle) * eyeBack + Math.cos(perp) * eyeSide * sgn;
     const ey = h.y + Math.sin(worm.angle) * eyeBack + Math.sin(perp) * eyeSide * sgn;
-    ctx.beginPath(); ctx.arc(ex, ey, eyeR + 1.2, 0, Math.PI * 2);
-    ctx.fillStyle = outlineColor; ctx.fill();
-    ctx.beginPath(); ctx.arc(ex, ey, eyeR, 0, Math.PI * 2);
-    ctx.fillStyle = '#ffffff'; ctx.fill();
-    const px = ex + Math.cos(worm.angle) * eyeR * 0.35;
-    const py = ey + Math.sin(worm.angle) * eyeR * 0.35;
-    ctx.beginPath(); ctx.arc(px, py, pupilR, 0, Math.PI * 2);
-    ctx.fillStyle = '#0a0e1a'; ctx.fill();
-    ctx.beginPath(); ctx.arc(px - pupilR * 0.35, py - pupilR * 0.35, pupilR * 0.42, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.fill();
+
+    // Äußerer dunkler Ring
+    ctx.beginPath();
+    ctx.arc(ex, ey, eyeR + 1.6, 0, Math.PI * 2);
+    ctx.fillStyle = outlineColor;
+    ctx.fill();
+
+    // Sclera mit Radial-Gradient
+    const eyeGrad = ctx.createRadialGradient(
+      ex - eyeR * 0.30, ey - eyeR * 0.30, eyeR * 0.10,
+      ex, ey, eyeR
+    );
+    eyeGrad.addColorStop(0, '#ffffff');
+    eyeGrad.addColorStop(0.75, '#eef3ff');
+    eyeGrad.addColorStop(1, '#cfd6e6');
+    ctx.beginPath();
+    ctx.arc(ex, ey, eyeR, 0, Math.PI * 2);
+    ctx.fillStyle = eyeGrad;
+    ctx.fill();
+
+    // Pupille (leicht in Blickrichtung verschoben)
+    const px = ex + Math.cos(worm.angle) * eyeR * 0.32;
+    const py = ey + Math.sin(worm.angle) * eyeR * 0.32;
+    ctx.beginPath();
+    ctx.arc(px, py, pupilR, 0, Math.PI * 2);
+    ctx.fillStyle = '#0a0e1a';
+    ctx.fill();
+
+    // Haupt-Glint (oben links)
+    ctx.beginPath();
+    ctx.arc(px - pupilR * 0.38, py - pupilR * 0.38, pupilR * 0.42, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.98)';
+    ctx.fill();
+
+    // Sekundär-Glint (unten rechts, schwächer)
+    ctx.beginPath();
+    ctx.arc(px + pupilR * 0.30, py + pupilR * 0.30, pupilR * 0.20, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fill();
   }
 
+  // ────────────────────────────────────────────────────────
+  // 9. NAMETAG
+  // ────────────────────────────────────────────────────────
   if (!isPlayer && zoom > 0.32) {
     const labelY = h.y - headR - 7;
     const fs = Math.max(10, 11 / Math.sqrt(zoom));
@@ -1912,8 +2114,8 @@ function drawWorm(worm, isPlayer, zoom) {
 }
 
 function drawMinimap() {
-  const size = IS_TOUCH ? 108 : 156;
-  const pad = IS_TOUCH ? 14 : 18;
+  const size = IS_TOUCH ? 81 : 117;
+  const pad = IS_TOUCH ? 12 : 14;
   const mcx = VW - size / 2 - pad;
   const mcy = size / 2 + pad;
   const R = size / 2;
@@ -1956,7 +2158,7 @@ function drawMinimap() {
     const prevA = ctx.globalAlpha;
     ctx.globalAlpha = alpha;
     ctx.strokeStyle = color;
-    ctx.lineWidth = 2.6;
+    ctx.lineWidth = 2.4;
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     ctx.beginPath();
     ctx.moveTo(mcx + (segs[0].x - z.x) * s, mcy + (segs[0].y - z.y) * s);
@@ -1965,7 +2167,7 @@ function drawMinimap() {
     }
     ctx.stroke();
     ctx.beginPath();
-    ctx.arc(mcx + (segs[0].x - z.x) * s, mcy + (segs[0].y - z.y) * s, 3, 0, Math.PI * 2);
+    ctx.arc(mcx + (segs[0].x - z.x) * s, mcy + (segs[0].y - z.y) * s, 2.8, 0, Math.PI * 2);
     ctx.fillStyle = color; ctx.fill();
     ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 1; ctx.stroke();
     ctx.globalAlpha = prevA;
@@ -1998,7 +2200,7 @@ function drawMinimap() {
     ctx.save();
     ctx.translate(px, py); ctx.rotate(a);
     ctx.beginPath();
-    ctx.moveTo(6, 0); ctx.lineTo(-4, -4); ctx.lineTo(-2, 0); ctx.lineTo(-4, 4);
+    ctx.moveTo(5.5, 0); ctx.lineTo(-3.5, -3.5); ctx.lineTo(-1.8, 0); ctx.lineTo(-3.5, 3.5);
     ctx.closePath();
     ctx.fillStyle = '#ffffff'; ctx.fill();
     ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.lineWidth = 0.8; ctx.stroke();
@@ -2016,7 +2218,6 @@ function drawMinimap() {
 function drawJoystick() {
   if (!IS_TOUCH || !input.joyActive) return;
   if (deathScreenEl.classList.contains('on')) return;
-  if (state && state.intermission) return;
   const bx = input.joyBaseX, by = input.joyBaseY, R = input.joyRadius;
   const grd = ctx.createRadialGradient(bx, by, R * 0.3, bx, by, R);
   grd.addColorStop(0, 'rgba(120,200,255,0.02)');
@@ -2044,6 +2245,7 @@ const uiMass = document.getElementById('ui-mass');
 const uiAlive = document.getElementById('ui-alive');
 const uiRank = document.getElementById('ui-rank');
 const uiKills = document.getElementById('ui-kills');
+const uiRespawn = document.getElementById('ui-respawn');
 const timerHudEl = document.getElementById('timerHud');
 const timerLabelEl = document.getElementById('timerLabel');
 const timerValueEl = document.getElementById('timerValue');
@@ -2061,11 +2263,12 @@ function updateHUD() {
   const alive = state.worms.filter(w => w.alive);
   uiAlive.textContent = alive.length;
 
-  let timeLabel, timeValue, urgent = false;
+  let timeLabel, timeValue, urgent = false, restart = false;
   if (state.intermission) {
     const remaining = Math.max(0, CFG.intermissionDuration - state.intermissionElapsed);
-    timeLabel = 'NEXT ROUND IN';
+    timeLabel = 'RESTART';
     timeValue = fmtShort(remaining);
+    restart = true;
   } else if (state.zoneRegrowing) {
     const remaining = Math.max(0, CFG.zoneRegrowDuration * (1 - state.zoneRegrowT));
     timeLabel = 'ZONE REGROW';
@@ -2081,16 +2284,21 @@ function updateHUD() {
     urgent = remaining <= 30;
   } else {
     timeLabel = 'FINAL ZONE';
-    timeValue = 'NOW';
-    urgent = true;
+    timeValue = 'WAIT';
   }
   timerLabelEl.textContent = timeLabel;
   timerValueEl.textContent = timeValue;
   timerHudEl.classList.toggle('urgent', urgent);
+  timerHudEl.classList.toggle('restart', restart);
 
   const sorted = [...state.worms].filter(w => w.alive).sort((a, b) => b.segments.length - a.segments.length);
   uiRank.textContent = p.alive ? (sorted.indexOf(p) + 1) + '/' + alive.length : '—';
   uiKills.textContent = p.kills || 0;
+
+  const respawnOpen = !state.intermission &&
+    (state.roundElapsed < CFG.respawnUntil || state.zoneRegrowing);
+  uiRespawn.textContent = respawnOpen ? 'OPEN' : 'CLOSED';
+  uiRespawn.className = 'stat-value ' + (respawnOpen ? 'respawn-open' : 'respawn-closed');
 
   const top5 = sorted.slice(0, 5);
   if (top5.length === 0) {
@@ -2161,7 +2369,7 @@ canvas.addEventListener('mousedown', e => {
     e.preventDefault();
     return;
   }
-  if (!document.body.classList.contains('dead') && !(state && state.intermission))
+  if (!document.body.classList.contains('dead'))
     input.boost = true;
 });
 window.addEventListener('mouseup', () => {
@@ -2178,7 +2386,7 @@ canvas.addEventListener('wheel', e => {
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 
 window.addEventListener('keydown', e => {
-  if (e.code === 'Space' && !document.body.classList.contains('dead') && !(state && state.intermission)) {
+  if (e.code === 'Space' && !document.body.classList.contains('dead')) {
     input.boost = true; e.preventDefault();
   }
 });
@@ -2186,7 +2394,6 @@ window.addEventListener('keyup', e => {
   if (e.code === 'Space') input.boost = false;
 });
 
-// ★ touchStart mit stale-Joystick-Reinigung (Fix)
 function touchStart(e) {
   if (isPlayerDead()) {
     if (e.touches.length === 2) {
@@ -2201,8 +2408,6 @@ function touchStart(e) {
     return;
   }
   if (document.body.classList.contains('dead')) return;
-  if (state && state.intermission) return;
-  // Sicherheitsnetz: joyActive true, aber der Touch existiert nicht mehr → reset
   if (input.joyActive) {
     let stillAlive = false;
     for (const t of e.touches) {
@@ -2251,7 +2456,6 @@ function touchMove(e) {
   }
   e.preventDefault();
 }
-// ★ touchEnd räumt jetzt auch im Death-Modus auf (Fix)
 function touchEnd(e) {
   if (isPlayerDead()) {
     if (e.touches.length < 2) freeCam.pinchPrevDist = 0;
@@ -2275,7 +2479,7 @@ canvas.addEventListener('touchend', touchEnd, { passive: false });
 canvas.addEventListener('touchcancel', touchEnd, { passive: false });
 
 const boostBtn = document.getElementById('boostBtn');
-function boostOn(e) { if (state && state.intermission) return; input.boost = true; boostBtn.classList.add('active'); e.preventDefault(); e.stopPropagation(); }
+function boostOn(e) { input.boost = true; boostBtn.classList.add('active'); e.preventDefault(); e.stopPropagation(); }
 function boostOff(e) { input.boost = false; boostBtn.classList.remove('active'); if (e) { e.preventDefault(); e.stopPropagation(); } }
 boostBtn.addEventListener('touchstart', boostOn, { passive: false });
 boostBtn.addEventListener('touchend', boostOff, { passive: false });
@@ -2294,18 +2498,23 @@ const czSave = document.getElementById('czSave');
 const czReset = document.getElementById('czReset');
 const czPresets = document.getElementById('czPresets');
 const czOutlineQuick = document.getElementById('czOutlineQuick');
+const czBoostGlowQuick = document.getElementById('czBoostGlowQuick');
 const czColorInput = document.getElementById('czColorInput');
 const czColorDot = document.getElementById('czColorDot');
 const czColorHex = document.getElementById('czColorHex');
 const czOutlineInput = document.getElementById('czOutlineInput');
 const czOutlineDot = document.getElementById('czOutlineDot');
 const czOutlineHex = document.getElementById('czOutlineHex');
+const czBoostGlowInput = document.getElementById('czBoostGlowInput');
+const czBoostGlowDot = document.getElementById('czBoostGlowDot');
+const czBoostGlowHex = document.getElementById('czBoostGlowHex');
 const czNameInput = document.getElementById('czNameInput');
 const czCanvas = document.getElementById('czCanvas');
 const czCtx = czCanvas.getContext('2d');
 
 let czTempColor = playerColor;
 let czTempOutline = playerOutline;
+let czTempBoostGlow = playerBoostGlow;
 let czTempName = playerName;
 let czAnimId = null, czStartTime = 0;
 
@@ -2324,6 +2533,13 @@ QUICK_OUTLINES.forEach(c => {
   el.addEventListener('click', () => { czTempOutline = c; updateCzUI(); });
   czOutlineQuick.appendChild(el);
 });
+QUICK_BOOST_GLOWS.forEach(c => {
+  const el = document.createElement('button');
+  el.className = 'cz-quick-color';
+  el.style.background = c;
+  el.addEventListener('click', () => { czTempBoostGlow = c; updateCzUI(); });
+  czBoostGlowQuick.appendChild(el);
+});
 
 function updateCzUI() {
   [...czPresets.children].forEach(el => {
@@ -2337,10 +2553,15 @@ function updateCzUI() {
   czOutlineDot.style.background = czTempOutline;
   czOutlineHex.textContent = czTempOutline.toUpperCase();
 
+  czBoostGlowInput.value = czTempBoostGlow;
+  czBoostGlowDot.style.background = czTempBoostGlow;
+  czBoostGlowHex.textContent = czTempBoostGlow.toUpperCase();
+
   if (czNameInput && czNameInput.value !== czTempName) czNameInput.value = czTempName;
 }
 czColorInput.addEventListener('input', e => { czTempColor = e.target.value; updateCzUI(); });
 czOutlineInput.addEventListener('input', e => { czTempOutline = e.target.value; updateCzUI(); });
+czBoostGlowInput.addEventListener('input', e => { czTempBoostGlow = e.target.value; updateCzUI(); });
 czNameInput.addEventListener('input', e => {
   czTempName = e.target.value.replace(/\s{2,}/g, ' ').slice(0, 14);
   if (czTempName !== e.target.value) e.target.value = czTempName;
@@ -2349,6 +2570,7 @@ czNameInput.addEventListener('input', e => {
 function openCustomize() {
   czTempColor = playerColor;
   czTempOutline = playerOutline;
+  czTempBoostGlow = playerBoostGlow;
   czTempName = playerName;
   czNameInput.value = playerName;
   updateCzUI();
@@ -2366,12 +2588,14 @@ czClose.addEventListener('click', closeCustomize);
 czSave.addEventListener('click', () => {
   setPlayerColor(czTempColor, true);
   setPlayerOutline(czTempOutline, true);
+  setPlayerBoostGlow(czTempBoostGlow, true);
   setPlayerName(czTempName, true);
   closeCustomize();
 });
 czReset.addEventListener('click', () => {
   czTempColor = DEFAULT_PLAYER_COLOR;
   czTempOutline = DEFAULT_PLAYER_OUTLINE;
+  czTempBoostGlow = DEFAULT_PLAYER_BOOST_GLOW;
   czTempName = DEFAULT_PLAYER_NAME;
   updateCzUI();
 });
@@ -2385,6 +2609,7 @@ function animateCzPreview() {
   czAnimId = requestAnimationFrame(animateCzPreview);
 }
 
+// ★ Preview mit gleichem Look wie Ingame
 function drawCzPreview(t) {
   const w = czCanvas.width, h = czCanvas.height;
   czCtx.clearRect(0, 0, w, h);
@@ -2393,71 +2618,161 @@ function drawCzPreview(t) {
   bg.addColorStop(1, 'rgba(120,180,255,0)');
   czCtx.fillStyle = bg; czCtx.fillRect(0, 0, w, h);
 
-  const segments = 30, segLen = 5.5, baseY = h / 2, amp = 14, wave = t * 1.6;
-  const headX = w / 2 + 50;
+  const segments = 34, segLen = 5.2, baseY = h / 2, amp = 16, wave = t * 1.6;
+  const headX = w / 2 + 55;
   const pts = [];
   for (let i = 0; i < segments; i++)
-    pts.push({ x: headX - i * segLen, y: baseY + Math.sin(wave - i * 0.34) * amp });
+    pts.push({ x: headX - i * segLen, y: baseY + Math.sin(wave - i * 0.32) * amp });
 
-  const bodyR = 12;
+  const bodyR = 13;
   const outlineW = CFG.outlineWidth;
   czCtx.lineCap = 'round'; czCtx.lineJoin = 'round';
 
-  czCtx.strokeStyle = czTempOutline;
-  czCtx.lineWidth = bodyR * 2 + outlineW * 2;
-  czCtx.beginPath(); czCtx.moveTo(pts[0].x, pts[0].y);
-  for (let i = 1; i < pts.length; i++) czCtx.lineTo(pts[i].x, pts[i].y);
-  czCtx.stroke();
+  const shadowColor   = mixColors(czTempColor, '#000000', 0.50);
+  const deepShadow    = mixColors(czTempColor, '#000000', 0.75);
+  const lightColor    = mixColors(czTempColor, '#ffffff', 0.50);
+  const specularColor = mixColors(czTempColor, '#ffffff', 0.90);
 
-  czCtx.strokeStyle = czTempColor;
-  czCtx.lineWidth = bodyR * 2;
-  czCtx.beginPath(); czCtx.moveTo(pts[0].x, pts[0].y);
-  for (let i = 1; i < pts.length; i++) czCtx.lineTo(pts[i].x, pts[i].y);
-  czCtx.stroke();
-
-  czCtx.strokeStyle = hexAlpha(czTempOutline, 0.42);
-  czCtx.lineWidth = 1.1;
-  for (let i = 4; i < pts.length - 1; i += 4) {
-    const s = pts[i], prev = pts[i - 1];
-    const ang = Math.atan2(s.y - prev.y, s.x - prev.x) + Math.PI / 2;
-    const cx = Math.cos(ang), cy = Math.sin(ang);
-    const rr = bodyR * 0.9;
-    czCtx.beginPath();
-    czCtx.moveTo(s.x + cx * rr, s.y + cy * rr);
-    czCtx.lineTo(s.x - cx * rr, s.y - cy * rr);
-    czCtx.stroke();
+  // Smooth Path
+  const path = new Path2D();
+  path.moveTo(pts[0].x, pts[0].y);
+  for (let i = 1; i < pts.length - 1; i++) {
+    const xc = (pts[i].x + pts[i + 1].x) * 0.5;
+    const yc = (pts[i].y + pts[i + 1].y) * 0.5;
+    path.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
   }
+  path.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+
+  // Boost-Glow-Preview
+  const flashRaw = 0.5 + 0.5 * Math.sin(t * Math.PI * 2 / CFG.boostFlashInterval);
+  const flashAmt = Math.pow(flashRaw, 4);
+  czCtx.strokeStyle = hexAlpha(czTempBoostGlow, 0.15 + 0.55 * flashAmt);
+  czCtx.lineWidth = bodyR * 2 + outlineW * 2 + 8 + 18 * flashAmt;
+  czCtx.stroke(path);
 
   const headPt = pts[0];
   const angle = Math.atan2(headPt.y - pts[1].y, headPt.x - pts[1].x);
   const hr = bodyR + 1;
-  czCtx.beginPath(); czCtx.arc(headPt.x, headPt.y, hr + outlineW, 0, Math.PI * 2);
+  czCtx.beginPath();
+  czCtx.arc(headPt.x, headPt.y, hr + outlineW + 6 + 12 * flashAmt, 0, Math.PI * 2);
+  czCtx.fillStyle = hexAlpha(czTempBoostGlow, 0.10 + 0.5 * flashAmt);
+  czCtx.fill();
+
+  // Outer outline
+  czCtx.strokeStyle = czTempOutline;
+  czCtx.lineWidth = bodyR * 2 + outlineW * 2 + 2;
+  czCtx.stroke(path);
+
+  // Shadow
+  czCtx.save();
+  czCtx.translate(bodyR * 0.10, bodyR * 0.22);
+  czCtx.strokeStyle = deepShadow;
+  czCtx.lineWidth = bodyR * 2 + outlineW * 1.6;
+  czCtx.stroke(path);
+  czCtx.restore();
+
+  // Base body
+  czCtx.strokeStyle = czTempColor;
+  czCtx.lineWidth = bodyR * 2 + outlineW * 0.4;
+  czCtx.stroke(path);
+
+  // Light
+  czCtx.save();
+  czCtx.translate(-bodyR * 0.22, -bodyR * 0.28);
+  czCtx.strokeStyle = hexAlpha(lightColor, 0.80);
+  czCtx.lineWidth = bodyR * 1.15;
+  czCtx.stroke(path);
+  czCtx.restore();
+
+  // Specular
+  czCtx.save();
+  czCtx.translate(-bodyR * 0.32, -bodyR * 0.40);
+  czCtx.strokeStyle = hexAlpha(specularColor, 0.90);
+  czCtx.lineWidth = Math.max(1.2, bodyR * 0.28);
+  czCtx.stroke(path);
+  czCtx.restore();
+
+  // Belly ripples
+  const step = Math.max(3, Math.floor(pts.length / 12));
+  const ripplePath = new Path2D();
+  for (let i = step; i < pts.length - 1; i += step) {
+    const s = pts[i];
+    const prev = pts[i - 1];
+    const ang = Math.atan2(s.y - prev.y, s.x - prev.x);
+    const perp = ang + Math.PI / 2;
+    const cx = Math.cos(perp), cy = Math.sin(perp);
+    const r0 = bodyR * 0.34;
+    const r1 = bodyR * 0.62;
+    ripplePath.moveTo(s.x + cx * r0, s.y + cy * r0);
+    ripplePath.lineTo(s.x + cx * r1, s.y + cy * r1);
+  }
+  czCtx.save();
+  czCtx.translate(bodyR * 0.05, bodyR * 0.16);
+  czCtx.strokeStyle = hexAlpha(deepShadow, 0.55);
+  czCtx.lineWidth = Math.max(1.0, bodyR * 0.13);
+  czCtx.lineCap = 'round';
+  czCtx.stroke(ripplePath);
+  czCtx.restore();
+
+  // Head
+  czCtx.beginPath(); czCtx.arc(headPt.x, headPt.y, hr + outlineW + 1, 0, Math.PI * 2);
   czCtx.fillStyle = czTempOutline; czCtx.fill();
-  czCtx.beginPath(); czCtx.arc(headPt.x, headPt.y, hr, 0, Math.PI * 2);
+  czCtx.beginPath(); czCtx.arc(headPt.x, headPt.y, hr + outlineW * 0.6, 0, Math.PI * 2);
   czCtx.fillStyle = czTempColor; czCtx.fill();
 
-  const eyeBack = hr * 0.18, eyeSide = hr * 0.58;
-  const eyeR = hr * 0.42, pupilR = eyeR * 0.6;
+  const headGrad = czCtx.createRadialGradient(
+    headPt.x - hr * 0.38, headPt.y - hr * 0.42, hr * 0.12,
+    headPt.x, headPt.y, hr * 1.05
+  );
+  headGrad.addColorStop(0, mixColors(czTempColor, '#ffffff', 0.78));
+  headGrad.addColorStop(0.45, czTempColor);
+  headGrad.addColorStop(1, shadowColor);
+  czCtx.beginPath(); czCtx.arc(headPt.x, headPt.y, hr, 0, Math.PI * 2);
+  czCtx.fillStyle = headGrad; czCtx.fill();
+
+  czCtx.beginPath();
+  czCtx.arc(headPt.x - hr * 0.32, headPt.y - hr * 0.38, hr * 0.32, 0, Math.PI * 2);
+  czCtx.fillStyle = hexAlpha(specularColor, 0.55);
+  czCtx.fill();
+
+  // Eyes
+  const eyeBack = hr * 0.20, eyeSide = hr * 0.60;
+  const eyeR = hr * 0.46, pupilR = eyeR * 0.55;
   const perp = angle + Math.PI / 2;
   for (const sgn of [-1, 1]) {
     const ex = headPt.x + Math.cos(angle) * eyeBack + Math.cos(perp) * eyeSide * sgn;
     const ey = headPt.y + Math.sin(angle) * eyeBack + Math.sin(perp) * eyeSide * sgn;
-    czCtx.beginPath(); czCtx.arc(ex, ey, eyeR + 1.2, 0, Math.PI * 2);
+
+    czCtx.beginPath(); czCtx.arc(ex, ey, eyeR + 1.6, 0, Math.PI * 2);
     czCtx.fillStyle = czTempOutline; czCtx.fill();
+
+    const eyeGrad = czCtx.createRadialGradient(
+      ex - eyeR * 0.30, ey - eyeR * 0.30, eyeR * 0.10,
+      ex, ey, eyeR
+    );
+    eyeGrad.addColorStop(0, '#ffffff');
+    eyeGrad.addColorStop(0.75, '#eef3ff');
+    eyeGrad.addColorStop(1, '#cfd6e6');
     czCtx.beginPath(); czCtx.arc(ex, ey, eyeR, 0, Math.PI * 2);
-    czCtx.fillStyle = '#ffffff'; czCtx.fill();
-    const px = ex + Math.cos(angle) * eyeR * 0.35;
-    const py = ey + Math.sin(angle) * eyeR * 0.35;
+    czCtx.fillStyle = eyeGrad; czCtx.fill();
+
+    const px = ex + Math.cos(angle) * eyeR * 0.32;
+    const py = ey + Math.sin(angle) * eyeR * 0.32;
     czCtx.beginPath(); czCtx.arc(px, py, pupilR, 0, Math.PI * 2);
     czCtx.fillStyle = '#0a0e1a'; czCtx.fill();
-    czCtx.beginPath(); czCtx.arc(px - pupilR * 0.35, py - pupilR * 0.35, pupilR * 0.42, 0, Math.PI * 2);
-    czCtx.fillStyle = 'rgba(255,255,255,0.95)'; czCtx.fill();
+    czCtx.beginPath();
+    czCtx.arc(px - pupilR * 0.38, py - pupilR * 0.38, pupilR * 0.42, 0, Math.PI * 2);
+    czCtx.fillStyle = 'rgba(255,255,255,0.98)'; czCtx.fill();
+    czCtx.beginPath();
+    czCtx.arc(px + pupilR * 0.30, py + pupilR * 0.30, pupilR * 0.20, 0, Math.PI * 2);
+    czCtx.fillStyle = 'rgba(255,255,255,0.55)'; czCtx.fill();
   }
 }
 
 setPlayerColor(playerColor, false);
 setPlayerName(playerName, false);
 setPlayerOutline(playerOutline, false);
+setPlayerBoostGlow(playerBoostGlow, false);
 updateCzUI();
 
 // ============================================================
