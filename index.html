@@ -844,6 +844,20 @@
     #statsHud { gap: 6px; bottom: 10px; }
     .stat-box { min-width: 76px; padding: 6px 10px; }
   }
+
+  /* Landscape-Mobile: Death-Screen nach unten links, halbe Größe */
+  @media (orientation: landscape) and (max-height: 500px) {
+    #deathScreen {
+      align-items: flex-end;
+      justify-content: flex-start;
+      padding: 0 12px 12px;
+    }
+    #deathScreen .ds-card {
+      zoom: 0.5;
+      max-width: 100%;
+      padding: 16px 24px 18px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -879,11 +893,11 @@
   </div>
   <div class="stat-box">
     <div class="stat-label">Rank</div>
-    <div class="stat-value rank" id="ui-rank">1/51</div>
+    <div class="stat-value rank" id="ui-rank">1/81</div>
   </div>
   <div class="stat-box">
     <div class="stat-label">Alive</div>
-    <div class="stat-value alive" id="ui-alive">51</div>
+    <div class="stat-value alive" id="ui-alive">81</div>
   </div>
   <div class="stat-box">
     <div class="stat-label">Kills</div>
@@ -940,7 +954,7 @@
     <div class="menu-stats">
       <div class="stat">
         <div class="stat-icon">◈</div>
-        <div class="stat-v">51</div>
+        <div class="stat-v">81</div>
         <div class="stat-l">Worms</div>
       </div>
       <div class="stat">
@@ -1048,13 +1062,13 @@
 const CFG = {
   worldSize: 16800,
   zoneStart: 6400,
-  zoneMin: 800,
+  zoneMin: 625,
   matchDuration: 6 * 60,
   respawnUntil: 3 * 60,
   intermissionDuration: 5,
   suddenDeathDuration: 60,
   zoneRegrowDuration: 5,
-  bots: 50,
+  bots: 80,
   food: 19000,
   segSpacing: 4,
   speed: 2.3,
@@ -1093,7 +1107,8 @@ const BOT_NAMES = ['Rex','Blaze','Venom','Storm','Fang','Nyx','Echo','Ghost','Ro
   'Viper','Onyx','Cinder','Frost','Karma','Zephyr','Havoc','Pixel','Wraith','Nova',
   'Sable','Drift','Jinx','Rune','Saber','Talon','Umbra','Vortex','Warden','Xeno',
   'Yara','Zenith','Ace','Bolt','Cobra','Dusk','Ember','Flux','Grit','Helix',
-  'Iris','Jolt','Krait','Lynx','Mirage','Nitro','Ozone','Prism','Quake','Rift'];
+  'Iris','Jolt','Krait','Lynx','Mirage','Nitro','Ozone','Prism','Quake','Rift',
+  'Justin','Joel','Wasserspielplatz','AnDenEiern8','Nero','Edeka-Kunde','Finanzamt','Hab_die_Wunme_dabei','Mr.Blubberbombe'];
 const BOT_COLORS = ['#ff6b6b','#feca57','#48dbfb','#ff9ff3','#54a0ff','#5f27cd','#00d2d3',
   '#ff9f43','#ee5a6f','#1dd1a1','#f368e0','#ff6348','#2ed573','#ffa502','#7bed9f','#70a1ff',
   '#ff7f50','#00cec9','#fd79a8','#c8d6e5'];
@@ -1328,6 +1343,21 @@ function wormRadiusMult(worm) {
 function wormBodyRadius(worm) { return CFG.bodyRadius * wormRadiusMult(worm); }
 function wormHeadRadius(worm) { return CFG.headRadius * wormRadiusMult(worm); }
 function wormCollisionRadius(worm) { return CFG.collisionRadius * wormRadiusMult(worm); }
+
+// Zufällige Startmasse für Bots (30–150 Segmente)
+function randomBotStartLen() {
+  return Math.floor(rand(30, 151));
+}
+
+// Kamera-Zoom basierend auf Wurmgröße:
+// startSegments  → Zoom 1.0 (Standard-FOV)
+// radiusMaxFactor → Zoom 0.55 (rausgezoomt)
+function computePlayerZoom(worm) {
+  const mult = wormRadiusMult(worm);
+  const t = clamp((mult - 1) / (CFG.radiusMaxFactor - 1), 0, 1);
+  const minZoom = 0.55;
+  return 1 - t * (1 - minZoom);
+}
 
 // ============================================================
 // FOOD SPATIAL GRID
@@ -1672,6 +1702,7 @@ function createMatch() {
       color: c,
       boostGlow: mixColors(c, '#ffffff', 0.6),
       accentColor: '#f5f5f8',
+      startLen: randomBotStartLen(),
       time: 0,
     }));
   }
@@ -1989,6 +2020,7 @@ function update(dt) {
         x: spawn.x, y: spawn.y, angle: spawn.ang,
         color: c, boostGlow: mixColors(c, '#ffffff', 0.6),
         accentColor: '#f5f5f8',
+        startLen: randomBotStartLen(),
         time: state.roundElapsed,
       });
     }
@@ -2000,7 +2032,8 @@ function update(dt) {
     const h = p2.head;
     state.camera.x += (h.x - state.camera.x) * Math.min(1, 8 * dt);
     state.camera.y += (h.y - state.camera.y) * Math.min(1, 8 * dt);
-    state.camera.targetZoom = 1;
+    // Zoom skaliert mit Wurmgröße → größer = weiter raus
+    state.camera.targetZoom = computePlayerZoom(p2);
   } else {
     if (!state.camera.freeCamActive) {
       state.camera.freeCamActive = true;
@@ -2212,6 +2245,7 @@ function startNewRound() {
       color: c,
       boostGlow: mixColors(c, '#ffffff', 0.6),
       accentColor: '#f5f5f8',
+      startLen: randomBotStartLen(),
       time: 0,
     }));
   }
@@ -2264,6 +2298,7 @@ function triggerDraw() {
       x: spawn.x, y: spawn.y, angle: spawn.ang,
       color: c, boostGlow: mixColors(c, '#ffffff', 0.6),
       accentColor: '#f5f5f8',
+      startLen: randomBotStartLen(),
       time: 0,
     });
   }
@@ -2690,7 +2725,7 @@ function drawWorm(worm, isPlayer, zoom) {
     ? mixColors(wormAccent, '#ff2040', outsideFlash * 0.85)
     : wormAccent;
 
-  // === NEUER BOOST GLOW mit Multi-Layer Additiv-Blending ===
+  // Boost Glow mit Multi-Layer Additiv-Blending
   if (isBoosting && zoom > 0.2) {
     const bc = worm.boostGlow || '#ffffff';
     const pulse = 0.5 + 0.5 * Math.sin(state.time * Math.PI * 2 / CFG.boostFlashInterval);
@@ -3635,19 +3670,17 @@ function startMatch() {
   input.hasMouse = false;
   zoneWarn.classList.remove('on'); zoneText.classList.remove('on');
 
-  // ============================================================
   // Wenn bereits ein Match läuft → in dieses zurückkehren
-  // (Respawn wenn möglich, sonst Zuschauer-Modus)
-  // ============================================================
   if (state && !state.matchOver) {
     state.paused = false;
     state.menuMode = false;
 
     if (state.player && state.player.alive) {
+      const pz = computePlayerZoom(state.player);
       state.camera.x = state.player.head.x;
       state.camera.y = state.player.head.y;
-      state.camera.zoom = 1;
-      state.camera.targetZoom = 1;
+      state.camera.zoom = pz;
+      state.camera.targetZoom = pz;
       state.camera.freeCamActive = false;
     } else {
       state.camera.freeCamActive = true;
@@ -3658,9 +3691,7 @@ function startMatch() {
     return;
   }
 
-  // ============================================================
   // Sonst: Neues Match starten
-  // ============================================================
   try {
     state = createMatch();
   } catch (err) {
