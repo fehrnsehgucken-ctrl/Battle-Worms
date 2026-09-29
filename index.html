@@ -11,7 +11,6 @@
               color:#fff; user-select:none; touch-action: none; }
   canvas { display:block; }
 
-  /* ===== Top Center Timer ===== */
   #timerHud {
     position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
     z-index: 4; text-align: center; pointer-events: none;
@@ -43,9 +42,8 @@
     50%     { transform: scale(1.06); opacity: 0.85; }
   }
 
-  /* ===== Left Leaderboard ===== */
   #leaderboard {
-    position: fixed; top: 16px; left: 16px; width: 236px;
+    position: fixed; top: 16px; left: 16px; width: 250px;
     z-index: 3; pointer-events: none;
     padding: 10px 12px 12px;
     background: linear-gradient(160deg, rgba(20,30,55,0.82), rgba(10,16,32,0.76));
@@ -63,12 +61,12 @@
     display: flex; align-items: center; gap: 8px;
   }
   #leaderboard .lb-row {
-    display: flex; align-items: center; gap: 7px;
+    display: flex; align-items: center; gap: 6px;
     padding: 3.5px 4px; font-size: 12.5px; font-weight: 600;
     border-radius: 6px;
   }
   #leaderboard .lb-rank {
-    width: 16px; text-align: right;
+    width: 15px; text-align: right;
     color: #56678a; font-size: 11.5px; font-weight: 800;
     font-variant-numeric: tabular-nums;
   }
@@ -91,14 +89,29 @@
   #leaderboard .lb-row.self .lb-name { color: #8ee0ff; font-weight: 800; }
   #leaderboard .lb-count {
     color: #a8e6ff; font-weight: 800;
-    font-variant-numeric: tabular-nums; font-size: 12.5px;
-    min-width: 32px; text-align: right;
+    font-variant-numeric: tabular-nums; font-size: 12px;
+    min-width: 28px; text-align: right;
   }
+  #leaderboard .lb-sieges {
+    color: #ffd479; font-weight: 800;
+    font-variant-numeric: tabular-nums; font-size: 11.5px;
+    min-width: 26px; text-align: right;
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 2px;
+  }
+  #leaderboard .lb-sieges::before {
+    content: '★';
+    color: #ff9a5b;
+    font-size: 8px;
+    line-height: 1;
+    opacity: 0.85;
+  }
+  #leaderboard .lb-sieges.zero { color: #56678a; opacity: 0.55; }
+  #leaderboard .lb-sieges.zero::before { color: #56678a; }
   #leaderboard .lb-empty {
     color: #56678a; font-size: 11.5px; font-style: italic; padding: 4px 0;
   }
 
-  /* ===== Bottom Stats ===== */
   #statsHud {
     position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
     display: flex; gap: 10px;
@@ -126,7 +139,6 @@
   .stat-value.rank  { color: #ffd479; }
   .stat-value.alive { color: #7bffa8; }
 
-  /* ===== Victory / Draw Banner ===== */
   #victoryBanner {
     position: fixed; top: 22px; left: 50%;
     transform: translate(-50%, -140px);
@@ -149,7 +161,6 @@
     text-transform: uppercase; font-weight: 700;
   }
 
-  /* ===== Sudden Death ===== */
   #suddenDeath {
     position: fixed; top: 22%; left: 50%;
     transform: translateX(-50%);
@@ -193,7 +204,6 @@
   }
   #zoneText.on { display:block; animation: zonePulse 0.7s ease-in-out infinite; }
 
-  /* ===== Start Overlay ===== */
   #overlay {
     position:fixed; inset:0; z-index:10; overflow:hidden;
     display:flex; align-items:center; justify-content:center;
@@ -257,7 +267,6 @@
   .menu-controls { margin-top: 26px; color: #56678a; font-size: 12px; line-height: 1.9; }
   .menu-controls b { color: #8ba0c5; font-weight: 600; }
 
-  /* ===== Customize Button + Panel ===== */
   #customizeBtn {
     position: fixed; bottom: 26px; left: 26px; z-index: 11;
     padding: 12px 22px 12px 18px;
@@ -349,7 +358,6 @@
   .cz-btn.primary { color: #04182e; background: linear-gradient(135deg, #8ee0ff 0%, #4ab5ff 100%); }
   .cz-btn.ghost { color: #a0b8d8; background: rgba(120,180,255,0.08); border: 1px solid rgba(120,180,255,0.22); }
 
-  /* ===== Death Screen ===== */
   #deathScreen {
     position: fixed; inset: 0; z-index: 7;
     display: none; align-items: flex-end; justify-content: center;
@@ -427,12 +435,13 @@
     .cz-card { padding: 20px 18px 22px; }
     #deathScreen { padding: 0 12px 24px; }
     #deathScreen .ds-card { padding: 14px 26px 20px; }
-    #leaderboard { width: 172px; padding: 8px 10px 10px; top: 12px; left: 12px; }
+    #leaderboard { width: 200px; padding: 8px 10px 10px; top: 12px; left: 12px; }
     #leaderboard .lb-title { font-size: 9px; letter-spacing: 1.6px; margin-bottom: 6px; padding-bottom: 5px; }
     #leaderboard .lb-row { font-size: 11px; padding: 2.5px 3px; gap: 5px; }
     #leaderboard .lb-name { font-size: 10.5px; }
-    #leaderboard .lb-count { font-size: 11px; min-width: 26px; }
-    #leaderboard .lb-rank { font-size: 10.5px; width: 14px; }
+    #leaderboard .lb-count { font-size: 10.5px; min-width: 24px; }
+    #leaderboard .lb-sieges { font-size: 10px; min-width: 22px; }
+    #leaderboard .lb-rank { font-size: 10.5px; width: 13px; }
     #leaderboard .lb-color { width: 8px; height: 8px; }
     #timerHud { top: 12px; padding: 6px 20px; min-width: 120px; }
     #timerLabel { font-size: 8.5px; letter-spacing: 1.8px; }
@@ -460,19 +469,16 @@
   <span class="vb-sub" id="vbSub">—</span>
 </div>
 
-<!-- Top-Center Timer -->
 <div id="timerHud">
   <div id="timerLabel">STARTS IN</div>
   <div id="timerValue">4:00</div>
 </div>
 
-<!-- Left Leaderboard (live) -->
 <div id="leaderboard">
   <div class="lb-title">Leaderboard</div>
   <div id="lbList"><div class="lb-empty">Waiting…</div></div>
 </div>
 
-<!-- Bottom Stats -->
 <div id="statsHud">
   <div class="stat-box">
     <div class="stat-label">Mass</div>
@@ -588,8 +594,7 @@ const CFG = {
   segSpacing: 4,
   speed: 2.3,
   boostSpeed: 5.0,
-  // Drehrate: sehr klein → großer Lenkradius
-  turnRate: 0.04,
+  turnRate: 0.07,
   turnSizePenalty: 0.60,
   turnScaleRef: 260,
   startSegments: 20,
@@ -610,6 +615,7 @@ const CFG = {
   foodRefillPerFrame: 400,
   mmUpdateInterval: 10,
   mmFadeDuration: 1.25,
+  mmViewFactor: 1.35,
 };
 
 const BOT_NAMES = ['Rex','Blaze','Venom','Storm','Fang','Nyx','Echo','Ghost','Rogue','Titan',
@@ -669,6 +675,24 @@ function setPlayerOutline(hex, save) {
   playerOutline = hex;
   if (save) localStorage.setItem(PLAYER_OUTLINE_KEY, hex);
   if (state && state.player && state.player.alive) state.player.outlineColor = hex;
+}
+
+// ============================================================
+// LEADERBOARD STORAGE (Siege)
+// ============================================================
+const LEADERBOARD_KEY = 'battle-worms-leaderboard';
+function getLeaderboard() {
+  try { return JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveLeaderboard(lb) { localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(lb)); }
+function addWin(name, color) {
+  if (!name) return;
+  const lb = getLeaderboard();
+  if (!lb[name]) lb[name] = { count: 0, color };
+  lb[name].count = (lb[name].count || 0) + 1;
+  lb[name].color = color;
+  saveLeaderboard(lb);
 }
 
 // ============================================================
@@ -802,6 +826,17 @@ const freeCam = {
   dragging: false, prevX: 0, prevY: 0,
   touchPrevX: 0, touchPrevY: 0, pinchPrevDist: 0,
 };
+
+// ★ Zentraler Reset, verhindert stale Joystick/Boost-Zustände überall
+function resetInputState() {
+  input.boost = false;
+  input.joyActive = false;
+  input.joyId = null;
+  freeCam.dragging = false;
+  freeCam.pinchPrevDist = 0;
+  const bb = document.getElementById('boostBtn');
+  if (bb) bb.classList.remove('active');
+}
 
 // ============================================================
 // WORM
@@ -1096,8 +1131,6 @@ function createMatch() {
       cx0: cx, cy0: cy,
       cx1: finalCenter.x, cy1: finalCenter.y,
     },
-    // Minimap Top-3 mit 10s-Lock + Fade. mmElapsed startet bei 10 damit die
-    // Top 3 sofort beim ersten Update berechnet werden.
     mmDisplayed: [],
     mmPrev: [],
     mmFadeT: 1,
@@ -1281,7 +1314,6 @@ function update(dt) {
 
   state.roundElapsed += dt;
 
-  // Minimap Top-3 Update (alle 10s oder wenn ein Top-3-Wurm stirbt)
   state.mmElapsed += dt;
   if (state.mmFadeT < 1) {
     state.mmFadeT = Math.min(1, state.mmFadeT + dt / CFG.mmFadeDuration);
@@ -1495,14 +1527,7 @@ function respawnPlayer() {
   state.camera.zoom = 1;
   state.camera.targetZoom = 1;
   state.camera.freeCamActive = false;
-
-  // Mobile-Respawn-Fix
-  input.joyActive = false;
-  input.joyId = null;
-  input.boost = false;
-  freeCam.dragging = false;
-  freeCam.pinchPrevDist = 0;
-
+  resetInputState();
   hideDeathScreen();
 }
 
@@ -1514,12 +1539,11 @@ function endRound(winner) {
   state.intermissionElapsed = 0;
   state.roundWinner = winner;
   if (winner) {
+    addWin(winner.name, winner.color);
     showVictoryBanner(winner);
   }
   hideDeathScreen();
-  input.boost = false;
-  const bb = document.getElementById('boostBtn');
-  if (bb) bb.classList.remove('active');
+  resetInputState();  // ★ FIX: sauberer Reset bei Rundenende
 }
 
 function startNewRound() {
@@ -1570,8 +1594,6 @@ function startNewRound() {
   state.suddenDeathActive = false;
   state.suddenDeathTime = 0;
 
-  // Minimap-Reset — mmElapsed sofort auf Update-Intervall setzen,
-  // damit die Top 3 direkt beim nächsten Update berechnet werden.
   state.mmDisplayed = [];
   state.mmPrev = [];
   state.mmFadeT = 1;
@@ -1587,10 +1609,10 @@ function startNewRound() {
     state.camera.freeCamActive = true;
   }
 
+  resetInputState();  // ★ FIX: Input zwischen Runden zurücksetzen
+
   hideVictoryBanner();
   hideDeathScreen();
-  const rl = document.getElementById('ui-round');
-  if (rl) rl.textContent = state.round;
 }
 
 function triggerDraw() {
@@ -1659,14 +1681,7 @@ function showDeathScreen() {
   dsNameInput.value = playerName;
   deathScreenEl.classList.add('on');
   document.body.classList.add('dead');
-
-  // Mobile-Respawn-Fix
-  input.joyActive = false;
-  input.joyId = null;
-  input.boost = false;
-
-  const bb = document.getElementById('boostBtn');
-  if (bb) bb.classList.remove('active');
+  resetInputState();
 }
 function hideDeathScreen() {
   deathScreenEl.classList.remove('on');
@@ -1896,47 +1911,66 @@ function drawWorm(worm, isPlayer, zoom) {
   }
 }
 
-function drawMinimapWorm(w, color, alpha, ox, oy, scale) {
-  const segs = w.segments;
-  if (segs.length < 2) return;
-  const prevA = ctx.globalAlpha;
-  ctx.globalAlpha = alpha;
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 2.6;
-  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+function drawMinimap() {
+  const size = IS_TOUCH ? 108 : 156;
+  const pad = IS_TOUCH ? 14 : 18;
+  const mcx = VW - size / 2 - pad;
+  const mcy = size / 2 + pad;
+  const R = size / 2;
+
+  const z = state.zone;
+  const viewR = Math.max(1, z.radius * CFG.mmViewFactor);
+  const s = R / viewR;
+
+  ctx.save();
   ctx.beginPath();
-  ctx.moveTo(ox + segs[0].x * scale, oy + segs[0].y * scale);
-  for (let i = 1; i < segs.length; i++) {
-    ctx.lineTo(ox + segs[i].x * scale, oy + segs[i].y * scale);
-  }
+  ctx.arc(mcx, mcy, R, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(8,14,28,0.82)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(120,180,255,0.30)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(mcx, mcy, R - 3, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(120,180,255,0.10)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(mcx, mcy, R - 1, 0, Math.PI * 2);
+  ctx.clip();
+
+  ctx.beginPath();
+  ctx.arc(mcx, mcy, z.radius * s, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,60,100,0.10)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,90,130,0.85)';
+  ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  ctx.beginPath();
-  ctx.arc(ox + segs[0].x * scale, oy + segs[0].y * scale, 3.2, 0, Math.PI * 2);
-  ctx.fillStyle = color; ctx.fill();
-  ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 1; ctx.stroke();
-  ctx.globalAlpha = prevA;
-}
+  const drawMM = (w, color, alpha) => {
+    const segs = w.segments;
+    if (segs.length < 2) return;
+    const prevA = ctx.globalAlpha;
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.6;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(mcx + (segs[0].x - z.x) * s, mcy + (segs[0].y - z.y) * s);
+    for (let i = 1; i < segs.length; i++) {
+      ctx.lineTo(mcx + (segs[i].x - z.x) * s, mcy + (segs[i].y - z.y) * s);
+    }
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(mcx + (segs[0].x - z.x) * s, mcy + (segs[0].y - z.y) * s, 3, 0, Math.PI * 2);
+    ctx.fillStyle = color; ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.globalAlpha = prevA;
+  };
 
-function drawMinimap() {
-  const size = IS_TOUCH ? 104 : 148;
-  const pad = IS_TOUCH ? 14 : 18;
-  const x = VW - size - pad, y = pad, r = 12;
-  ctx.save();
-  roundRect(x, y, size, size, r);
-  ctx.fillStyle = 'rgba(8,14,28,0.78)'; ctx.fill();
-  ctx.strokeStyle = 'rgba(120,180,255,0.22)'; ctx.lineWidth = 1; ctx.stroke();
-  ctx.restore();
-  const s = size / CFG.worldSize;
-  ctx.save();
-  roundRect(x, y, size, size, r); ctx.clip();
-
-  ctx.beginPath();
-  ctx.arc(x + state.zone.x * s, y + state.zone.y * s, state.zone.radius * s, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255,60,100,0.08)'; ctx.fill();
-  ctx.strokeStyle = 'rgba(255,90,130,0.75)'; ctx.lineWidth = 1.2; ctx.stroke();
-
-  // Top-3 mit 10s-Lock + Fade
   const cur = state.mmDisplayed;
   const old = state.mmPrev;
   const fade = state.mmFadeT;
@@ -1946,21 +1980,20 @@ function drawMinimap() {
       const w = old[i];
       if (!w.alive) continue;
       if (cur.indexOf(w) >= 0) continue;
-      drawMinimapWorm(w, MM_RANK_COLORS[i] || '#888', 1 - fade, x, y, s);
+      drawMM(w, MM_RANK_COLORS[i] || '#888', 1 - fade);
     }
   }
-
   for (let i = 0; i < cur.length; i++) {
     const w = cur[i];
     if (!w.alive) continue;
     const wasInOld = old.indexOf(w) >= 0;
     const alpha = (fade >= 1 || wasInOld) ? 1 : fade;
-    drawMinimapWorm(w, MM_RANK_COLORS[i] || '#888', alpha, x, y, s);
+    drawMM(w, MM_RANK_COLORS[i] || '#888', alpha);
   }
 
   if (state.player.alive) {
-    const px = x + state.player.head.x * s;
-    const py = y + state.player.head.y * s;
+    const px = mcx + (state.player.head.x - z.x) * s;
+    const py = mcy + (state.player.head.y - z.y) * s;
     const a = state.player.angle;
     ctx.save();
     ctx.translate(px, py); ctx.rotate(a);
@@ -1971,23 +2004,15 @@ function drawMinimap() {
     ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.lineWidth = 0.8; ctx.stroke();
     ctx.restore();
   } else if (state.camera.freeCamActive) {
-    const px = x + state.camera.x * s;
-    const py = y + state.camera.y * s;
+    const px = mcx + (state.camera.x - z.x) * s;
+    const py = mcy + (state.camera.y - z.y) * s;
     ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI * 2);
     ctx.strokeStyle = '#8ee0ff'; ctx.lineWidth = 1.5; ctx.stroke();
   }
 
   ctx.restore();
 }
-function roundRect(x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-}
+
 function drawJoystick() {
   if (!IS_TOUCH || !input.joyActive) return;
   if (deathScreenEl.classList.contains('on')) return;
@@ -2036,7 +2061,6 @@ function updateHUD() {
   const alive = state.worms.filter(w => w.alive);
   uiAlive.textContent = alive.length;
 
-  // Top-Center Timer
   let timeLabel, timeValue, urgent = false;
   if (state.intermission) {
     const remaining = Math.max(0, CFG.intermissionDuration - state.intermissionElapsed);
@@ -2064,32 +2088,33 @@ function updateHUD() {
   timerValueEl.textContent = timeValue;
   timerHudEl.classList.toggle('urgent', urgent);
 
-  // Rank + Kills
   const sorted = [...state.worms].filter(w => w.alive).sort((a, b) => b.segments.length - a.segments.length);
   uiRank.textContent = p.alive ? (sorted.indexOf(p) + 1) + '/' + alive.length : '—';
   uiKills.textContent = p.kills || 0;
 
-  // Live Leaderboard (Top 5)
   const top5 = sorted.slice(0, 5);
   if (top5.length === 0) {
     lbListEl.innerHTML = '<div class="lb-empty">No survivors</div>';
   } else {
+    const lb = getLeaderboard();
     let html = '';
     for (let i = 0; i < top5.length; i++) {
       const w = top5[i];
       const isSelf = w === p;
       const cls = `lb-row r${i+1}${isSelf ? ' self' : ''}`;
+      const sieges = (lb[w.name] && lb[w.name].count) || 0;
+      const siegesCls = sieges === 0 ? 'lb-sieges zero' : 'lb-sieges';
       html += `<div class="${cls}">
         <span class="lb-rank">${i+1}</span>
         <span class="lb-color" style="background:${w.color}; color:${w.color}"></span>
         <span class="lb-name">${escapeHtml(w.name)}</span>
         <span class="lb-count">${w.segments.length}</span>
+        <span class="${siegesCls}">${sieges}</span>
       </div>`;
     }
     lbListEl.innerHTML = html;
   }
 
-  // Sudden-Death-Overlay
   if (state.suddenDeathActive) {
     suddenDeathEl.classList.add('on');
     sdTimerEl.textContent = Math.max(0, Math.ceil(state.suddenDeathTime));
@@ -2097,7 +2122,6 @@ function updateHUD() {
     suddenDeathEl.classList.remove('on');
   }
 
-  // Zone-Warnung
   if (state.intermission || state.zoneRegrowing) {
     zoneWarn.classList.remove('on'); zoneText.classList.remove('on');
   } else if (p.alive && p.outside) {
@@ -2162,6 +2186,7 @@ window.addEventListener('keyup', e => {
   if (e.code === 'Space') input.boost = false;
 });
 
+// ★ touchStart mit stale-Joystick-Reinigung (Fix)
 function touchStart(e) {
   if (isPlayerDead()) {
     if (e.touches.length === 2) {
@@ -2177,6 +2202,17 @@ function touchStart(e) {
   }
   if (document.body.classList.contains('dead')) return;
   if (state && state.intermission) return;
+  // Sicherheitsnetz: joyActive true, aber der Touch existiert nicht mehr → reset
+  if (input.joyActive) {
+    let stillAlive = false;
+    for (const t of e.touches) {
+      if (t.identifier === input.joyId) { stillAlive = true; break; }
+    }
+    if (!stillAlive) {
+      input.joyActive = false;
+      input.joyId = null;
+    }
+  }
   for (const t of e.changedTouches) {
     if (input.joyActive) continue;
     input.joyActive = true; input.joyId = t.identifier;
@@ -2215,6 +2251,7 @@ function touchMove(e) {
   }
   e.preventDefault();
 }
+// ★ touchEnd räumt jetzt auch im Death-Modus auf (Fix)
 function touchEnd(e) {
   if (isPlayerDead()) {
     if (e.touches.length < 2) freeCam.pinchPrevDist = 0;
@@ -2222,6 +2259,8 @@ function touchEnd(e) {
       freeCam.touchPrevX = e.touches[0].clientX;
       freeCam.touchPrevY = e.touches[0].clientY;
     }
+    input.joyActive = false;
+    input.joyId = null;
     e.preventDefault();
     return;
   }
@@ -2422,8 +2461,7 @@ setPlayerOutline(playerOutline, false);
 updateCzUI();
 
 // ============================================================
-// LOOP — mit try/catch damit ein einzelner Fehler nicht das ganze
-// Spiel als Standbild einfriert.
+// LOOP
 // ============================================================
 let lastT = performance.now();
 function loop(t) {
@@ -2453,9 +2491,8 @@ function startMatch() {
   hideDeathScreen();
   hideVictoryBanner();
   suddenDeathEl.classList.remove('on');
-  input.joyActive = false; input.joyId = null;
-  input.boost = false; input.hasMouse = false;
-  boostBtn.classList.remove('active');
+  resetInputState();
+  input.hasMouse = false;
   zoneWarn.classList.remove('on'); zoneText.classList.remove('on');
   customizeBtn.style.display = 'none';
   try {
