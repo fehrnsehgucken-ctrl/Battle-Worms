@@ -216,69 +216,361 @@
   }
   #zoneText.on { display:block; animation: zonePulse 0.7s ease-in-out infinite; }
 
+  /* ============================================================
+     ★★★ NEUES START MENÜ ★★★
+     ============================================================ */
   #overlay {
     position:fixed; inset:0; z-index:10; overflow:hidden;
     display:flex; align-items:center; justify-content:center;
-    background: radial-gradient(circle at 50% 45%, #101a30 0%, #080d1a 55%, #04070d 100%);
+    background: radial-gradient(circle at 50% 40%, #16243f 0%, #0a1122 55%, #03050a 100%);
   }
   #overlay.hidden { display:none; }
-  #overlay::before, #overlay::after {
-    content:''; position:absolute; width:600px; height:600px; border-radius:50%;
-    filter: blur(90px); opacity:0.35; pointer-events:none;
-  }
-  #overlay::before { background: radial-gradient(circle, #1f6fa8, transparent 70%);
-    top:-180px; left:-180px; animation: float1 22s ease-in-out infinite; }
-  #overlay::after { background: radial-gradient(circle, #a83060, transparent 70%);
-    bottom:-200px; right:-180px; animation: float2 26s ease-in-out infinite; }
-  @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(140px,80px) scale(1.15);} }
-  @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-120px,-70px) scale(1.2);} }
-  #overlay .dots {
-    position:absolute; inset:0; pointer-events:none; opacity:0.5;
-    background-image: radial-gradient(rgba(120,180,255,0.14) 1px, transparent 1.5px);
-    background-size: 28px 28px;
-    mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 75%);
-    -webkit-mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 75%);
-  }
-  .menu-card {
-    position:relative; z-index:2;
-    padding: clamp(28px, 5vw, 46px) clamp(22px, 5vw, 54px);
-    text-align:center; max-width: 500px; width: calc(100% - 32px);
-  }
-  .menu-title { margin: 0; font-size: clamp(42px, 12vw, 68px); font-weight: 900;
-    letter-spacing: -3px; line-height: 1; display: flex; justify-content: center; }
-  .menu-title span { -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent; color: transparent; }
-  .menu-title .t1 { background-image: linear-gradient(180deg, #ffffff 0%, #7fd4ff 55%, #2a8dd6 100%);
-    filter: drop-shadow(0 4px 32px rgba(108,204,255,0.5)); }
-  .menu-title .t2 { background-image: linear-gradient(180deg, #ffc0c0 0%, #ff5577 55%, #b81e46 100%);
-    filter: drop-shadow(0 4px 32px rgba(255,80,110,0.5)); }
-  .menu-sub { margin: 10px 0 28px; color: #7d8fb3; font-size: 14px;
-    letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
-  .menu-stats { display: flex; gap: 10px; justify-content: center; margin-bottom: 30px; }
-  .stat { flex: 1; background: rgba(120,180,255,0.05);
-    border: 1px solid rgba(120,180,255,0.14); border-radius: 12px; padding: 12px 6px; }
-  .stat-v { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #a8e6ff; }
-  .stat-l { font-size: 9.5px; color: #6a7d9e; text-transform: uppercase;
-    letter-spacing: 1.4px; margin-top: 3px; font-weight: 600; }
-  .menu-play { width: 100%; padding: 17px 0; font-size: 19px; font-weight: 800;
-    letter-spacing: 4px; color: #04182e;
-    background: linear-gradient(135deg, #8ee0ff 0%, #4ab5ff 100%);
-    border: 0; border-radius: 14px; cursor: pointer; position: relative; overflow: hidden;
-    transition: transform .15s, filter .2s;
-    animation: playPulse 2.6s ease-in-out infinite; }
-  .menu-play::after { content:''; position:absolute; inset:0;
-    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.6) 50%, transparent 70%);
-    transform: translateX(-120%); transition: transform .7s; }
-  .menu-play:hover { transform: translateY(-2px); filter: brightness(1.08); }
-  .menu-play:hover::after { transform: translateX(120%); }
-  .menu-play:active { transform: translateY(0); }
-  @keyframes playPulse {
-    0%,100% { box-shadow: 0 0 0 0 rgba(108,204,255,0.55), 0 12px 34px rgba(108,204,255,0.35); }
-    50%     { box-shadow: 0 0 0 16px rgba(108,204,255,0),  0 16px 44px rgba(108,204,255,0.55); }
-  }
-  .menu-controls { margin-top: 26px; color: #56678a; font-size: 12px; line-height: 1.9; }
-  .menu-controls b { color: #8ba0c5; font-weight: 600; }
 
+  /* Animierte Hintergrund-Blobs */
+  .menu-blob {
+    position: absolute; border-radius: 50%;
+    pointer-events: none;
+    filter: blur(100px);
+    will-change: transform, opacity;
+  }
+  .menu-blob.b1 {
+    width: 620px; height: 620px;
+    background: radial-gradient(circle, rgba(31,111,168,0.75) 0%, rgba(31,111,168,0) 70%);
+    top: -220px; left: -180px;
+    animation: blobFloat1 24s ease-in-out infinite;
+  }
+  .menu-blob.b2 {
+    width: 720px; height: 720px;
+    background: radial-gradient(circle, rgba(168,48,96,0.65) 0%, rgba(168,48,96,0) 70%);
+    bottom: -260px; right: -220px;
+    animation: blobFloat2 28s ease-in-out infinite;
+  }
+  .menu-blob.b3 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(120,80,220,0.55) 0%, rgba(120,80,220,0) 70%);
+    top: 40%; left: 55%;
+    animation: blobFloat3 32s ease-in-out infinite;
+  }
+  @keyframes blobFloat1 {
+    0%,100% { transform: translate(0,0) scale(1); opacity: 0.75; }
+    50%     { transform: translate(160px,100px) scale(1.18); opacity: 0.95; }
+  }
+  @keyframes blobFloat2 {
+    0%,100% { transform: translate(0,0) scale(1); opacity: 0.7; }
+    50%     { transform: translate(-140px,-90px) scale(1.22); opacity: 0.9; }
+  }
+  @keyframes blobFloat3 {
+    0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.55; }
+    50%     { transform: translate(-40%,-60%) scale(1.3); opacity: 0.8; }
+  }
+
+  /* Punkte-Raster */
+  .menu-dots {
+    position:absolute; inset:0; pointer-events:none; opacity: 0.55;
+    background-image: radial-gradient(rgba(140,200,255,0.16) 1px, transparent 1.5px);
+    background-size: 30px 30px;
+    mask-image: radial-gradient(circle at 50% 50%, black 25%, transparent 72%);
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, black 25%, transparent 72%);
+  }
+
+  /* Feine Scanlines */
+  .menu-scanlines {
+    position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(140,200,255,0.035) 0px,
+      rgba(140,200,255,0.035) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    opacity: 0.35;
+    mix-blend-mode: overlay;
+  }
+
+  /* Vignette */
+  .menu-vignette {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%);
+  }
+
+  /* Menu Card */
+  .menu-card {
+    position:relative; z-index:3;
+    padding: clamp(26px, 4vw, 42px) clamp(24px, 5vw, 48px) clamp(26px, 4vw, 40px);
+    text-align:center;
+    max-width: 520px;
+    width: calc(100% - 32px);
+    background: linear-gradient(160deg, rgba(18,28,52,0.72), rgba(8,14,28,0.75));
+    border: 1px solid rgba(140,200,255,0.14);
+    border-radius: 28px;
+    backdrop-filter: blur(28px) saturate(140%);
+    -webkit-backdrop-filter: blur(28px) saturate(140%);
+    box-shadow:
+      0 30px 100px rgba(0,0,0,0.7),
+      0 0 0 1px rgba(140,200,255,0.06) inset,
+      0 1px 0 rgba(255,255,255,0.09) inset;
+    animation: cardIn .7s cubic-bezier(.2,.9,.3,1.15) both;
+    overflow: hidden;
+  }
+  .menu-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: 28px;
+    background: linear-gradient(140deg, rgba(140,200,255,0.10) 0%, transparent 40%, transparent 60%, rgba(255,140,180,0.08) 100%);
+    pointer-events: none;
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(28px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Hero — Wurm-Vorschau */
+  .menu-hero {
+    position: relative;
+    margin: -14px -8px 8px;
+    height: 130px;
+    overflow: hidden;
+    border-radius: 18px;
+  }
+  .menu-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(140,200,255,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  #menuWormCanvas {
+    display: block;
+    width: 100%;
+    height: 130px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Titel */
+  .menu-title {
+    margin: 4px 0 6px;
+    font-size: clamp(40px, 10vw, 62px);
+    font-weight: 900;
+    letter-spacing: -3px;
+    line-height: 1;
+    display: flex;
+    justify-content: center;
+    position: relative;
+  }
+  .menu-title span {
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    filter: drop-shadow(0 6px 30px rgba(0,0,0,0.6));
+    animation: titleGlow 4s ease-in-out infinite;
+  }
+  .menu-title .t1 {
+    background-image: linear-gradient(180deg, #ffffff 0%, #b6e8ff 45%, #2a8dd6 100%);
+  }
+  .menu-title .t2 {
+    background-image: linear-gradient(180deg, #ffd0d0 0%, #ff6688 45%, #b81e46 100%);
+    animation-delay: 1.5s;
+  }
+  @keyframes titleGlow {
+    0%,100% { filter: drop-shadow(0 6px 30px rgba(0,0,0,0.6)) drop-shadow(0 0 0 transparent); }
+    50%     { filter: drop-shadow(0 6px 30px rgba(0,0,0,0.6)) drop-shadow(0 0 22px rgba(140,200,255,0.35)); }
+  }
+
+  .menu-sub {
+    margin: 0 0 22px;
+    color: #7d8fb3;
+    font-size: 11px;
+    letter-spacing: 4.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  /* Name Input */
+  .menu-name-wrap {
+    text-align: left;
+    margin-bottom: 16px;
+  }
+  .menu-name-label {
+    display: block;
+    font-size: 9.5px;
+    color: #7a8db5;
+    font-weight: 800;
+    letter-spacing: 2.4px;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+    padding-left: 4px;
+  }
+  .menu-name-input-wrap {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    padding: 4px;
+    border-radius: 14px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(120,180,255,0.22);
+    transition: border-color .25s, box-shadow .25s;
+  }
+  .menu-name-input-wrap:focus-within {
+    border-color: rgba(140,210,255,0.65);
+    box-shadow: 0 0 0 3px rgba(108,204,255,0.15), 0 0 22px rgba(108,204,255,0.25);
+  }
+  #menuNameInput {
+    flex: 1; min-width: 0;
+    padding: 11px 14px;
+    background: transparent;
+    border: 0; outline: none;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 800;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+  }
+  #menuNameInput::placeholder {
+    color: #4f5e7e;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .menu-name-edit {
+    flex-shrink: 0;
+    width: 42px;
+    border-radius: 10px;
+    background: linear-gradient(160deg, rgba(140,200,255,0.14), rgba(140,200,255,0.06));
+    border: 1px solid rgba(140,200,255,0.22);
+    color: #bfe0ff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .15s, background .2s, border-color .2s;
+  }
+  .menu-name-edit:hover {
+    background: linear-gradient(160deg, rgba(140,200,255,0.28), rgba(140,200,255,0.14));
+    border-color: rgba(140,200,255,0.55);
+    transform: translateY(-1px);
+  }
+  .menu-name-edit:active { transform: translateY(0) scale(0.96); }
+
+  /* Stat-Karten */
+  .menu-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .stat {
+    padding: 11px 8px 10px;
+    background: linear-gradient(160deg, rgba(140,200,255,0.06), rgba(140,200,255,0.02));
+    border: 1px solid rgba(140,200,255,0.12);
+    border-radius: 14px;
+    transition: transform .18s, border-color .2s, background .2s;
+  }
+  .stat:hover {
+    transform: translateY(-2px);
+    border-color: rgba(140,200,255,0.28);
+    background: linear-gradient(160deg, rgba(140,200,255,0.10), rgba(140,200,255,0.03));
+  }
+  .stat-icon {
+    font-size: 13px;
+    color: #8ee0ff;
+    margin-bottom: 3px;
+    text-shadow: 0 0 10px rgba(108,204,255,0.55);
+  }
+  .stat-v {
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: #a8e6ff;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.05;
+  }
+  .stat-l {
+    font-size: 8.5px;
+    color: #6a7d9e;
+    text-transform: uppercase;
+    letter-spacing: 1.6px;
+    margin-top: 3px;
+    font-weight: 700;
+  }
+
+  /* Play Button */
+  .menu-play {
+    width: 100%;
+    padding: 18px 0;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #04182e;
+    background: linear-gradient(135deg, #b6f0ff 0%, #6ccfff 40%, #4ab5ff 100%);
+    border: 0;
+    border-radius: 16px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px;
+    transition: transform .15s, filter .2s, box-shadow .2s;
+    animation: playPulse 2.8s ease-in-out infinite;
+  }
+  .menu-play .play-icon {
+    display: inline-block;
+    font-size: 15px;
+    transition: transform .25s;
+  }
+  .menu-play:hover { transform: translateY(-2px); filter: brightness(1.1); }
+  .menu-play:hover .play-icon { transform: translateX(3px); }
+  .menu-play:active { transform: translateY(0); }
+  .menu-play::after {
+    content:'';
+    position:absolute; inset:0;
+    background: linear-gradient(120deg,
+      transparent 30%, rgba(255,255,255,0.75) 50%, transparent 70%);
+    transform: translateX(-140%);
+    transition: transform .8s;
+  }
+  .menu-play:hover::after { transform: translateX(140%); }
+  @keyframes playPulse {
+    0%,100% {
+      box-shadow:
+        0 0 0 0 rgba(108,204,255,0.55),
+        0 14px 40px rgba(108,204,255,0.40),
+        0 0 0 1px rgba(255,255,255,0.15) inset;
+    }
+    50% {
+      box-shadow:
+        0 0 0 18px rgba(108,204,255,0),
+        0 20px 50px rgba(108,204,255,0.60),
+        0 0 0 1px rgba(255,255,255,0.25) inset;
+    }
+  }
+
+  /* Controls */
+  .menu-controls {
+    margin-top: 20px;
+    color: #56678a;
+    font-size: 11px;
+    line-height: 1.9;
+    letter-spacing: 0.3px;
+  }
+  .menu-controls b {
+    color: #8ba0c5;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    font-size: 9.5px;
+  }
+  .menu-controls div { display: block; }
+
+  @media (max-width: 480px) {
+    .menu-hero { height: 110px; }
+    #menuWormCanvas { height: 110px; }
+    .menu-title { letter-spacing: -2px; }
+    .menu-sub { letter-spacing: 3.2px; font-size: 10px; }
+    .menu-play { padding: 16px 0; font-size: 18px; letter-spacing: 5px; }
+  }
+
+  /* ============================================================
+     Customize Button + Panel
+     ============================================================ */
   #customizeBtn {
     position: fixed; bottom: 17px; left: 17px; z-index: 11;
     zoom: 0.65;
@@ -371,6 +663,72 @@
   .cz-btn.primary { color: #04182e; background: linear-gradient(135deg, #8ee0ff 0%, #4ab5ff 100%); }
   .cz-btn.ghost { color: #a0b8d8; background: rgba(120,180,255,0.08); border: 1px solid rgba(120,180,255,0.22); }
 
+  .cz-boost-row {
+    display: flex; gap: 10px; margin-bottom: 12px;
+  }
+  .cz-pos-btn {
+    flex: 1; padding: 13px 0; cursor: pointer;
+    background: rgba(120,180,255,0.06);
+    border: 1px solid rgba(120,180,255,0.22);
+    border-radius: 12px;
+    color: #a0b8d8; font-size: 12.5px; font-weight: 800;
+    letter-spacing: 1.6px; text-transform: uppercase;
+    text-align: center;
+    transition: all .15s;
+  }
+  .cz-pos-btn input { display: none; }
+  .cz-pos-btn:hover { border-color: rgba(140,210,255,0.55); color: #c8d8f0; }
+  .cz-pos-btn.selected {
+    background: linear-gradient(135deg, rgba(142,224,255,0.22), rgba(74,181,255,0.18));
+    border-color: rgba(142,224,255,0.8);
+    color: #e6f6ff;
+    box-shadow: 0 0 0 2px rgba(140,210,255,0.15) inset, 0 4px 16px rgba(108,204,255,0.25);
+  }
+  .cz-slider-wrap {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(120,180,255,0.22);
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+  .cz-slider-wrap label {
+    font-size: 10.5px; color: #7a8db5; font-weight: 800;
+    letter-spacing: 1.6px; text-transform: uppercase;
+    min-width: 40px;
+  }
+  .cz-slider-wrap input[type="range"] {
+    flex: 1; height: 6px; -webkit-appearance: none; appearance: none;
+    background: rgba(120,180,255,0.20);
+    border-radius: 3px; outline: none;
+    cursor: pointer;
+  }
+  .cz-slider-wrap input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(180deg, #a8e6ff, #6ccfff);
+    border: 2px solid #fff;
+    cursor: pointer;
+    box-shadow: 0 0 14px rgba(108,204,255,0.75);
+    transition: transform .1s;
+  }
+  .cz-slider-wrap input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.12);
+  }
+  .cz-slider-wrap input[type="range"]::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(180deg, #a8e6ff, #6ccfff);
+    border: 2px solid #fff; cursor: pointer;
+    box-shadow: 0 0 14px rgba(108,204,255,0.75);
+  }
+  .cz-slider-value {
+    font-family: ui-monospace, monospace;
+    font-size: 14px; font-weight: 800; color: #a8e6ff;
+    min-width: 52px; text-align: right;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 10px rgba(108,204,255,0.5);
+  }
+
   #deathScreen {
     position: fixed; inset: 0; z-index: 7;
     display: none; align-items: flex-end; justify-content: center;
@@ -431,21 +789,34 @@
   }
 
   #boostBtn {
-    position:fixed; bottom:20px; left:20px; width:96px; height:96px; border-radius:50%;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: calc(96px * var(--boost-scale, 2.5));
+    height: calc(96px * var(--boost-scale, 2.5));
+    border-radius: 50%;
     zoom: 0.65;
-    background:radial-gradient(circle at 35% 30%, rgba(140,220,255,0.35), rgba(108,204,255,0.15));
-    border:2px solid rgba(108,204,255,0.6);
-    display:none; align-items:center; justify-content:center;
-    font-size:13px; font-weight:700; letter-spacing:1px; color:#bfe8ff;
-    z-index:8; pointer-events:auto; backdrop-filter: blur(4px);
-    box-shadow: 0 0 28px rgba(108,204,255,0.35);
-    transition: background .1s, transform .1s; }
-  #boostBtn.active { background:radial-gradient(circle at 35% 30%, rgba(200,240,255,0.6), rgba(108,204,255,0.35)); transform: scale(0.94); }
+    background: radial-gradient(circle at 35% 30%, rgba(140,220,255,0.35), rgba(108,204,255,0.15));
+    border: 2px solid rgba(108,204,255,0.6);
+    display: none; align-items: center; justify-content: center;
+    font-size: calc(13px * var(--boost-scale, 2.5));
+    font-weight: 700; letter-spacing: 1px; color: #bfe8ff;
+    z-index: 8; pointer-events: auto; backdrop-filter: blur(4px);
+    box-shadow: 0 0 32px rgba(108,204,255,0.40);
+    transition: background .1s, transform .1s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #boostBtn.pos-right { left: auto; right: 20px; }
+  #boostBtn.active {
+    background: radial-gradient(circle at 35% 30%, rgba(200,240,255,0.6), rgba(108,204,255,0.35));
+    transform: scale(0.94);
+  }
   body.touch #boostBtn { display:flex; }
   body.dead #boostBtn { display: none !important; }
 
   @media (max-width: 640px) {
-    #customizeBtn { bottom: 100px; left: 16px; }
+    #customizeBtn { bottom: 220px; left: 16px; }
     .cz-card { padding: 20px 18px 22px; }
     #deathScreen { padding: 0 12px 24px; }
     #deathScreen .ds-card { padding: 14px 26px 20px; }
@@ -526,17 +897,60 @@
   <span class="swatch" id="czBtnSwatch" style="background:#6ccfff;"></span>
 </button>
 
+<!-- ═══════════════════════════════════════════════
+     NEUES START MENÜ
+     ═══════════════════════════════════════════════ -->
 <div id="overlay">
-  <div class="dots"></div>
+  <div class="menu-blob b1"></div>
+  <div class="menu-blob b2"></div>
+  <div class="menu-blob b3"></div>
+  <div class="menu-dots"></div>
+  <div class="menu-scanlines"></div>
+  <div class="menu-vignette"></div>
+
   <div class="menu-card">
-    <h1 class="menu-title"><span class="t1">Battle</span><span class="t2">-Worms</span></h1>
-    <p class="menu-sub">Slither-style Battle Royale</p>
-    <div class="menu-stats">
-      <div class="stat"><div class="stat-v">51</div><div class="stat-l">Worms</div></div>
-      <div class="stat"><div class="stat-v">4:00</div><div class="stat-l">Match</div></div>
-      <div class="stat"><div class="stat-v">2:30</div><div class="stat-l">Respawn ends</div></div>
+    <!-- Hero: lebendiger Wurm-Preview -->
+    <div class="menu-hero">
+      <canvas id="menuWormCanvas" width="960" height="260"></canvas>
     </div>
-    <button class="menu-play" id="startBtn">PLAY</button>
+
+    <h1 class="menu-title"><span class="t1">Battle</span><span class="t2">-Worms</span></h1>
+    <p class="menu-sub">Slither-Style · Battle Royale</p>
+
+    <!-- Name Input -->
+    <div class="menu-name-wrap">
+      <label class="menu-name-label" for="menuNameInput">Your name</label>
+      <div class="menu-name-input-wrap">
+        <input type="text" id="menuNameInput" maxlength="14" placeholder="Enter your name" autocomplete="off" spellcheck="false">
+        <button class="menu-name-edit" id="menuCustomizeBtn" title="Customize worm" type="button">🎨</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="menu-stats">
+      <div class="stat">
+        <div class="stat-icon">◈</div>
+        <div class="stat-v">51</div>
+        <div class="stat-l">Worms</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon">⌛</div>
+        <div class="stat-v">4:00</div>
+        <div class="stat-l">Match</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon">★</div>
+        <div class="stat-v" id="menuStatWins">0</div>
+        <div class="stat-l">Your Wins</div>
+      </div>
+    </div>
+
+    <!-- Play -->
+    <button class="menu-play" id="startBtn" type="button">
+      <span class="play-icon">▶</span>
+      <span class="play-text">PLAY</span>
+    </button>
+
     <div class="menu-controls">
       <div><b>Desktop</b> · Mouse to steer · Click/Space to boost</div>
       <div><b>Mobile</b> · Drag anywhere · Hold BOOST</div>
@@ -584,6 +998,23 @@
       </div>
     </div>
 
+    <div class="cz-section-title">Boost Button</div>
+    <div class="cz-boost-row">
+      <label class="cz-pos-btn" id="czPosLeft" data-pos="left">
+        <input type="radio" name="czBoostPos" value="left">
+        <span>◀ Left</span>
+      </label>
+      <label class="cz-pos-btn" id="czPosRight" data-pos="right">
+        <input type="radio" name="czBoostPos" value="right">
+        <span>Right ▶</span>
+      </label>
+    </div>
+    <div class="cz-slider-wrap">
+      <label>Size</label>
+      <input type="range" id="czBoostSize" min="0.8" max="4.0" step="0.1" value="2.5">
+      <span class="cz-slider-value" id="czBoostSizeVal">2.5×</span>
+    </div>
+
     <div class="cz-actions">
       <button class="cz-btn ghost" id="czReset">Reset</button>
       <button class="cz-btn primary" id="czSave">Save</button>
@@ -605,7 +1036,7 @@ const CFG = {
   suddenDeathDuration: 30,
   zoneRegrowDuration: 5,
   bots: 50,
-  food: 16000,
+  food: 19000,
   segSpacing: 4,
   speed: 2.3,
   boostSpeed: 5.0,
@@ -662,21 +1093,28 @@ function pickFoodTier() {
 }
 
 // ============================================================
-// PLAYER COLOR / NAME / OUTLINE / BOOST GLOW
+// PLAYER COLOR / NAME / OUTLINE / BOOST GLOW / BOOST BTN
 // ============================================================
 const PLAYER_COLOR_KEY = 'battle-worms-color';
 const PLAYER_NAME_KEY = 'battle-worms-name';
 const PLAYER_OUTLINE_KEY = 'battle-worms-outline';
 const PLAYER_BOOST_GLOW_KEY = 'battle-worms-boost-glow';
+const PLAYER_BOOST_POS_KEY = 'battle-worms-boost-pos';
+const PLAYER_BOOST_SIZE_KEY = 'battle-worms-boost-size';
 const DEFAULT_PLAYER_COLOR = '#6ccfff';
 const DEFAULT_PLAYER_NAME = 'You';
 const DEFAULT_PLAYER_OUTLINE = '#0a0e1a';
 const DEFAULT_PLAYER_BOOST_GLOW = '#ffffff';
+const DEFAULT_PLAYER_BOOST_POS = 'left';
+const DEFAULT_PLAYER_BOOST_SIZE = 2.5;
 
 let playerColor = localStorage.getItem(PLAYER_COLOR_KEY) || DEFAULT_PLAYER_COLOR;
 let playerName = localStorage.getItem(PLAYER_NAME_KEY) || DEFAULT_PLAYER_NAME;
 let playerOutline = localStorage.getItem(PLAYER_OUTLINE_KEY) || DEFAULT_PLAYER_OUTLINE;
 let playerBoostGlow = localStorage.getItem(PLAYER_BOOST_GLOW_KEY) || DEFAULT_PLAYER_BOOST_GLOW;
+let playerBoostPos = localStorage.getItem(PLAYER_BOOST_POS_KEY) || DEFAULT_PLAYER_BOOST_POS;
+let playerBoostSize = parseFloat(localStorage.getItem(PLAYER_BOOST_SIZE_KEY) || String(DEFAULT_PLAYER_BOOST_SIZE));
+if (!isFinite(playerBoostSize)) playerBoostSize = DEFAULT_PLAYER_BOOST_SIZE;
 
 function setPlayerColor(hex, save) {
   playerColor = hex;
@@ -690,8 +1128,10 @@ function setPlayerName(name, save) {
   if (save) localStorage.setItem(PLAYER_NAME_KEY, name);
   const a = document.getElementById('czNameInput');
   const b = document.getElementById('dsNameInput');
+  const c = document.getElementById('menuNameInput');
   if (a && a.value !== name) a.value = name;
   if (b && b.value !== name) b.value = name;
+  if (c && c.value !== name && document.activeElement !== c) c.value = name;
   if (state && state.player && state.player.alive) state.player.name = name;
 }
 function setPlayerOutline(hex, save) {
@@ -703,6 +1143,24 @@ function setPlayerBoostGlow(hex, save) {
   playerBoostGlow = hex;
   if (save) localStorage.setItem(PLAYER_BOOST_GLOW_KEY, hex);
   if (state && state.player && state.player.alive) state.player.boostGlow = hex;
+}
+function applyBoostBtnSettings() {
+  const btn = document.getElementById('boostBtn');
+  if (!btn) return;
+  btn.style.setProperty('--boost-scale', playerBoostSize);
+  if (playerBoostPos === 'right') btn.classList.add('pos-right');
+  else btn.classList.remove('pos-right');
+}
+function setPlayerBoostPos(pos, save) {
+  playerBoostPos = (pos === 'right') ? 'right' : 'left';
+  if (save) localStorage.setItem(PLAYER_BOOST_POS_KEY, playerBoostPos);
+  applyBoostBtnSettings();
+}
+function setPlayerBoostSize(size, save) {
+  size = clamp(parseFloat(size) || DEFAULT_PLAYER_BOOST_SIZE, 0.8, 4.0);
+  playerBoostSize = size;
+  if (save) localStorage.setItem(PLAYER_BOOST_SIZE_KEY, String(size));
+  applyBoostBtnSettings();
 }
 
 // ============================================================
@@ -721,6 +1179,13 @@ function addWin(name, color) {
   lb[name].count = (lb[name].count || 0) + 1;
   lb[name].color = color;
   saveLeaderboard(lb);
+  updateMenuWinStat();
+}
+function updateMenuWinStat() {
+  const el = document.getElementById('menuStatWins');
+  if (!el) return;
+  const lb = getLeaderboard();
+  el.textContent = (lb[playerName] && lb[playerName].count) || 0;
 }
 
 // ============================================================
@@ -900,6 +1365,9 @@ class Worm {
       caution: 0.7 + Math.random() * 0.7,
       retargetAt: 0, desiredAngle: this.angle,
       lastSafety: 0, wanderAngle: this.angle,
+      boostUntil: 0,
+      boostCooldownUntil: 0,
+      nextBoostCheck: null,
     } : null;
   }
   get head() { return this.segments[0]; }
@@ -1228,14 +1696,25 @@ function botAI(worm, dt) {
   }
   worm.targetAngle = ai.desiredAngle;
 
+  const t = state.time;
   const mass = worm.segments.length;
-  let wantBoost = false;
-  if (ai.lastSafety < -25 && mass > 12) {
-    wantBoost = true;
-  } else if (mass > 22 && Math.random() < 0.15 + ai.aggression * 0.30) {
-    wantBoost = true;
+
+  if (ai.nextBoostCheck == null) {
+    ai.nextBoostCheck = t + 1.5 + Math.random() * 3.0;
   }
-  worm.boosting = wantBoost;
+
+  const panic = ai.lastSafety < -30 && mass > 12;
+
+  if (panic && t >= ai.boostCooldownUntil) {
+    ai.boostUntil = t + 0.40 + Math.random() * 0.40;
+    ai.boostCooldownUntil = ai.boostUntil + 0.7 + Math.random() * 0.6;
+  } else if (t >= ai.nextBoostCheck && mass > 22 && t >= ai.boostCooldownUntil) {
+    ai.boostUntil = t + 0.7 + Math.random() * 1.0;
+    ai.boostCooldownUntil = ai.boostUntil + 1.0 + Math.random() * 1.5;
+    ai.nextBoostCheck = ai.boostCooldownUntil + 2.0 + Math.random() * 3.0;
+  }
+
+  worm.boosting = t < ai.boostUntil;
 }
 
 function scoreDirection(worm, ang, nearby, nearestFood, nearestFoodD) {
@@ -1879,9 +2358,7 @@ function drawFood(cam, visW, visH) {
 }
 
 // ============================================================
-// ★★★ NEUER WORM-LOOK ★★★
-// Glatte Bézier-Kurve, 3D-Schattierung, sanfte Specular-Highlights,
-// Belly-Scales, randlos abgerundeter Schwanz (kein Fade), polierte Augen.
+// WORM RENDER — 12 Schichten, Bézier-Kurve, Schuppen, Augen
 // ============================================================
 function drawWorm(worm, isPlayer, zoom) {
   const segs = worm.segments;
@@ -1898,15 +2375,15 @@ function drawWorm(worm, isPlayer, zoom) {
     ? mixColors(worm.color, '#ff2040', outsideFlash * 0.85)
     : worm.color;
 
-  // Abgeleitete Schattierungen
-  const shadowColor   = mixColors(bodyColor, '#000000', 0.50);
-  const deepShadow    = mixColors(bodyColor, '#000000', 0.75);
-  const lightColor    = mixColors(bodyColor, '#ffffff', 0.50);
-  const specularColor = mixColors(bodyColor, '#ffffff', 0.90);
+  const cVoid       = mixColors(bodyColor, '#000000', 0.78);
+  const cShadow     = mixColors(bodyColor, '#000000', 0.52);
+  const cShade      = mixColors(bodyColor, '#000000', 0.28);
+  const cBase       = bodyColor;
+  const cLight      = mixColors(bodyColor, '#ffffff', 0.28);
+  const cHighlight  = mixColors(bodyColor, '#ffffff', 0.58);
+  const cSpecular   = mixColors(bodyColor, '#ffffff', 0.85);
+  const cShine      = mixColors(bodyColor, '#ffffff', 0.98);
 
-  // ────────────────────────────────────────────────────────
-  // Glatter Körper-Pfad (quadratische Bézier-Splines durch alle Segmente)
-  // ────────────────────────────────────────────────────────
   const path = new Path2D();
   path.moveTo(segs[0].x, segs[0].y);
   if (N >= 3) {
@@ -1923,180 +2400,224 @@ function drawWorm(worm, isPlayer, zoom) {
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
 
-  // ────────────────────────────────────────────────────────
-  // 0. BOOST GLOW (unter allem)
-  // ────────────────────────────────────────────────────────
   if (worm.boosting && worm.alive) {
     const flashRaw = 0.5 + 0.5 * Math.sin(state.time * Math.PI * 2 / CFG.boostFlashInterval);
     const flashAmt = Math.pow(flashRaw, 4);
     const bc = worm.boostGlow || '#ffffff';
-    ctx.strokeStyle = hexAlpha(bc, 0.15 + 0.55 * flashAmt);
-    ctx.lineWidth = bodyR * 2 + outlineW * 2 + 8 + 18 * flashAmt;
+    ctx.strokeStyle = hexAlpha(bc, 0.20 + 0.55 * flashAmt);
+    ctx.lineWidth = bodyR * 2 + outlineW * 2 + 10 + 22 * flashAmt;
     ctx.stroke(path);
     ctx.beginPath();
-    ctx.arc(h.x, h.y, headR + outlineW + 6 + 12 * flashAmt, 0, Math.PI * 2);
-    ctx.fillStyle = hexAlpha(bc, 0.10 + 0.5 * flashAmt);
+    ctx.arc(h.x, h.y, headR + outlineW + 8 + 15 * flashAmt, 0, Math.PI * 2);
+    ctx.fillStyle = hexAlpha(bc, 0.12 + 0.5 * flashAmt);
     ctx.fill();
   }
 
-  // ────────────────────────────────────────────────────────
-  // 1. ÄUßERE OUTLINE (dunkel, breiteste Schicht)
-  // ────────────────────────────────────────────────────────
-  ctx.strokeStyle = outlineColor;
+  ctx.save();
+  ctx.translate(bodyR * 0.16, bodyR * 0.32);
+  ctx.strokeStyle = 'rgba(0,0,0,0.30)';
   ctx.lineWidth = bodyR * 2 + outlineW * 2 + 2;
   ctx.stroke(path);
+  ctx.beginPath();
+  ctx.arc(h.x + bodyR * 0.16, h.y + bodyR * 0.32, headR + outlineW + 1, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,0.30)';
+  ctx.fill();
+  ctx.restore();
 
-  // ────────────────────────────────────────────────────────
-  // 2. SCHATTEN-Schicht (nach unten-rechts versetzt)
-  // ────────────────────────────────────────────────────────
+  ctx.strokeStyle = outlineColor;
+  ctx.lineWidth = bodyR * 2 + outlineW * 2 + 2.5;
+  ctx.stroke(path);
+
   ctx.save();
-  ctx.translate(bodyR * 0.10, bodyR * 0.22);
-  ctx.strokeStyle = deepShadow;
+  ctx.translate(bodyR * 0.14, bodyR * 0.24);
+  ctx.strokeStyle = cVoid;
   ctx.lineWidth = bodyR * 2 + outlineW * 1.6;
   ctx.stroke(path);
   ctx.restore();
 
-  // ────────────────────────────────────────────────────────
-  // 3. BASIS-KÖRPER
-  // ────────────────────────────────────────────────────────
-  ctx.strokeStyle = bodyColor;
+  ctx.save();
+  ctx.translate(bodyR * 0.06, bodyR * 0.12);
+  ctx.strokeStyle = cShadow;
+  ctx.lineWidth = bodyR * 2 + outlineW * 0.9;
+  ctx.stroke(path);
+  ctx.restore();
+
+  ctx.strokeStyle = cShade;
   ctx.lineWidth = bodyR * 2 + outlineW * 0.4;
   ctx.stroke(path);
 
-  // ────────────────────────────────────────────────────────
-  // 4. LICHT-Schicht (nach oben-links versetzt)
-  // ────────────────────────────────────────────────────────
-  ctx.save();
-  ctx.translate(-bodyR * 0.22, -bodyR * 0.28);
-  ctx.strokeStyle = hexAlpha(lightColor, 0.80);
-  ctx.lineWidth = bodyR * 1.15;
+  ctx.strokeStyle = cBase;
+  ctx.lineWidth = bodyR * 2 - outlineW * 0.4;
   ctx.stroke(path);
-  ctx.restore();
 
-  // ────────────────────────────────────────────────────────
-  // 5. SPECULAR-HIGHLIGHT (dünn, obere Kante)
-  // ────────────────────────────────────────────────────────
-  ctx.save();
-  ctx.translate(-bodyR * 0.32, -bodyR * 0.40);
-  ctx.strokeStyle = hexAlpha(specularColor, 0.90);
-  ctx.lineWidth = Math.max(1.2, bodyR * 0.28);
-  ctx.stroke(path);
-  ctx.restore();
-
-  // ────────────────────────────────────────────────────────
-  // 6. BELLY-RIPPLES (kleine dunkle Schuppen, gebündelt als ein Stroke)
-  // ────────────────────────────────────────────────────────
-  if (zoom > 0.30 && N > 8) {
-    const step = Math.max(3, Math.floor(N / 42));
-    const ripplePath = new Path2D();
-    for (let i = step; i < N - 1; i += step) {
+  if (zoom > 0.30 && N > 10) {
+    const scaleStep = Math.max(3, Math.floor(N / 55));
+    const arcPath = new Path2D();
+    for (let i = scaleStep; i < N - 1; i += scaleStep) {
       const s = segs[i];
-      const prev = segs[i - 1];
-      const ang = Math.atan2(s.y - prev.y, s.x - prev.x);
-      const perp = ang + Math.PI / 2;
-      const cx = Math.cos(perp), cy = Math.sin(perp);
-      const r0 = bodyR * 0.34;
-      const r1 = bodyR * 0.62;
-      ripplePath.moveTo(s.x + cx * r0, s.y + cy * r0);
-      ripplePath.lineTo(s.x + cx * r1, s.y + cy * r1);
+      const prev = segs[Math.max(0, i - 2)];
+      const next = segs[Math.min(N - 1, i + 1)];
+      let dx = next.x - prev.x;
+      let dy = next.y - prev.y;
+      const dl = Math.hypot(dx, dy) || 1;
+      dx /= dl; dy /= dl;
+      const px = -dy, py = dx;
+      const r = bodyR * 0.94;
+      const x0 = s.x + px * r;
+      const y0 = s.y + py * r;
+      const x1 = s.x - px * r;
+      const y1 = s.y - py * r;
+      const bulge = r * 0.25;
+      const cx = (x0 + x1) * 0.5 - dx * bulge;
+      const cy = (y0 + y1) * 0.5 - dy * bulge;
+      arcPath.moveTo(x0, y0);
+      arcPath.quadraticCurveTo(cx, cy, x1, y1);
     }
     ctx.save();
-    ctx.translate(bodyR * 0.05, bodyR * 0.16);
-    ctx.strokeStyle = hexAlpha(deepShadow, 0.55);
-    ctx.lineWidth = Math.max(1.0, bodyR * 0.13);
+    ctx.strokeStyle = hexAlpha(cShadow, 0.55);
+    ctx.lineWidth = Math.max(1.0, bodyR * 0.12);
     ctx.lineCap = 'round';
-    ctx.stroke(ripplePath);
+    ctx.stroke(arcPath);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(0, -bodyR * 0.10);
+    ctx.strokeStyle = hexAlpha(cHighlight, 0.30);
+    ctx.lineWidth = Math.max(0.8, bodyR * 0.07);
+    ctx.stroke(arcPath);
     ctx.restore();
   }
 
-  // ────────────────────────────────────────────────────────
-  // 7. KOPF (mit Outline + Gradient)
-  // ────────────────────────────────────────────────────────
-  // Äußerer Outline-Ring
+  ctx.save();
+  ctx.translate(0, bodyR * 0.42);
+  ctx.strokeStyle = hexAlpha(cLight, 0.35);
+  ctx.lineWidth = bodyR * 0.55;
+  ctx.stroke(path);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-bodyR * 0.10, -bodyR * 0.22);
+  ctx.strokeStyle = hexAlpha(cLight, 0.62);
+  ctx.lineWidth = bodyR * 1.10;
+  ctx.stroke(path);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-bodyR * 0.20, -bodyR * 0.38);
+  ctx.strokeStyle = hexAlpha(cHighlight, 0.85);
+  ctx.lineWidth = bodyR * 0.50;
+  ctx.stroke(path);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(-bodyR * 0.28, -bodyR * 0.50);
+  ctx.strokeStyle = hexAlpha(cSpecular, 0.92);
+  ctx.lineWidth = Math.max(1.0, bodyR * 0.16);
+  ctx.stroke(path);
+  ctx.restore();
+
+  // Head
   ctx.beginPath();
-  ctx.arc(h.x, h.y, headR + outlineW + 1, 0, Math.PI * 2);
+  ctx.arc(h.x, h.y, headR + outlineW + 1.4, 0, Math.PI * 2);
   ctx.fillStyle = outlineColor;
   ctx.fill();
 
-  // Basis-Kopf
   ctx.beginPath();
-  ctx.arc(h.x, h.y, headR + outlineW * 0.6, 0, Math.PI * 2);
-  ctx.fillStyle = bodyColor;
+  ctx.arc(h.x, h.y, headR + outlineW * 0.55, 0, Math.PI * 2);
+  ctx.fillStyle = cShadow;
   ctx.fill();
 
-  // Kopf-Radialgradient (Lichtquelle oben links)
   const headGrad = ctx.createRadialGradient(
-    h.x - headR * 0.38, h.y - headR * 0.42, headR * 0.12,
-    h.x, h.y, headR * 1.05
+    h.x - headR * 0.42, h.y - headR * 0.48, headR * 0.08,
+    h.x, h.y, headR * 1.15
   );
-  headGrad.addColorStop(0, mixColors(bodyColor, '#ffffff', 0.78));
-  headGrad.addColorStop(0.45, bodyColor);
-  headGrad.addColorStop(1, shadowColor);
+  headGrad.addColorStop(0, cShine);
+  headGrad.addColorStop(0.20, mixColors(bodyColor, '#ffffff', 0.55));
+  headGrad.addColorStop(0.55, bodyColor);
+  headGrad.addColorStop(1, cShadow);
   ctx.beginPath();
   ctx.arc(h.x, h.y, headR, 0, Math.PI * 2);
   ctx.fillStyle = headGrad;
   ctx.fill();
 
-  // Kopf-Specular-Highlight
   ctx.beginPath();
-  ctx.arc(h.x - headR * 0.32, h.y - headR * 0.38, headR * 0.32, 0, Math.PI * 2);
-  ctx.fillStyle = hexAlpha(specularColor, 0.55);
+  ctx.arc(h.x - headR * 0.38, h.y - headR * 0.44, headR * 0.34, 0, Math.PI * 2);
+  ctx.fillStyle = hexAlpha(cSpecular, 0.55);
   ctx.fill();
 
-  // ────────────────────────────────────────────────────────
-  // 8. AUGEN (Sclera mit Gradient, dunkle Pupille, 2 Glints)
-  // ────────────────────────────────────────────────────────
-  const eyeBack = headR * 0.20, eyeSide = headR * 0.60;
-  const eyeR = headR * 0.46, pupilR = eyeR * 0.55;
+  ctx.beginPath();
+  ctx.arc(h.x, h.y + headR * 0.35, headR * 0.55, 0, Math.PI);
+  ctx.fillStyle = hexAlpha(cShadow, 0.35);
+  ctx.fill();
+
+  // Eyes
+  const eyeBack = headR * 0.20, eyeSide = headR * 0.62;
+  const eyeR = headR * 0.48, pupilR = eyeR * 0.55, irisR = eyeR * 0.72;
   const perp = worm.angle + Math.PI / 2;
+  const irisColor = mixColors(bodyColor, '#000000', 0.55);
+  const irisRim   = mixColors(bodyColor, '#ffffff', 0.15);
 
   for (const sgn of [-1, 1]) {
     const ex = h.x + Math.cos(worm.angle) * eyeBack + Math.cos(perp) * eyeSide * sgn;
     const ey = h.y + Math.sin(worm.angle) * eyeBack + Math.sin(perp) * eyeSide * sgn;
 
-    // Äußerer dunkler Ring
     ctx.beginPath();
-    ctx.arc(ex, ey, eyeR + 1.6, 0, Math.PI * 2);
+    ctx.arc(ex, ey, eyeR + 1.8, 0, Math.PI * 2);
     ctx.fillStyle = outlineColor;
     ctx.fill();
 
-    // Sclera mit Radial-Gradient
-    const eyeGrad = ctx.createRadialGradient(
-      ex - eyeR * 0.30, ey - eyeR * 0.30, eyeR * 0.10,
+    const scleraGrad = ctx.createRadialGradient(
+      ex - eyeR * 0.35, ey - eyeR * 0.35, eyeR * 0.05,
       ex, ey, eyeR
     );
-    eyeGrad.addColorStop(0, '#ffffff');
-    eyeGrad.addColorStop(0.75, '#eef3ff');
-    eyeGrad.addColorStop(1, '#cfd6e6');
+    scleraGrad.addColorStop(0, '#ffffff');
+    scleraGrad.addColorStop(0.6, '#f0f4ff');
+    scleraGrad.addColorStop(1, '#cfd8e8');
     ctx.beginPath();
     ctx.arc(ex, ey, eyeR, 0, Math.PI * 2);
-    ctx.fillStyle = eyeGrad;
+    ctx.fillStyle = scleraGrad;
     ctx.fill();
 
-    // Pupille (leicht in Blickrichtung verschoben)
-    const px = ex + Math.cos(worm.angle) * eyeR * 0.32;
-    const py = ey + Math.sin(worm.angle) * eyeR * 0.32;
+    const px = ex + Math.cos(worm.angle) * eyeR * 0.30;
+    const py = ey + Math.sin(worm.angle) * eyeR * 0.30;
+
+    const irisGrad = ctx.createRadialGradient(
+      px - irisR * 0.22, py - irisR * 0.22, irisR * 0.08,
+      px, py, irisR
+    );
+    irisGrad.addColorStop(0, irisRim);
+    irisGrad.addColorStop(0.55, irisColor);
+    irisGrad.addColorStop(1, mixColors(irisColor, '#000000', 0.4));
+    ctx.beginPath();
+    ctx.arc(px, py, irisR, 0, Math.PI * 2);
+    ctx.fillStyle = irisGrad;
+    ctx.fill();
+
     ctx.beginPath();
     ctx.arc(px, py, pupilR, 0, Math.PI * 2);
-    ctx.fillStyle = '#0a0e1a';
+    ctx.fillStyle = '#07080f';
     ctx.fill();
 
-    // Haupt-Glint (oben links)
     ctx.beginPath();
-    ctx.arc(px - pupilR * 0.38, py - pupilR * 0.38, pupilR * 0.42, 0, Math.PI * 2);
+    ctx.arc(px - pupilR * 0.48, py - pupilR * 0.48, pupilR * 0.50, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(255,255,255,0.98)';
     ctx.fill();
-
-    // Sekundär-Glint (unten rechts, schwächer)
     ctx.beginPath();
-    ctx.arc(px + pupilR * 0.30, py + pupilR * 0.30, pupilR * 0.20, 0, Math.PI * 2);
+    ctx.arc(px + pupilR * 0.38, py + pupilR * 0.38, pupilR * 0.22, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(255,255,255,0.55)';
     ctx.fill();
+    ctx.beginPath();
+    ctx.arc(px + irisR * 0.42, py - irisR * 0.42, irisR * 0.13, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(ex, ey, eyeR * 0.98, Math.PI * 1.12, Math.PI * 1.88);
+    ctx.strokeStyle = hexAlpha(outlineColor, 0.55);
+    ctx.lineWidth = Math.max(1.2, eyeR * 0.15);
+    ctx.lineCap = 'round';
+    ctx.stroke();
   }
 
-  // ────────────────────────────────────────────────────────
-  // 9. NAMETAG
-  // ────────────────────────────────────────────────────────
   if (!isPlayer && zoom > 0.32) {
     const labelY = h.y - headR - 7;
     const fs = Math.max(10, 11 / Math.sqrt(zoom));
@@ -2511,10 +3032,16 @@ const czBoostGlowHex = document.getElementById('czBoostGlowHex');
 const czNameInput = document.getElementById('czNameInput');
 const czCanvas = document.getElementById('czCanvas');
 const czCtx = czCanvas.getContext('2d');
+const czPosLeft = document.getElementById('czPosLeft');
+const czPosRight = document.getElementById('czPosRight');
+const czBoostSize = document.getElementById('czBoostSize');
+const czBoostSizeVal = document.getElementById('czBoostSizeVal');
 
 let czTempColor = playerColor;
 let czTempOutline = playerOutline;
 let czTempBoostGlow = playerBoostGlow;
+let czTempBoostPos = playerBoostPos;
+let czTempBoostSize = playerBoostSize;
 let czTempName = playerName;
 let czAnimId = null, czStartTime = 0;
 
@@ -2557,6 +3084,21 @@ function updateCzUI() {
   czBoostGlowDot.style.background = czTempBoostGlow;
   czBoostGlowHex.textContent = czTempBoostGlow.toUpperCase();
 
+  if (czTempBoostPos === 'right') {
+    czPosRight.classList.add('selected');
+    czPosLeft.classList.remove('selected');
+    czPosRight.querySelector('input').checked = true;
+  } else {
+    czPosLeft.classList.add('selected');
+    czPosRight.classList.remove('selected');
+    czPosLeft.querySelector('input').checked = true;
+  }
+
+  if (czBoostSize && parseFloat(czBoostSize.value) !== czTempBoostSize) {
+    czBoostSize.value = String(czTempBoostSize);
+  }
+  if (czBoostSizeVal) czBoostSizeVal.textContent = czTempBoostSize.toFixed(1) + '×';
+
   if (czNameInput && czNameInput.value !== czTempName) czNameInput.value = czTempName;
 }
 czColorInput.addEventListener('input', e => { czTempColor = e.target.value; updateCzUI(); });
@@ -2567,10 +3109,22 @@ czNameInput.addEventListener('input', e => {
   if (czTempName !== e.target.value) e.target.value = czTempName;
 });
 
+czPosLeft.addEventListener('click', () => { czTempBoostPos = 'left'; updateCzUI(); });
+czPosRight.addEventListener('click', () => { czTempBoostPos = 'right'; updateCzUI(); });
+czPosLeft.querySelector('input').addEventListener('change', () => { czTempBoostPos = 'left'; updateCzUI(); });
+czPosRight.querySelector('input').addEventListener('change', () => { czTempBoostPos = 'right'; updateCzUI(); });
+
+czBoostSize.addEventListener('input', e => {
+  czTempBoostSize = clamp(parseFloat(e.target.value) || DEFAULT_PLAYER_BOOST_SIZE, 0.8, 4.0);
+  if (czBoostSizeVal) czBoostSizeVal.textContent = czTempBoostSize.toFixed(1) + '×';
+});
+
 function openCustomize() {
   czTempColor = playerColor;
   czTempOutline = playerOutline;
   czTempBoostGlow = playerBoostGlow;
+  czTempBoostPos = playerBoostPos;
+  czTempBoostSize = playerBoostSize;
   czTempName = playerName;
   czNameInput.value = playerName;
   updateCzUI();
@@ -2589,13 +3143,18 @@ czSave.addEventListener('click', () => {
   setPlayerColor(czTempColor, true);
   setPlayerOutline(czTempOutline, true);
   setPlayerBoostGlow(czTempBoostGlow, true);
+  setPlayerBoostPos(czTempBoostPos, true);
+  setPlayerBoostSize(czTempBoostSize, true);
   setPlayerName(czTempName, true);
+  updateMenuWinStat();
   closeCustomize();
 });
 czReset.addEventListener('click', () => {
   czTempColor = DEFAULT_PLAYER_COLOR;
   czTempOutline = DEFAULT_PLAYER_OUTLINE;
   czTempBoostGlow = DEFAULT_PLAYER_BOOST_GLOW;
+  czTempBoostPos = DEFAULT_PLAYER_BOOST_POS;
+  czTempBoostSize = DEFAULT_PLAYER_BOOST_SIZE;
   czTempName = DEFAULT_PLAYER_NAME;
   updateCzUI();
 });
@@ -2609,7 +3168,6 @@ function animateCzPreview() {
   czAnimId = requestAnimationFrame(animateCzPreview);
 }
 
-// ★ Preview mit gleichem Look wie Ingame
 function drawCzPreview(t) {
   const w = czCanvas.width, h = czCanvas.height;
   czCtx.clearRect(0, 0, w, h);
@@ -2624,16 +3182,25 @@ function drawCzPreview(t) {
   for (let i = 0; i < segments; i++)
     pts.push({ x: headX - i * segLen, y: baseY + Math.sin(wave - i * 0.32) * amp });
 
-  const bodyR = 13;
+  drawPreviewWorm(czCtx, pts, 13, czTempColor, czTempOutline, czTempBoostGlow, t);
+}
+
+// ============================================================
+// Shared Preview Worm Renderer (12 layers, curved scales, cartoon eyes)
+// ============================================================
+function drawPreviewWorm(c, pts, bodyR, bodyColor, outlineColor, boostGlow, t) {
   const outlineW = CFG.outlineWidth;
-  czCtx.lineCap = 'round'; czCtx.lineJoin = 'round';
+  c.lineCap = 'round'; c.lineJoin = 'round';
 
-  const shadowColor   = mixColors(czTempColor, '#000000', 0.50);
-  const deepShadow    = mixColors(czTempColor, '#000000', 0.75);
-  const lightColor    = mixColors(czTempColor, '#ffffff', 0.50);
-  const specularColor = mixColors(czTempColor, '#ffffff', 0.90);
+  const cVoid      = mixColors(bodyColor, '#000000', 0.78);
+  const cShadow    = mixColors(bodyColor, '#000000', 0.52);
+  const cShade     = mixColors(bodyColor, '#000000', 0.28);
+  const cBase      = bodyColor;
+  const cLight     = mixColors(bodyColor, '#ffffff', 0.28);
+  const cHighlight = mixColors(bodyColor, '#ffffff', 0.58);
+  const cSpecular  = mixColors(bodyColor, '#ffffff', 0.85);
+  const cShine     = mixColors(bodyColor, '#ffffff', 0.98);
 
-  // Smooth Path
   const path = new Path2D();
   path.moveTo(pts[0].x, pts[0].y);
   for (let i = 1; i < pts.length - 1; i++) {
@@ -2643,137 +3210,321 @@ function drawCzPreview(t) {
   }
   path.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
 
-  // Boost-Glow-Preview
   const flashRaw = 0.5 + 0.5 * Math.sin(t * Math.PI * 2 / CFG.boostFlashInterval);
   const flashAmt = Math.pow(flashRaw, 4);
-  czCtx.strokeStyle = hexAlpha(czTempBoostGlow, 0.15 + 0.55 * flashAmt);
-  czCtx.lineWidth = bodyR * 2 + outlineW * 2 + 8 + 18 * flashAmt;
-  czCtx.stroke(path);
+  c.strokeStyle = hexAlpha(boostGlow, 0.20 + 0.55 * flashAmt);
+  c.lineWidth = bodyR * 2 + outlineW * 2 + 10 + 22 * flashAmt;
+  c.stroke(path);
 
   const headPt = pts[0];
   const angle = Math.atan2(headPt.y - pts[1].y, headPt.x - pts[1].x);
   const hr = bodyR + 1;
-  czCtx.beginPath();
-  czCtx.arc(headPt.x, headPt.y, hr + outlineW + 6 + 12 * flashAmt, 0, Math.PI * 2);
-  czCtx.fillStyle = hexAlpha(czTempBoostGlow, 0.10 + 0.5 * flashAmt);
-  czCtx.fill();
+  c.beginPath();
+  c.arc(headPt.x, headPt.y, hr + outlineW + 8 + 15 * flashAmt, 0, Math.PI * 2);
+  c.fillStyle = hexAlpha(boostGlow, 0.12 + 0.5 * flashAmt);
+  c.fill();
+
+  // Ground shadow
+  c.save();
+  c.translate(bodyR * 0.16, bodyR * 0.32);
+  c.strokeStyle = 'rgba(0,0,0,0.30)';
+  c.lineWidth = bodyR * 2 + outlineW * 2 + 2;
+  c.stroke(path);
+  c.beginPath();
+  c.arc(headPt.x + bodyR * 0.16, headPt.y + bodyR * 0.32, hr + outlineW + 1, 0, Math.PI * 2);
+  c.fillStyle = 'rgba(0,0,0,0.30)';
+  c.fill();
+  c.restore();
 
   // Outer outline
-  czCtx.strokeStyle = czTempOutline;
-  czCtx.lineWidth = bodyR * 2 + outlineW * 2 + 2;
-  czCtx.stroke(path);
+  c.strokeStyle = outlineColor;
+  c.lineWidth = bodyR * 2 + outlineW * 2 + 2.5;
+  c.stroke(path);
+
+  // Void
+  c.save();
+  c.translate(bodyR * 0.14, bodyR * 0.24);
+  c.strokeStyle = cVoid;
+  c.lineWidth = bodyR * 2 + outlineW * 1.6;
+  c.stroke(path);
+  c.restore();
 
   // Shadow
-  czCtx.save();
-  czCtx.translate(bodyR * 0.10, bodyR * 0.22);
-  czCtx.strokeStyle = deepShadow;
-  czCtx.lineWidth = bodyR * 2 + outlineW * 1.6;
-  czCtx.stroke(path);
-  czCtx.restore();
+  c.save();
+  c.translate(bodyR * 0.06, bodyR * 0.12);
+  c.strokeStyle = cShadow;
+  c.lineWidth = bodyR * 2 + outlineW * 0.9;
+  c.stroke(path);
+  c.restore();
 
-  // Base body
-  czCtx.strokeStyle = czTempColor;
-  czCtx.lineWidth = bodyR * 2 + outlineW * 0.4;
-  czCtx.stroke(path);
+  // Shade
+  c.strokeStyle = cShade;
+  c.lineWidth = bodyR * 2 + outlineW * 0.4;
+  c.stroke(path);
+
+  // Base
+  c.strokeStyle = cBase;
+  c.lineWidth = bodyR * 2 - outlineW * 0.4;
+  c.stroke(path);
+
+  // Curved scales
+  const scaleStep = Math.max(3, Math.floor(pts.length / 12));
+  const arcPath = new Path2D();
+  for (let i = scaleStep; i < pts.length - 1; i += scaleStep) {
+    const s = pts[i];
+    const prev = pts[Math.max(0, i - 2)];
+    const next = pts[Math.min(pts.length - 1, i + 1)];
+    let dx = next.x - prev.x, dy = next.y - prev.y;
+    const dl = Math.hypot(dx, dy) || 1;
+    dx /= dl; dy /= dl;
+    const px = -dy, py = dx;
+    const r = bodyR * 0.94;
+    const x0 = s.x + px * r, y0 = s.y + py * r;
+    const x1 = s.x - px * r, y1 = s.y - py * r;
+    const bulge = r * 0.25;
+    const cx = (x0 + x1) * 0.5 - dx * bulge;
+    const cy = (y0 + y1) * 0.5 - dy * bulge;
+    arcPath.moveTo(x0, y0);
+    arcPath.quadraticCurveTo(cx, cy, x1, y1);
+  }
+  c.save();
+  c.strokeStyle = hexAlpha(cShadow, 0.55);
+  c.lineWidth = Math.max(1.0, bodyR * 0.12);
+  c.stroke(arcPath);
+  c.restore();
+  c.save();
+  c.translate(0, -bodyR * 0.10);
+  c.strokeStyle = hexAlpha(cHighlight, 0.30);
+  c.lineWidth = Math.max(0.8, bodyR * 0.07);
+  c.stroke(arcPath);
+  c.restore();
+
+  // Belly light
+  c.save();
+  c.translate(0, bodyR * 0.42);
+  c.strokeStyle = hexAlpha(cLight, 0.35);
+  c.lineWidth = bodyR * 0.55;
+  c.stroke(path);
+  c.restore();
 
   // Light
-  czCtx.save();
-  czCtx.translate(-bodyR * 0.22, -bodyR * 0.28);
-  czCtx.strokeStyle = hexAlpha(lightColor, 0.80);
-  czCtx.lineWidth = bodyR * 1.15;
-  czCtx.stroke(path);
-  czCtx.restore();
+  c.save();
+  c.translate(-bodyR * 0.10, -bodyR * 0.22);
+  c.strokeStyle = hexAlpha(cLight, 0.62);
+  c.lineWidth = bodyR * 1.10;
+  c.stroke(path);
+  c.restore();
+
+  // Highlight
+  c.save();
+  c.translate(-bodyR * 0.20, -bodyR * 0.38);
+  c.strokeStyle = hexAlpha(cHighlight, 0.85);
+  c.lineWidth = bodyR * 0.50;
+  c.stroke(path);
+  c.restore();
 
   // Specular
-  czCtx.save();
-  czCtx.translate(-bodyR * 0.32, -bodyR * 0.40);
-  czCtx.strokeStyle = hexAlpha(specularColor, 0.90);
-  czCtx.lineWidth = Math.max(1.2, bodyR * 0.28);
-  czCtx.stroke(path);
-  czCtx.restore();
-
-  // Belly ripples
-  const step = Math.max(3, Math.floor(pts.length / 12));
-  const ripplePath = new Path2D();
-  for (let i = step; i < pts.length - 1; i += step) {
-    const s = pts[i];
-    const prev = pts[i - 1];
-    const ang = Math.atan2(s.y - prev.y, s.x - prev.x);
-    const perp = ang + Math.PI / 2;
-    const cx = Math.cos(perp), cy = Math.sin(perp);
-    const r0 = bodyR * 0.34;
-    const r1 = bodyR * 0.62;
-    ripplePath.moveTo(s.x + cx * r0, s.y + cy * r0);
-    ripplePath.lineTo(s.x + cx * r1, s.y + cy * r1);
-  }
-  czCtx.save();
-  czCtx.translate(bodyR * 0.05, bodyR * 0.16);
-  czCtx.strokeStyle = hexAlpha(deepShadow, 0.55);
-  czCtx.lineWidth = Math.max(1.0, bodyR * 0.13);
-  czCtx.lineCap = 'round';
-  czCtx.stroke(ripplePath);
-  czCtx.restore();
+  c.save();
+  c.translate(-bodyR * 0.28, -bodyR * 0.50);
+  c.strokeStyle = hexAlpha(cSpecular, 0.92);
+  c.lineWidth = Math.max(1.0, bodyR * 0.16);
+  c.stroke(path);
+  c.restore();
 
   // Head
-  czCtx.beginPath(); czCtx.arc(headPt.x, headPt.y, hr + outlineW + 1, 0, Math.PI * 2);
-  czCtx.fillStyle = czTempOutline; czCtx.fill();
-  czCtx.beginPath(); czCtx.arc(headPt.x, headPt.y, hr + outlineW * 0.6, 0, Math.PI * 2);
-  czCtx.fillStyle = czTempColor; czCtx.fill();
+  c.beginPath(); c.arc(headPt.x, headPt.y, hr + outlineW + 1.4, 0, Math.PI * 2);
+  c.fillStyle = outlineColor; c.fill();
+  c.beginPath(); c.arc(headPt.x, headPt.y, hr + outlineW * 0.55, 0, Math.PI * 2);
+  c.fillStyle = cShadow; c.fill();
 
-  const headGrad = czCtx.createRadialGradient(
-    headPt.x - hr * 0.38, headPt.y - hr * 0.42, hr * 0.12,
-    headPt.x, headPt.y, hr * 1.05
+  const headGrad = c.createRadialGradient(
+    headPt.x - hr * 0.42, headPt.y - hr * 0.48, hr * 0.08,
+    headPt.x, headPt.y, hr * 1.15
   );
-  headGrad.addColorStop(0, mixColors(czTempColor, '#ffffff', 0.78));
-  headGrad.addColorStop(0.45, czTempColor);
-  headGrad.addColorStop(1, shadowColor);
-  czCtx.beginPath(); czCtx.arc(headPt.x, headPt.y, hr, 0, Math.PI * 2);
-  czCtx.fillStyle = headGrad; czCtx.fill();
+  headGrad.addColorStop(0, cShine);
+  headGrad.addColorStop(0.20, mixColors(bodyColor, '#ffffff', 0.55));
+  headGrad.addColorStop(0.55, bodyColor);
+  headGrad.addColorStop(1, cShadow);
+  c.beginPath(); c.arc(headPt.x, headPt.y, hr, 0, Math.PI * 2);
+  c.fillStyle = headGrad; c.fill();
 
-  czCtx.beginPath();
-  czCtx.arc(headPt.x - hr * 0.32, headPt.y - hr * 0.38, hr * 0.32, 0, Math.PI * 2);
-  czCtx.fillStyle = hexAlpha(specularColor, 0.55);
-  czCtx.fill();
+  c.beginPath();
+  c.arc(headPt.x - hr * 0.38, headPt.y - hr * 0.44, hr * 0.34, 0, Math.PI * 2);
+  c.fillStyle = hexAlpha(cSpecular, 0.55);
+  c.fill();
+
+  c.beginPath();
+  c.arc(headPt.x, headPt.y + hr * 0.35, hr * 0.55, 0, Math.PI);
+  c.fillStyle = hexAlpha(cShadow, 0.35);
+  c.fill();
 
   // Eyes
-  const eyeBack = hr * 0.20, eyeSide = hr * 0.60;
-  const eyeR = hr * 0.46, pupilR = eyeR * 0.55;
+  const eyeBack = hr * 0.20, eyeSide = hr * 0.62;
+  const eyeR = hr * 0.48, pupilR = eyeR * 0.55, irisR = eyeR * 0.72;
   const perp = angle + Math.PI / 2;
+  const irisColor = mixColors(bodyColor, '#000000', 0.55);
+  const irisRim   = mixColors(bodyColor, '#ffffff', 0.15);
+
   for (const sgn of [-1, 1]) {
     const ex = headPt.x + Math.cos(angle) * eyeBack + Math.cos(perp) * eyeSide * sgn;
     const ey = headPt.y + Math.sin(angle) * eyeBack + Math.sin(perp) * eyeSide * sgn;
 
-    czCtx.beginPath(); czCtx.arc(ex, ey, eyeR + 1.6, 0, Math.PI * 2);
-    czCtx.fillStyle = czTempOutline; czCtx.fill();
+    c.beginPath(); c.arc(ex, ey, eyeR + 1.8, 0, Math.PI * 2);
+    c.fillStyle = outlineColor; c.fill();
 
-    const eyeGrad = czCtx.createRadialGradient(
-      ex - eyeR * 0.30, ey - eyeR * 0.30, eyeR * 0.10,
+    const scleraGrad = c.createRadialGradient(
+      ex - eyeR * 0.35, ey - eyeR * 0.35, eyeR * 0.05,
       ex, ey, eyeR
     );
-    eyeGrad.addColorStop(0, '#ffffff');
-    eyeGrad.addColorStop(0.75, '#eef3ff');
-    eyeGrad.addColorStop(1, '#cfd6e6');
-    czCtx.beginPath(); czCtx.arc(ex, ey, eyeR, 0, Math.PI * 2);
-    czCtx.fillStyle = eyeGrad; czCtx.fill();
+    scleraGrad.addColorStop(0, '#ffffff');
+    scleraGrad.addColorStop(0.6, '#f0f4ff');
+    scleraGrad.addColorStop(1, '#cfd8e8');
+    c.beginPath(); c.arc(ex, ey, eyeR, 0, Math.PI * 2);
+    c.fillStyle = scleraGrad; c.fill();
 
-    const px = ex + Math.cos(angle) * eyeR * 0.32;
-    const py = ey + Math.sin(angle) * eyeR * 0.32;
-    czCtx.beginPath(); czCtx.arc(px, py, pupilR, 0, Math.PI * 2);
-    czCtx.fillStyle = '#0a0e1a'; czCtx.fill();
-    czCtx.beginPath();
-    czCtx.arc(px - pupilR * 0.38, py - pupilR * 0.38, pupilR * 0.42, 0, Math.PI * 2);
-    czCtx.fillStyle = 'rgba(255,255,255,0.98)'; czCtx.fill();
-    czCtx.beginPath();
-    czCtx.arc(px + pupilR * 0.30, py + pupilR * 0.30, pupilR * 0.20, 0, Math.PI * 2);
-    czCtx.fillStyle = 'rgba(255,255,255,0.55)'; czCtx.fill();
+    const px = ex + Math.cos(angle) * eyeR * 0.30;
+    const py = ey + Math.sin(angle) * eyeR * 0.30;
+
+    const irisGrad = c.createRadialGradient(
+      px - irisR * 0.22, py - irisR * 0.22, irisR * 0.08,
+      px, py, irisR
+    );
+    irisGrad.addColorStop(0, irisRim);
+    irisGrad.addColorStop(0.55, irisColor);
+    irisGrad.addColorStop(1, mixColors(irisColor, '#000000', 0.4));
+    c.beginPath(); c.arc(px, py, irisR, 0, Math.PI * 2);
+    c.fillStyle = irisGrad; c.fill();
+
+    c.beginPath(); c.arc(px, py, pupilR, 0, Math.PI * 2);
+    c.fillStyle = '#07080f'; c.fill();
+
+    c.beginPath();
+    c.arc(px - pupilR * 0.48, py - pupilR * 0.48, pupilR * 0.50, 0, Math.PI * 2);
+    c.fillStyle = 'rgba(255,255,255,0.98)'; c.fill();
+    c.beginPath();
+    c.arc(px + pupilR * 0.38, py + pupilR * 0.38, pupilR * 0.22, 0, Math.PI * 2);
+    c.fillStyle = 'rgba(255,255,255,0.55)'; c.fill();
+    c.beginPath();
+    c.arc(px + irisR * 0.42, py - irisR * 0.42, irisR * 0.13, 0, Math.PI * 2);
+    c.fillStyle = 'rgba(255,255,255,0.75)'; c.fill();
+
+    c.beginPath();
+    c.arc(ex, ey, eyeR * 0.98, Math.PI * 1.12, Math.PI * 1.88);
+    c.strokeStyle = hexAlpha(outlineColor, 0.55);
+    c.lineWidth = Math.max(1.2, eyeR * 0.15);
+    c.lineCap = 'round';
+    c.stroke();
   }
 }
 
+// ============================================================
+// MENU WORM PREVIEW (Hero)
+// ============================================================
+const menuWormCanvas = document.getElementById('menuWormCanvas');
+const menuWormCtx = menuWormCanvas ? menuWormCanvas.getContext('2d') : null;
+let menuWormStartTime = performance.now();
+
+function drawMenuWorm() {
+  if (!menuWormCanvas || !menuWormCtx) return;
+  const overlay = document.getElementById('overlay');
+  if (!overlay || overlay.classList.contains('hidden')) return;
+
+  const W = menuWormCanvas.width;
+  const H = menuWormCanvas.height;
+  const c = menuWormCtx;
+
+  c.clearRect(0, 0, W, H);
+
+  const t = (performance.now() - menuWormStartTime) / 1000;
+  const wave = t * 1.4;
+
+  const segments = 46;
+  const segLen = 16;
+  const baseY = H / 2 + 6;
+  const amp = 32;
+
+  // Worm swims across with a small wrap effect
+  const travelOffset = (t * 60) % (W + 400) - 200;
+  const headX = W * 0.5 + 60 + Math.sin(t * 0.7) * 24;
+  const headYOffset = Math.sin(t * 0.9) * 6;
+
+  const pts = [];
+  for (let i = 0; i < segments; i++) {
+    const phase = wave - i * 0.30;
+    pts.push({
+      x: headX - i * segLen,
+      y: baseY + headYOffset + Math.sin(phase) * amp,
+    });
+  }
+
+  const bodyR = 22;
+
+  drawPreviewWorm(
+    c,
+    pts,
+    bodyR,
+    playerColor,
+    playerOutline,
+    playerBoostGlow,
+    t
+  );
+}
+
+function menuWormLoop() {
+  drawMenuWorm();
+  requestAnimationFrame(menuWormLoop);
+}
+if (menuWormCanvas) {
+  requestAnimationFrame(menuWormLoop);
+}
+
+// ============================================================
+// MENU INPUTS (Name + Customize)
+// ============================================================
+const menuNameInput = document.getElementById('menuNameInput');
+const menuCustomizeBtn = document.getElementById('menuCustomizeBtn');
+
+if (menuNameInput) {
+  menuNameInput.value = playerName;
+  menuNameInput.addEventListener('input', e => {
+    const cleaned = e.target.value.replace(/\s{2,}/g, ' ').slice(0, 14);
+    if (cleaned !== e.target.value) e.target.value = cleaned;
+    setPlayerName(cleaned, false);
+  });
+  menuNameInput.addEventListener('blur', () => {
+    const v = (menuNameInput.value || '').trim() || DEFAULT_PLAYER_NAME;
+    menuNameInput.value = v;
+    setPlayerName(v, true);
+    updateMenuWinStat();
+  });
+  menuNameInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); menuNameInput.blur(); }
+  });
+  menuNameInput.addEventListener('keydown', e => {
+    // Prevent Space from triggering boost
+    if (e.code === 'Space') e.stopPropagation();
+  }, true);
+}
+
+if (menuCustomizeBtn) {
+  menuCustomizeBtn.addEventListener('click', () => {
+    // Save current name first
+    const v = (menuNameInput.value || '').trim() || DEFAULT_PLAYER_NAME;
+    setPlayerName(v, true);
+    openCustomize();
+  });
+}
+
+// ============================================================
+// INIT PLAYER
+// ============================================================
 setPlayerColor(playerColor, false);
 setPlayerName(playerName, false);
 setPlayerOutline(playerOutline, false);
 setPlayerBoostGlow(playerBoostGlow, false);
+applyBoostBtnSettings();
 updateCzUI();
+updateMenuWinStat();
 
 // ============================================================
 // LOOP
@@ -2802,7 +3553,12 @@ function loop(t) {
 requestAnimationFrame(loop);
 
 function startMatch() {
-  overlay.classList.add('hidden');
+  // Save name from menu
+  if (menuNameInput) {
+    const v = (menuNameInput.value || '').trim() || DEFAULT_PLAYER_NAME;
+    setPlayerName(v, true);
+  }
+  document.getElementById('overlay').classList.add('hidden');
   hideDeathScreen();
   hideVictoryBanner();
   suddenDeathEl.classList.remove('on');
