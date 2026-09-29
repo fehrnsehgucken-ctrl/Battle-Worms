@@ -11,54 +11,131 @@
               color:#fff; user-select:none; touch-action: none; }
   canvas { display:block; }
 
-  #hud {
-    position:fixed; top:14px; left:14px;
-    background: linear-gradient(160deg, rgba(20,30,55,0.7), rgba(10,16,32,0.65));
-    padding:12px 16px; border-radius:14px; font-size:13px; line-height:1.6;
-    pointer-events:none; min-width:200px;
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    border:1px solid rgba(120,180,255,0.14);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-  }
-  #hud .row { display:flex; justify-content:space-between; gap:16px; }
-  #hud .label { color:#7a8db5; font-size:10.5px; text-transform:uppercase; letter-spacing:1.4px; font-weight:600; }
-  #hud .val { font-weight:700; font-variant-numeric: tabular-nums; }
-  #ui-mass { color:#8ee0ff; }
-  #ui-rank { color:#ffd479; }
-  #ui-alive { color:#7bffa8; }
-  #ui-time { color:#a8e6ff; }
-  #status-open { color:#6cf; }
-  #status-closed { color:#f88; }
-
-  #leaderboard {
-    position: fixed; top: 180px; right: 18px; width: 200px;
+  /* ===== Panel Basis ===== */
+  .panel {
     background: linear-gradient(160deg, rgba(20,30,55,0.78), rgba(10,16,32,0.72));
-    border: 1px solid rgba(255,200,80,0.20);
-    border-radius: 14px; padding: 12px 14px 14px;
+    border: 1px solid rgba(120,180,255,0.18);
+    border-radius: 14px;
     backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  /* ===== Top Center Timer ===== */
+  #timerHud {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    z-index: 4; text-align: center; pointer-events: none;
+    padding: 8px 28px;
+    min-width: 150px;
+    background: linear-gradient(160deg, rgba(20,30,55,0.82), rgba(10,16,32,0.78));
+    border: 1px solid rgba(120,180,255,0.22);
+    border-radius: 14px;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  #timerLabel {
+    font-size: 9.5px; color: #7a8db5;
+    letter-spacing: 2.4px; text-transform: uppercase; font-weight: 700;
+  }
+  #timerValue {
+    font-size: 30px; font-weight: 900; color: #a8e6ff;
+    font-variant-numeric: tabular-nums; line-height: 1.05;
+    margin-top: 1px;
+    text-shadow: 0 0 16px rgba(108,204,255,0.4);
+  }
+  #timerHud.urgent #timerValue {
+    color: #ff5577;
+    text-shadow: 0 0 22px rgba(255,60,90,0.8);
+    animation: timerPulse 0.8s ease-in-out infinite;
+  }
+  @keyframes timerPulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50%     { transform: scale(1.06); opacity: 0.85; }
+  }
+
+  /* ===== Left Leaderboard ===== */
+  #leaderboard {
+    position: fixed; top: 16px; left: 16px; width: 236px;
     z-index: 3; pointer-events: none;
+    padding: 10px 12px 12px;
+    background: linear-gradient(160deg, rgba(20,30,55,0.82), rgba(10,16,32,0.76));
+    border: 1px solid rgba(120,180,255,0.18);
+    border-radius: 14px;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
   }
   #leaderboard .lb-title {
-    font-size: 10.5px; color: #ffd479;
-    letter-spacing: 2px; text-transform: uppercase;
-    font-weight: 800; margin-bottom: 10px;
+    font-size: 10px; color: #8ee0ff;
+    letter-spacing: 2.2px; text-transform: uppercase;
+    font-weight: 800; margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(120,180,255,0.14);
     display: flex; align-items: center; gap: 8px;
   }
-  #leaderboard .lb-title::after {
-    content:''; flex: 1; height: 1px;
-    background: linear-gradient(90deg, rgba(255,200,80,0.35), transparent);
+  #leaderboard .lb-row {
+    display: flex; align-items: center; gap: 7px;
+    padding: 3.5px 4px; font-size: 12.5px; font-weight: 600;
+    border-radius: 6px;
   }
-  #leaderboard .lb-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; font-weight: 600; }
-  #leaderboard .lb-rank { width: 20px; color: #56678a; font-size: 11px; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
-  #leaderboard .lb-row:nth-child(1) .lb-rank { color: #ffd479; }
-  #leaderboard .lb-row:nth-child(2) .lb-rank { color: #d8d8e0; }
-  #leaderboard .lb-row:nth-child(3) .lb-rank { color: #cd9f6b; }
-  #leaderboard .lb-color { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 8px currentColor; }
-  #leaderboard .lb-name { flex: 1; color: #d8ecff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; }
-  #leaderboard .lb-count { color: #8ee0ff; font-weight: 800; font-variant-numeric: tabular-nums; font-size: 13px; min-width: 20px; text-align: right; }
-  #leaderboard .lb-empty { color: #56678a; font-size: 12px; font-style: italic; padding: 4px 0; }
+  #leaderboard .lb-rank {
+    width: 16px; text-align: right;
+    color: #56678a; font-size: 11.5px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  #leaderboard .lb-row.r1 .lb-rank { color: #ffd479; }
+  #leaderboard .lb-row.r2 .lb-rank { color: #d8d8e0; }
+  #leaderboard .lb-row.r3 .lb-rank { color: #cd9f6b; }
+  #leaderboard .lb-color {
+    width: 9px; height: 9px; border-radius: 50%;
+    flex-shrink: 0; box-shadow: 0 0 6px currentColor;
+  }
+  #leaderboard .lb-name {
+    flex: 1; color: #d8ecff;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-size: 12px;
+  }
+  #leaderboard .lb-row.r1 .lb-name { color: #ffe9b8; }
+  #leaderboard .lb-row.r2 .lb-name { color: #e8e8f0; }
+  #leaderboard .lb-row.r3 .lb-name { color: #e0c29a; }
+  #leaderboard .lb-row.self { background: rgba(140,210,255,0.10); }
+  #leaderboard .lb-row.self .lb-name { color: #8ee0ff; font-weight: 800; }
+  #leaderboard .lb-count {
+    color: #a8e6ff; font-weight: 800;
+    font-variant-numeric: tabular-nums; font-size: 12.5px;
+    min-width: 32px; text-align: right;
+  }
+  #leaderboard .lb-empty {
+    color: #56678a; font-size: 11.5px; font-style: italic; padding: 4px 0;
+  }
 
+  /* ===== Bottom Stats ===== */
+  #statsHud {
+    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 10px;
+    z-index: 4; pointer-events: none;
+  }
+  .stat-box {
+    min-width: 96px; padding: 8px 18px;
+    background: linear-gradient(160deg, rgba(20,30,55,0.82), rgba(10,16,32,0.78));
+    border: 1px solid rgba(120,180,255,0.18);
+    border-radius: 12px;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+    text-align: center;
+  }
+  .stat-label {
+    font-size: 9px; color: #7a8db5;
+    letter-spacing: 2px; text-transform: uppercase; font-weight: 700;
+  }
+  .stat-value {
+    font-size: 20px; font-weight: 800; color: #8ee0ff;
+    font-variant-numeric: tabular-nums; line-height: 1.1;
+    margin-top: 2px;
+  }
+  .stat-value.kills { color: #ff9a5b; }
+  .stat-value.rank  { color: #ffd479; }
+  .stat-value.alive { color: #7bffa8; }
+
+  /* ===== Victory / Draw Banner ===== */
   #victoryBanner {
     position: fixed; top: 22px; left: 50%;
     transform: translate(-50%, -140px);
@@ -81,8 +158,9 @@
     text-transform: uppercase; font-weight: 700;
   }
 
+  /* ===== Sudden Death ===== */
   #suddenDeath {
-    position: fixed; top: 16%; left: 50%;
+    position: fixed; top: 22%; left: 50%;
     transform: translateX(-50%);
     z-index: 9; text-align: center;
     display: none; pointer-events: none;
@@ -107,7 +185,7 @@
   }
 
   #zoneWarn {
-    position:fixed; inset:0; pointer-events:none; z-index:4; display:none;
+    position:fixed; inset:0; pointer-events:none; z-index:2; display:none;
     box-shadow: inset 0 0 180px 40px rgba(255,30,80,0.55);
     animation: zonePulse 0.7s ease-in-out infinite;
   }
@@ -117,13 +195,14 @@
     50%     { box-shadow: inset 0 0 260px 70px rgba(255,30,80,0.8); }
   }
   #zoneText {
-    position:fixed; top:20%; left:50%; transform:translateX(-50%);
+    position:fixed; top:26%; left:50%; transform:translateX(-50%);
     color:#ff5577; font-size:26px; font-weight:900; letter-spacing:6px;
     text-shadow: 0 0 24px rgba(255,60,90,1), 0 0 8px rgba(255,60,90,1);
     display:none; z-index:6; pointer-events:none;
   }
   #zoneText.on { display:block; animation: zonePulse 0.7s ease-in-out infinite; }
 
+  /* ===== Start Overlay ===== */
   #overlay {
     position:fixed; inset:0; z-index:10; overflow:hidden;
     display:flex; align-items:center; justify-content:center;
@@ -187,6 +266,7 @@
   .menu-controls { margin-top: 26px; color: #56678a; font-size: 12px; line-height: 1.9; }
   .menu-controls b { color: #8ba0c5; font-weight: 600; }
 
+  /* ===== Customize Button + Panel ===== */
   #customizeBtn {
     position: fixed; bottom: 26px; left: 26px; z-index: 11;
     padding: 12px 22px 12px 18px;
@@ -278,6 +358,7 @@
   .cz-btn.primary { color: #04182e; background: linear-gradient(135deg, #8ee0ff 0%, #4ab5ff 100%); }
   .cz-btn.ghost { color: #a0b8d8; background: rgba(120,180,255,0.08); border: 1px solid rgba(120,180,255,0.22); }
 
+  /* ===== Death Screen ===== */
   #deathScreen {
     position: fixed; inset: 0; z-index: 7;
     display: none; align-items: flex-end; justify-content: center;
@@ -350,12 +431,25 @@
   body.touch #boostBtn { display:flex; }
   body.dead #boostBtn { display: none !important; }
 
-  @media (max-width: 520px) {
-    #customizeBtn { bottom: 18px; left: 18px; padding: 10px 16px 10px 14px; font-size: 11px; }
+  @media (max-width: 640px) {
+    #customizeBtn { bottom: 132px; left: 16px; padding: 10px 16px 10px 14px; font-size: 11px; }
     .cz-card { padding: 20px 18px 22px; }
     #deathScreen { padding: 0 12px 24px; }
     #deathScreen .ds-card { padding: 14px 26px 20px; }
-    #leaderboard { top: 132px; right: 14px; width: 160px; }
+    #leaderboard { width: 172px; padding: 8px 10px 10px; top: 12px; left: 12px; }
+    #leaderboard .lb-title { font-size: 9px; letter-spacing: 1.6px; margin-bottom: 6px; padding-bottom: 5px; }
+    #leaderboard .lb-row { font-size: 11px; padding: 2.5px 3px; gap: 5px; }
+    #leaderboard .lb-name { font-size: 10.5px; }
+    #leaderboard .lb-count { font-size: 11px; min-width: 26px; }
+    #leaderboard .lb-rank { font-size: 10.5px; width: 14px; }
+    #leaderboard .lb-color { width: 8px; height: 8px; }
+    #timerHud { top: 12px; padding: 6px 20px; min-width: 120px; }
+    #timerLabel { font-size: 8.5px; letter-spacing: 1.8px; }
+    #timerValue { font-size: 24px; }
+    #statsHud { bottom: 12px; gap: 7px; }
+    .stat-box { min-width: 68px; padding: 6px 10px; }
+    .stat-label { font-size: 8px; letter-spacing: 1.4px; }
+    .stat-value { font-size: 16px; }
   }
 </style>
 </head>
@@ -375,18 +469,36 @@
   <span class="vb-sub" id="vbSub">—</span>
 </div>
 
-<div id="hud">
-  <div class="row"><span class="label">Mass</span><span class="val" id="ui-mass">20</span></div>
-  <div class="row"><span class="label">Rank</span><span class="val" id="ui-rank">1/51</span></div>
-  <div class="row"><span class="label">Alive</span><span class="val" id="ui-alive">51</span></div>
-  <div class="row"><span class="label" id="ui-time-label">Zone closes</span><span class="val" id="ui-time">4:00</span></div>
-  <div class="row"><span class="label">Round</span><span class="val" id="ui-round">1</span></div>
-  <div class="row"><span class="label">Status</span><span class="val" id="ui-status"><span id="status-open">Respawn open</span></span></div>
+<!-- Top-Center Timer -->
+<div id="timerHud">
+  <div id="timerLabel">STARTS IN</div>
+  <div id="timerValue">4:00</div>
 </div>
 
+<!-- Left Leaderboard (live) -->
 <div id="leaderboard">
-  <div class="lb-title">Top Winners</div>
-  <div id="lbList"></div>
+  <div class="lb-title">Leaderboard</div>
+  <div id="lbList"><div class="lb-empty">Waiting…</div></div>
+</div>
+
+<!-- Bottom Stats -->
+<div id="statsHud">
+  <div class="stat-box">
+    <div class="stat-label">Mass</div>
+    <div class="stat-value" id="ui-mass">20</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Rank</div>
+    <div class="stat-value rank" id="ui-rank">1/51</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Alive</div>
+    <div class="stat-value alive" id="ui-alive">51</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Kills</div>
+    <div class="stat-value kills" id="ui-kills">0</div>
+  </div>
 </div>
 
 <div id="boostBtn">BOOST</div>
@@ -474,7 +586,7 @@
 const CFG = {
   worldSize: 16800,
   zoneStart: 6400,
-  zoneMin: 306,
+  zoneMin: 382,
   matchDuration: 4 * 60,
   respawnUntil: 2.5 * 60,
   intermissionDuration: 5,
@@ -485,13 +597,16 @@ const CFG = {
   segSpacing: 4,
   speed: 2.3,
   boostSpeed: 5.0,
-  turnRate: 0.36,
+  // ★ Drehrate stark reduziert (war 0.36) → ~10x größerer Lenkradius
+  turnRate: 0.04,
   turnSizePenalty: 0.60,
+  turnScaleRef: 260,
   startSegments: 20,
-  maxSegments: 260,
   headRadius: 11,
   bodyRadius: 10,
   collisionRadius: 9,
+  radiusGrowth: 0.50,
+  radiusMaxFactor: 2.6,
   maxParticles: 320,
   deathZoomMargin: 200,
   safeSpawnDist: 350,
@@ -502,6 +617,8 @@ const CFG = {
   zoneOffCenterMax: 0.30,
   foodGridCell: 600,
   foodRefillPerFrame: 400,
+  mmUpdateInterval: 10,      // ★ Minimap Top-3 Update alle 10s
+  mmFadeDuration: 1.25,      // ★ Minimap Fade-Dauer
 };
 
 const BOT_NAMES = ['Rex','Blaze','Venom','Storm','Fang','Nyx','Echo','Ghost','Rogue','Titan',
@@ -564,46 +681,6 @@ function setPlayerOutline(hex, save) {
 }
 
 // ============================================================
-// LEADERBOARD
-// ============================================================
-const LEADERBOARD_KEY = 'battle-worms-leaderboard';
-function getLeaderboard() {
-  try { return JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || {}; }
-  catch { return {}; }
-}
-function saveLeaderboard(lb) { localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(lb)); }
-function addWin(name, color) {
-  const lb = getLeaderboard();
-  if (!lb[name]) lb[name] = { count: 0, color };
-  lb[name].count += 1;
-  lb[name].color = color;
-  saveLeaderboard(lb);
-  renderLeaderboard();
-}
-function getTopEntries(n) {
-  const lb = getLeaderboard();
-  return Object.entries(lb).sort((a, b) => b[1].count - a[1].count).slice(0, n);
-}
-const lbListEl = document.getElementById('lbList');
-function renderLeaderboard() {
-  const top = getTopEntries(5);
-  if (top.length === 0) { lbListEl.innerHTML = '<div class="lb-empty">No wins yet</div>'; return; }
-  lbListEl.innerHTML = top.map(([name, d], i) => `
-    <div class="lb-row">
-      <span class="lb-rank">${i + 1}</span>
-      <span class="lb-color" style="background:${d.color}; color:${d.color}"></span>
-      <span class="lb-name">${escapeHtml(name)}</span>
-      <span class="lb-count">${d.count}</span>
-    </div>
-  `).join('');
-}
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => (
-    { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]
-  ));
-}
-
-// ============================================================
 // PRESETS
 // ============================================================
 const PRESET_WORMS = [
@@ -618,9 +695,9 @@ const PRESET_WORMS = [
 ];
 const QUICK_OUTLINES = ['#0a0e1a','#000000','#2a2a3a','#ffffff','#e0e6f5','#5a1a2a','#1a3a2a','#3a2a1a'];
 
-// ★ Rank-Farben für Minimap (Körper): Gold / Lila / Blau
+// Minimap Top-3 Farben (Gold / Lila / Blau)
 const MM_RANK_COLORS = ['#ffd479', '#a78bfa', '#7fbfff'];
-// ★ Rank-Farben für Nametags: 1 = Weiß, 2 = Lila, 3 = Blau
+// Nametag Farben: 1 = Weiß, 2 = Lila, 3 = Blau
 const NT_RANK_COLORS = [null, '#ffffff', '#c9a3ff', '#7fbfff'];
 
 // ============================================================
@@ -671,6 +748,18 @@ function computeFitZoom() {
   const m = CFG.deathZoomMargin;
   return Math.min(VW / (CFG.worldSize + m), VH / (CFG.worldSize + m));
 }
+
+// ============================================================
+// WORM RADIUS HELPERS
+// ============================================================
+function wormRadiusMult(worm) {
+  const t = Math.max(1, worm.segments.length / CFG.startSegments);
+  const f = 1 + (Math.sqrt(t) - 1) * CFG.radiusGrowth;
+  return clamp(f, 0.9, CFG.radiusMaxFactor);
+}
+function wormBodyRadius(worm) { return CFG.bodyRadius * wormRadiusMult(worm); }
+function wormHeadRadius(worm) { return CFG.headRadius * wormRadiusMult(worm); }
+function wormCollisionRadius(worm) { return CFG.collisionRadius * wormRadiusMult(worm); }
 
 // ============================================================
 // FOOD SPATIAL GRID
@@ -737,6 +826,7 @@ class Worm {
     this.deathTime = -1; this.spawnTime = o.time || 0;
     this.killer = null;
     this.respawnAt = null;
+    this.kills = 0;                         // ★ Kill-Counter
     this.angle = o.angle ?? Math.random() * Math.PI * 2;
     this.targetAngle = this.angle;
     this.boosting = false; this.boostDrain = 0;
@@ -762,7 +852,9 @@ class Worm {
   get head() { return this.segments[0]; }
   update(dt) {
     if (!this.alive) return;
-    const sizeMult = 1 - (this.segments.length / CFG.maxSegments) * CFG.turnSizePenalty;
+    // ★ VIEL weichere Drehung: turnRate 0.04 statt 0.36 → ~10x größerer Radius
+    const sizeNorm = Math.min(1, this.segments.length / CFG.turnScaleRef);
+    const sizeMult = 1 - sizeNorm * CFG.turnSizePenalty;
     const maxTurn = CFG.turnRate * sizeMult * dt * 60;
     const diff = angleDiff(this.targetAngle, this.angle);
     if (Math.abs(diff) < maxTurn) this.angle = this.targetAngle;
@@ -787,8 +879,8 @@ class Worm {
       if (this.boostDrain > 0.18) {
         this.boostDrain = 0;
         const tail = this.segments[this.segments.length - 1];
-        const sizeT = Math.min(1, this.segments.length / CFG.maxSegments);
-        const trailR = 2.5 + sizeT * 4.0;
+        const sizeT = Math.min(1, this.segments.length / CFG.turnScaleRef);
+        const trailR = 2.5 + sizeT * 4.5;
         state.foods.push(makeFood(tail.x, tail.y, this.color, { grow: 1, r: trailR }));
         this.segments.pop();
       }
@@ -804,9 +896,8 @@ class Worm {
     const whole = Math.floor(this._growFrac);
     if (whole <= 0) return;
     this._growFrac -= whole;
-    const target = Math.min(CFG.maxSegments, this.segments.length + whole);
-    while (this.segments.length < target) {
-      const last = this.segments[this.segments.length - 1];
+    const last = this.segments[this.segments.length - 1];
+    for (let i = 0; i < whole; i++) {
       this.segments.push({ x: last.x, y: last.y });
     }
   }
@@ -815,6 +906,10 @@ class Worm {
     this.alive = false;
     this.deathTime = state ? state.roundElapsed : 0;
     this.killer = killer ?? null;
+    // Kill-Credit
+    if (killer && killer !== 'ZONE' && killer !== 'WALL' && killer.kills != null) {
+      killer.kills = (killer.kills || 0) + 1;
+    }
     if (this.isBot && state && state.roundElapsed < CFG.respawnUntil) {
       this.respawnAt = Math.min(
         state.roundElapsed + CFG.botRespawnDelay + Math.random() * CFG.botRespawnJitter,
@@ -1011,12 +1106,17 @@ function createMatch() {
       cx0: cx, cy0: cy,
       cx1: finalCenter.x, cy1: finalCenter.y,
     },
+    // Minimap Top-3 mit Fade
+    mmDisplayed: [],
+    mmPrev: [],
+    mmFadeT: 1,
+    mmElapsed: 0,
     matchOver: false, paused: false,
   };
 }
 
 // ============================================================
-// RANKS — Top 3 nach Masse
+// RANKS
 // ============================================================
 function computeRanks() {
   if (!state) return;
@@ -1062,7 +1162,8 @@ function botAI(worm, dt) {
       const offset = (i / (N - 1) - 0.5) * spread;
       const ang = worm.angle + offset;
       const { total, safety } = scoreDirection(worm, ang, nearby, nearestFood, nearestFoodD);
-      const turnCost = Math.abs(offset) * 5;
+      // ★ Turn-Cost reduziert, damit AI trotz kleiner Drehrate navigieren kann
+      const turnCost = Math.abs(offset) * 2;
       const s = total - turnCost;
       if (s > bestScore) { bestScore = s; bestAngle = ang; bestSafety = safety; }
     }
@@ -1086,6 +1187,7 @@ function scoreDirection(worm, ang, nearby, nearestFood, nearestFoodD) {
   const dx = Math.cos(ang), dy = Math.sin(ang);
   const lookAhead = 160;
   let safety = 0, food = 0, attack = 0;
+  const myR = wormBodyRadius(worm);
 
   for (let t = 25; t <= lookAhead; t += 25) {
     const px = head.x + dx * t, py = head.y + dy * t;
@@ -1097,11 +1199,12 @@ function scoreDirection(worm, ang, nearby, nearestFood, nearestFoodD) {
     if (outsideBy > -90) safety -= (outsideBy + 90) * 1.6 * w;
   }
 
-  const dangerR = CFG.bodyRadius + CFG.collisionRadius + 4;
-  const dangerR2 = dangerR * dangerR;
   for (const { worm: other } of nearby) {
     const hdx = other.head.x - head.x, hdy = other.head.y - head.y;
     if (hdx * hdx + hdy * hdy > (lookAhead + 200) ** 2) continue;
+    const otherR = wormBodyRadius(other);
+    const dangerR = myR + otherR + 4;
+    const dangerR2 = dangerR * dangerR;
     for (let i = 0; i < other.segments.length; i += 2) {
       const seg = other.segments[i];
       const rx = seg.x - head.x, ry = seg.y - head.y;
@@ -1187,6 +1290,29 @@ function update(dt) {
   }
 
   state.roundElapsed += dt;
+
+  // ★ Minimap Top-3 Update (alle 10s oder wenn ein Top-3-Wurm stirbt)
+  state.mmElapsed += dt;
+  if (state.mmFadeT < 1) {
+    state.mmFadeT = Math.min(1, state.mmFadeT + dt / CFG.mmFadeDuration);
+  }
+  let needMmUpdate = false;
+  if (state.mmFadeT >= 1) {
+    if (state.mmElapsed >= CFG.mmUpdateInterval) needMmUpdate = true;
+    else {
+      for (const w of state.mmDisplayed) {
+        if (!w.alive) { needMmUpdate = true; break; }
+      }
+    }
+  }
+  if (needMmUpdate) {
+    const sorted = state.worms.filter(w => w.alive)
+      .sort((a, b) => b.segments.length - a.segments.length).slice(0, 3);
+    state.mmPrev = state.mmDisplayed.slice();
+    state.mmDisplayed = sorted;
+    state.mmFadeT = 0;
+    state.mmElapsed = 0;
+  }
 
   rebuildFoodGrid();
 
@@ -1310,21 +1436,28 @@ function playerControl(worm) {
 function checkCollisions() {
   for (const worm of state.worms) {
     if (!worm.alive) continue;
-    const h = worm.head, hR = CFG.collisionRadius;
+    const h = worm.head;
+    const hR = wormCollisionRadius(worm);
     let dead = false;
     for (const other of state.worms) {
       if (other === worm || !other.alive) continue;
       const far = (other.head.x - h.x) ** 2 + (other.head.y - h.y) ** 2;
       const maxLen = other.segments.length * CFG.segSpacing;
       if (far > (maxLen + 100) ** 2) continue;
+
+      const otherHR = wormCollisionRadius(other);
       const hh = Math.hypot(other.head.x - h.x, other.head.y - h.y);
-      if (hh < hR * 2 && worm.segments.length <= other.segments.length) {
+      if (hh < hR + otherHR && worm.segments.length <= other.segments.length) {
         worm.die(other); dead = true; break;
       }
+
+      const otherBodyR = wormBodyRadius(other);
+      const hitR = hR + otherBodyR;
+      const hitR2 = hitR * hitR;
       for (let i = 2; i < other.segments.length; i += 2) {
         const s = other.segments[i];
         const dx = s.x - h.x, dy = s.y - h.y;
-        if (dx * dx + dy * dy < (hR + CFG.bodyRadius) ** 2) { worm.die(other); dead = true; break; }
+        if (dx * dx + dy * dy < hitR2) { worm.die(other); dead = true; break; }
       }
       if (dead) break;
     }
@@ -1335,7 +1468,8 @@ function checkFood() {
   const eaten = new Set();
   for (const worm of state.worms) {
     if (!worm.alive) continue;
-    const h = worm.head, eatR = CFG.headRadius + 4;
+    const h = worm.head;
+    const eatR = wormHeadRadius(worm) + 4;
     forEachFoodNear(h.x, h.y, eatR + 30, f => {
       if (eaten.has(f)) return;
       const dx = f.x - h.x, dy = f.y - h.y;
@@ -1362,6 +1496,7 @@ function respawnPlayer() {
   const p = state.player;
   const spawn = findSafeSpawn();
   const newWorm = makePlayerWorm(spawn.x, spawn.y, spawn.ang);
+  newWorm.kills = p.kills || 0;
   const idx = state.worms.indexOf(p);
   if (idx >= 0) state.worms[idx] = newWorm;
   else state.worms.push(newWorm);
@@ -1370,6 +1505,14 @@ function respawnPlayer() {
   state.camera.zoom = 1;
   state.camera.targetZoom = 1;
   state.camera.freeCamActive = false;
+
+  // ★ Mobile-Respawn-Fix
+  input.joyActive = false;
+  input.joyId = null;
+  input.boost = false;
+  freeCam.dragging = false;
+  freeCam.pinchPrevDist = 0;
+
   hideDeathScreen();
 }
 
@@ -1381,7 +1524,6 @@ function endRound(winner) {
   state.intermissionElapsed = 0;
   state.roundWinner = winner;
   if (winner) {
-    addWin(winner.name, winner.color);
     showVictoryBanner(winner);
   }
   hideDeathScreen();
@@ -1437,6 +1579,12 @@ function startNewRound() {
   state.round += 1;
   state.suddenDeathActive = false;
   state.suddenDeathTime = 0;
+
+  // Minimap-Reset
+  state.mmDisplayed = [];
+  state.mmPrev = [];
+  state.mmFadeT = 1;
+  state.mmElapsed = 0;
 
   if (state.player.alive) {
     state.camera.x = state.player.head.x;
@@ -1520,7 +1668,12 @@ function showDeathScreen() {
   dsNameInput.value = playerName;
   deathScreenEl.classList.add('on');
   document.body.classList.add('dead');
+
+  // ★ Mobile-Fix: Joystick zurücksetzen
+  input.joyActive = false;
+  input.joyId = null;
   input.boost = false;
+
   const bb = document.getElementById('boostBtn');
   if (bb) bb.classList.remove('active');
 }
@@ -1578,7 +1731,7 @@ function render() {
   ctx.strokeRect(0, 0, CFG.worldSize, CFG.worldSize);
   drawZone(cam, visW, visH, zoom);
   drawFood(cam, visW, visH);
-  const wormPad = 260 / zoom;
+  const wormPad = 500 / zoom;
   for (const w of state.worms) {
     if (!w.alive) continue;
     if (w.head.x < cam.x - visW / 2 - wormPad || w.head.x > cam.x + visW / 2 + wormPad) continue;
@@ -1678,16 +1831,18 @@ function drawWorm(worm, isPlayer, zoom) {
   const outlineColor = worm.outlineColor || '#0a0e1a';
   const h = segs[0], N = segs.length;
   const outlineW = CFG.outlineWidth;
+  const bodyR = wormBodyRadius(worm);
+  const headR = wormHeadRadius(worm);
 
   ctx.strokeStyle = outlineColor;
-  ctx.lineWidth = CFG.bodyRadius * 2 + outlineW * 2;
+  ctx.lineWidth = bodyR * 2 + outlineW * 2;
   ctx.beginPath();
   ctx.moveTo(segs[0].x, segs[0].y);
   for (let i = 1; i < N; i++) ctx.lineTo(segs[i].x, segs[i].y);
   ctx.stroke();
 
   ctx.strokeStyle = bodyColor;
-  ctx.lineWidth = CFG.bodyRadius * 2;
+  ctx.lineWidth = bodyR * 2;
   ctx.beginPath();
   ctx.moveTo(segs[0].x, segs[0].y);
   for (let i = 1; i < N; i++) ctx.lineTo(segs[i].x, segs[i].y);
@@ -1696,29 +1851,28 @@ function drawWorm(worm, isPlayer, zoom) {
   if (zoom > 0.32 && N > 6) {
     ctx.strokeStyle = hexAlpha(outlineColor, 0.42);
     ctx.lineWidth = 1.1;
-    const r = CFG.bodyRadius * 0.9;
+    const rr = bodyR * 0.9;
     for (let i = 4; i < N - 1; i += 4) {
       const s = segs[i];
       const prev = segs[i - 1];
       const ang = Math.atan2(s.y - prev.y, s.x - prev.x) + Math.PI / 2;
       const cx = Math.cos(ang), cy = Math.sin(ang);
       ctx.beginPath();
-      ctx.moveTo(s.x + cx * r, s.y + cy * r);
-      ctx.lineTo(s.x - cx * r, s.y - cy * r);
+      ctx.moveTo(s.x + cx * rr, s.y + cy * rr);
+      ctx.lineTo(s.x - cx * rr, s.y - cy * rr);
       ctx.stroke();
     }
   }
 
-  const hr = CFG.headRadius;
   ctx.beginPath();
-  ctx.arc(h.x, h.y, hr + outlineW, 0, Math.PI * 2);
+  ctx.arc(h.x, h.y, headR + outlineW, 0, Math.PI * 2);
   ctx.fillStyle = outlineColor; ctx.fill();
   ctx.beginPath();
-  ctx.arc(h.x, h.y, hr, 0, Math.PI * 2);
+  ctx.arc(h.x, h.y, headR, 0, Math.PI * 2);
   ctx.fillStyle = bodyColor; ctx.fill();
 
-  const eyeBack = hr * 0.18, eyeSide = hr * 0.58;
-  const eyeR = hr * 0.42, pupilR = eyeR * 0.6;
+  const eyeBack = headR * 0.18, eyeSide = headR * 0.58;
+  const eyeR = headR * 0.42, pupilR = eyeR * 0.6;
   const perp = worm.angle + Math.PI / 2;
   for (const sgn of [-1, 1]) {
     const ex = h.x + Math.cos(worm.angle) * eyeBack + Math.cos(perp) * eyeSide * sgn;
@@ -1736,7 +1890,7 @@ function drawWorm(worm, isPlayer, zoom) {
   }
 
   if (!isPlayer && zoom > 0.32) {
-    const labelY = h.y - hr - 7;
+    const labelY = h.y - headR - 7;
     const fs = Math.max(10, 11 / Math.sqrt(zoom));
     ctx.font = `bold ${fs}px system-ui`;
     ctx.textAlign = 'center';
@@ -1749,6 +1903,29 @@ function drawWorm(worm, isPlayer, zoom) {
     ctx.fillStyle = rankColor;
     ctx.fillText(worm.name, h.x, labelY);
   }
+}
+
+// ★ Minimap: Top 3 mit 10s-Lock + 1.25s Fade
+function drawMinimapWorm(w, color, alpha, ox, oy, scale) {
+  const segs = w.segments;
+  if (segs.length < 2) return;
+  const prevA = ctx.globalAlpha;
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.6;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(ox + segs[0].x * scale, oy + segs[0].y * scale);
+  for (let i = 1; i < segs.length; i++) {
+    ctx.lineTo(ox + segs[i].x * scale, oy + segs[i].y * scale);
+  }
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(ox + segs[0].x * scale, oy + segs[0].y * scale, 3.2, 0, Math.PI * 2);
+  ctx.fillStyle = color; ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 1; ctx.stroke();
+  ctx.globalAlpha = prevA;
 }
 
 function drawMinimap() {
@@ -1769,29 +1946,31 @@ function drawMinimap() {
   ctx.fillStyle = 'rgba(255,60,100,0.08)'; ctx.fill();
   ctx.strokeStyle = 'rgba(255,90,130,0.75)'; ctx.lineWidth = 1.2; ctx.stroke();
 
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  for (const w of state.worms) {
-    if (!w.alive || !w._rank || w._rank > 3) continue;
-    const segs = w.segments;
-    if (segs.length < 2) continue;
-    const col = MM_RANK_COLORS[w._rank - 1];
+  // ★ Top-3 mit 10s-Lock + Fade
+  const cur = state.mmDisplayed;
+  const old = state.mmPrev;
+  const fade = state.mmFadeT;
 
-    ctx.strokeStyle = col;
-    ctx.lineWidth = 2.6;
-    ctx.beginPath();
-    ctx.moveTo(x + segs[0].x * s, y + segs[0].y * s);
-    for (let i = 1; i < segs.length; i++) {
-      ctx.lineTo(x + segs[i].x * s, y + segs[i].y * s);
+  // Alte Würmer die rausfallen
+  if (fade < 1) {
+    for (let i = 0; i < old.length; i++) {
+      const w = old[i];
+      if (!w.alive) continue;
+      if (cur.indexOf(w) >= 0) continue;
+      drawMinimapWorm(w, MM_RANK_COLORS[i] || '#888', 1 - fade, x, y, s);
     }
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(x + segs[0].x * s, y + segs[0].y * s, 3.2, 0, Math.PI * 2);
-    ctx.fillStyle = col; ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 1; ctx.stroke();
   }
 
+  // Aktuelle Würmer
+  for (let i = 0; i < cur.length; i++) {
+    const w = cur[i];
+    if (!w.alive) continue;
+    const wasInOld = old.indexOf(w) >= 0;
+    const alpha = (fade >= 1 || wasInOld) ? 1 : fade;
+    drawMinimapWorm(w, MM_RANK_COLORS[i] || '#888', alpha, x, y, s);
+  }
+
+  // Spieler-Pfeil
   if (state.player.alive) {
     const px = x + state.player.head.x * s;
     const py = y + state.player.head.y * s;
@@ -1851,14 +2030,17 @@ function drawJoystick() {
 // ============================================================
 const uiMass = document.getElementById('ui-mass');
 const uiAlive = document.getElementById('ui-alive');
-const uiTime = document.getElementById('ui-time');
-const uiTimeLabel = document.getElementById('ui-time-label');
 const uiRank = document.getElementById('ui-rank');
+const uiKills = document.getElementById('ui-kills');
 const uiStatus = document.getElementById('ui-status');
+const timerHudEl = document.getElementById('timerHud');
+const timerLabelEl = document.getElementById('timerLabel');
+const timerValueEl = document.getElementById('timerValue');
 const zoneWarn = document.getElementById('zoneWarn');
 const zoneText = document.getElementById('zoneText');
 const suddenDeathEl = document.getElementById('suddenDeath');
 const sdTimerEl = document.getElementById('sdTimer');
+const lbListEl = document.getElementById('lbList');
 
 function updateHUD() {
   const p = state.player;
@@ -1866,32 +2048,60 @@ function updateHUD() {
   const alive = state.worms.filter(w => w.alive);
   uiAlive.textContent = alive.length;
 
-  let timeLabel, timeValue;
+  // Top-Center Timer
+  let timeLabel, timeValue, urgent = false;
   if (state.intermission) {
     const remaining = Math.max(0, CFG.intermissionDuration - state.intermissionElapsed);
-    timeLabel = 'Next round';
+    timeLabel = 'NEXT ROUND IN';
     timeValue = fmtShort(remaining);
   } else if (state.zoneRegrowing) {
     const remaining = Math.max(0, CFG.zoneRegrowDuration * (1 - state.zoneRegrowT));
-    timeLabel = 'Zone regrow';
+    timeLabel = 'ZONE REGROW';
     timeValue = fmtShort(remaining);
   } else if (state.suddenDeathActive) {
-    timeLabel = 'Sudden death';
+    timeLabel = 'SUDDEN DEATH';
     timeValue = Math.max(0, Math.ceil(state.suddenDeathTime)) + 's';
+    urgent = state.suddenDeathTime <= 10;
   } else if (state.zoneShrinkT < 1) {
     const remaining = Math.max(0, CFG.matchDuration * (1 - state.zoneShrinkT));
-    timeLabel = 'Zone closes';
+    timeLabel = 'ZONE CLOSES IN';
     timeValue = fmtTime(remaining);
+    urgent = remaining <= 30;
   } else {
-    timeLabel = 'Zone';
-    timeValue = 'Final';
+    timeLabel = 'FINAL ZONE';
+    timeValue = 'NOW';
+    urgent = true;
   }
-  uiTimeLabel.textContent = timeLabel;
-  uiTime.textContent = timeValue;
+  timerLabelEl.textContent = timeLabel;
+  timerValueEl.textContent = timeValue;
+  timerHudEl.classList.toggle('urgent', urgent);
 
+  // Rank + Kills
   const sorted = [...state.worms].filter(w => w.alive).sort((a, b) => b.segments.length - a.segments.length);
   uiRank.textContent = p.alive ? (sorted.indexOf(p) + 1) + '/' + alive.length : '—';
+  uiKills.textContent = p.kills || 0;
 
+  // Live Leaderboard (Top 5)
+  const top5 = sorted.slice(0, 5);
+  if (top5.length === 0) {
+    lbListEl.innerHTML = '<div class="lb-empty">No survivors</div>';
+  } else {
+    let html = '';
+    for (let i = 0; i < top5.length; i++) {
+      const w = top5[i];
+      const isSelf = w === p;
+      const cls = `lb-row r${i+1}${isSelf ? ' self' : ''}`;
+      html += `<div class="${cls}">
+        <span class="lb-rank">${i+1}</span>
+        <span class="lb-color" style="background:${w.color}; color:${w.color}"></span>
+        <span class="lb-name">${escapeHtml(w.name)}</span>
+        <span class="lb-count">${w.segments.length}</span>
+      </div>`;
+    }
+    lbListEl.innerHTML = html;
+  }
+
+  // Sudden-Death-Overlay
   if (state.suddenDeathActive) {
     suddenDeathEl.classList.add('on');
     sdTimerEl.textContent = Math.max(0, Math.ceil(state.suddenDeathTime));
@@ -1899,20 +2109,14 @@ function updateHUD() {
     suddenDeathEl.classList.remove('on');
   }
 
+  // Zone-Warnung
   if (state.intermission) {
-    uiStatus.innerHTML = '<span id="status-closed">Intermission</span>';
     zoneWarn.classList.remove('on'); zoneText.classList.remove('on');
   } else if (state.zoneRegrowing) {
-    uiStatus.innerHTML = '<span id="status-open">Zone resetting…</span>';
     zoneWarn.classList.remove('on'); zoneText.classList.remove('on');
   } else if (p.alive && p.outside) {
-    uiStatus.innerHTML = '<span id="status-closed">OUTSIDE ZONE</span>';
     zoneWarn.classList.add('on'); zoneText.classList.add('on');
   } else {
-    const closed = state.roundElapsed >= CFG.respawnUntil;
-    uiStatus.innerHTML = closed
-      ? '<span id="status-closed">No respawn</span>'
-      : '<span id="status-open">Respawn open</span>';
     zoneWarn.classList.remove('on'); zoneText.classList.remove('on');
   }
 }
@@ -2224,7 +2428,6 @@ setPlayerColor(playerColor, false);
 setPlayerName(playerName, false);
 setPlayerOutline(playerOutline, false);
 updateCzUI();
-renderLeaderboard();
 
 // ============================================================
 // LOOP
@@ -2260,8 +2463,6 @@ function startMatch() {
   customizeBtn.style.display = 'none';
   state = createMatch();
   lastT = performance.now();
-  const rl = document.getElementById('ui-round');
-  if (rl) rl.textContent = '1';
 }
 document.getElementById('startBtn').onclick = startMatch;
 </script>
