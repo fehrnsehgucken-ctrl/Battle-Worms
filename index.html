@@ -172,6 +172,38 @@
     text-transform: uppercase; font-weight: 700;
   }
 
+  #respawnClosed {
+    position: fixed; top: 22%; left: 50%;
+    transform: translateX(-50%);
+    zoom: 0.65;
+    z-index: 9; text-align: center;
+    display: none; pointer-events: none;
+    opacity: 0;
+  }
+  #respawnClosed.on {
+    display: block;
+    animation: rcIn 3.5s ease-in-out forwards;
+  }
+  #respawnClosed .rc-label {
+    color: #ffb066; font-size: 15px;
+    letter-spacing: 5px; font-weight: 900;
+    text-shadow: 0 0 22px rgba(255,140,80,1), 0 0 8px rgba(255,140,80,0.8);
+    padding: 14px 30px;
+    background: linear-gradient(160deg, rgba(50,30,20,0.85), rgba(30,18,10,0.9));
+    border: 1px solid rgba(255,150,80,0.6);
+    border-radius: 14px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 12px 50px rgba(255,140,60,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  @keyframes rcIn {
+    0%   { opacity: 0; transform: translateX(-50%) translateY(-20px) scale(0.9); }
+    12%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.06); }
+    22%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    80%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.98); }
+  }
+
   #suddenDeath {
     position: fixed; top: 22%; left: 50%;
     transform: translateX(-50%);
@@ -224,6 +256,7 @@
   body.in-menu #zoneText,
   body.in-menu #suddenDeath,
   body.in-menu #victoryBanner,
+  body.in-menu #respawnClosed,
   body.in-menu #deathScreen { display: none !important; }
 
   #overlay {
@@ -845,7 +878,6 @@
     .stat-box { min-width: 76px; padding: 6px 10px; }
   }
 
-  /* Landscape-Mobile: Death-Screen nach unten links, halbe Größe */
   @media (orientation: landscape) and (max-height: 500px) {
     #deathScreen {
       align-items: flex-end;
@@ -865,6 +897,10 @@
 
 <div id="zoneWarn"></div>
 <div id="zoneText">OUTSIDE ZONE</div>
+
+<div id="respawnClosed">
+  <div class="rc-label">⚠ RESPAWN CLOSED ⚠</div>
+</div>
 
 <div id="suddenDeath">
   <div class="sd-label">⚠ SUDDEN DEATH ⚠</div>
@@ -1064,7 +1100,7 @@ const CFG = {
   zoneStart: 6400,
   zoneMin: 625,
   matchDuration: 6 * 60,
-  respawnUntil: 3 * 60,
+  respawnUntil: 2 * 60,
   intermissionDuration: 5,
   suddenDeathDuration: 60,
   zoneRegrowDuration: 5,
@@ -1088,6 +1124,7 @@ const CFG = {
   botRespawnDelay: 2.0,
   botRespawnJitter: 2.0,
   deathDropCount: 40,
+  maxOrbGrow: 25,
   outlineWidth: 2.2,
   zoneOffCenterMax: 0.30,
   foodGridCell: 600,
@@ -1128,6 +1165,18 @@ function pickFoodTier() {
 }
 
 // ============================================================
+// SAFE STORAGE HELPERS (Bug 6 Fix)
+// ============================================================
+function safeSetItem(key, value) {
+  try { localStorage.setItem(key, value); }
+  catch (e) { /* Speicher voll oder blockiert — still ignorieren */ }
+}
+function safeGetItem(key) {
+  try { return localStorage.getItem(key); }
+  catch (e) { return null; }
+}
+
+// ============================================================
 // PLAYER COLOR / NAME / OUTLINE / ACCENT / BOOST
 // ============================================================
 const PLAYER_COLOR_KEY = 'battle-worms-color';
@@ -1145,23 +1194,22 @@ const DEFAULT_PLAYER_BOOST_GLOW = '#ffffff';
 const DEFAULT_PLAYER_BOOST_POS = 'left';
 const DEFAULT_PLAYER_BOOST_SIZE = 2.5;
 
-let playerColor = localStorage.getItem(PLAYER_COLOR_KEY) || DEFAULT_PLAYER_COLOR;
-let playerName = localStorage.getItem(PLAYER_NAME_KEY) || DEFAULT_PLAYER_NAME;
-let playerOutline = localStorage.getItem(PLAYER_OUTLINE_KEY) || DEFAULT_PLAYER_OUTLINE;
-let playerAccent = localStorage.getItem(PLAYER_ACCENT_KEY) || DEFAULT_PLAYER_ACCENT;
-let playerBoostGlow = localStorage.getItem(PLAYER_BOOST_GLOW_KEY) || DEFAULT_PLAYER_BOOST_GLOW;
-let playerBoostPos = localStorage.getItem(PLAYER_BOOST_POS_KEY) || DEFAULT_PLAYER_BOOST_POS;
-let playerBoostSize = parseFloat(localStorage.getItem(PLAYER_BOOST_SIZE_KEY) || String(DEFAULT_PLAYER_BOOST_SIZE));
+let playerColor = safeGetItem(PLAYER_COLOR_KEY) || DEFAULT_PLAYER_COLOR;
+let playerName = safeGetItem(PLAYER_NAME_KEY) || DEFAULT_PLAYER_NAME;
+let playerOutline = safeGetItem(PLAYER_OUTLINE_KEY) || DEFAULT_PLAYER_OUTLINE;
+let playerAccent = safeGetItem(PLAYER_ACCENT_KEY) || DEFAULT_PLAYER_ACCENT;
+let playerBoostGlow = safeGetItem(PLAYER_BOOST_GLOW_KEY) || DEFAULT_PLAYER_BOOST_GLOW;
+let playerBoostPos = safeGetItem(PLAYER_BOOST_POS_KEY) || DEFAULT_PLAYER_BOOST_POS;
+let playerBoostSize = parseFloat(safeGetItem(PLAYER_BOOST_SIZE_KEY) || String(DEFAULT_PLAYER_BOOST_SIZE));
 if (!isFinite(playerBoostSize)) playerBoostSize = DEFAULT_PLAYER_BOOST_SIZE;
 
 function setPlayerColor(hex, save) {
   playerColor = hex;
-  if (save) localStorage.setItem(PLAYER_COLOR_KEY, hex);
-
+  if (save) safeSetItem(PLAYER_COLOR_KEY, hex);
   const forced = effectiveOutline(playerColor, playerOutline);
   if (forced !== playerOutline) {
     playerOutline = forced;
-    if (save) localStorage.setItem(PLAYER_OUTLINE_KEY, forced);
+    if (save) safeSetItem(PLAYER_OUTLINE_KEY, forced);
   }
   if (state && state.player && state.player.alive) {
     state.player.color = hex;
@@ -1171,7 +1219,7 @@ function setPlayerColor(hex, save) {
 function setPlayerName(name, save) {
   name = (name || '').trim().slice(0, 14) || DEFAULT_PLAYER_NAME;
   playerName = name;
-  if (save) localStorage.setItem(PLAYER_NAME_KEY, name);
+  if (save) safeSetItem(PLAYER_NAME_KEY, name);
   const a = document.getElementById('czNameInput');
   const b = document.getElementById('dsNameInput');
   const c = document.getElementById('menuNameInput');
@@ -1183,17 +1231,17 @@ function setPlayerName(name, save) {
 function setPlayerOutline(hex, save) {
   hex = effectiveOutline(playerColor, hex);
   playerOutline = hex;
-  if (save) localStorage.setItem(PLAYER_OUTLINE_KEY, hex);
+  if (save) safeSetItem(PLAYER_OUTLINE_KEY, hex);
   if (state && state.player && state.player.alive) state.player.outlineColor = hex;
 }
 function setPlayerAccent(hex, save) {
   playerAccent = hex;
-  if (save) localStorage.setItem(PLAYER_ACCENT_KEY, hex);
+  if (save) safeSetItem(PLAYER_ACCENT_KEY, hex);
   if (state && state.player && state.player.alive) state.player.accentColor = hex;
 }
 function setPlayerBoostGlow(hex, save) {
   playerBoostGlow = hex;
-  if (save) localStorage.setItem(PLAYER_BOOST_GLOW_KEY, hex);
+  if (save) safeSetItem(PLAYER_BOOST_GLOW_KEY, hex);
   if (state && state.player && state.player.alive) state.player.boostGlow = hex;
 }
 function applyBoostBtnSettings() {
@@ -1205,25 +1253,25 @@ function applyBoostBtnSettings() {
 }
 function setPlayerBoostPos(pos, save) {
   playerBoostPos = (pos === 'right') ? 'right' : 'left';
-  if (save) localStorage.setItem(PLAYER_BOOST_POS_KEY, playerBoostPos);
+  if (save) safeSetItem(PLAYER_BOOST_POS_KEY, playerBoostPos);
   applyBoostBtnSettings();
 }
 function setPlayerBoostSize(size, save) {
   size = clamp(parseFloat(size) || DEFAULT_PLAYER_BOOST_SIZE, 0.8, 4.0);
   playerBoostSize = size;
-  if (save) localStorage.setItem(PLAYER_BOOST_SIZE_KEY, String(size));
+  if (save) safeSetItem(PLAYER_BOOST_SIZE_KEY, String(size));
   applyBoostBtnSettings();
 }
 
 // ============================================================
-// LEADERBOARD (Siege)
+// LEADERBOARD
 // ============================================================
 const LEADERBOARD_KEY = 'battle-worms-leaderboard';
 function getLeaderboard() {
-  try { return JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || {}; }
+  try { return JSON.parse(safeGetItem(LEADERBOARD_KEY)) || {}; }
   catch { return {}; }
 }
-function saveLeaderboard(lb) { localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(lb)); }
+function saveLeaderboard(lb) { safeSetItem(LEADERBOARD_KEY, JSON.stringify(lb)); }
 function addWin(name, color) {
   if (!name) return;
   const lb = getLeaderboard();
@@ -1305,7 +1353,6 @@ function hexAlpha(hex, a) {
   return `rgba(${p.r},${p.g},${p.b},${a})`;
 }
 
-// --- Dunkelheits-Erkennung für Body & Outline ---
 function colorBrightness(hex) {
   const p = parseHex(hex);
   return 0.299 * p.r + 0.587 * p.g + 0.114 * p.b;
@@ -1344,19 +1391,26 @@ function wormBodyRadius(worm) { return CFG.bodyRadius * wormRadiusMult(worm); }
 function wormHeadRadius(worm) { return CFG.headRadius * wormRadiusMult(worm); }
 function wormCollisionRadius(worm) { return CFG.collisionRadius * wormRadiusMult(worm); }
 
-// Zufällige Startmasse für Bots (30–150 Segmente)
 function randomBotStartLen() {
   return Math.floor(rand(30, 151));
 }
 
-// Kamera-Zoom basierend auf Wurmgröße:
-// startSegments  → Zoom 1.0 (Standard-FOV)
-// radiusMaxFactor → Zoom 0.55 (rausgezoomt)
 function computePlayerZoom(worm) {
   const mult = wormRadiusMult(worm);
   const t = clamp((mult - 1) / (CFG.radiusMaxFactor - 1), 0, 1);
   const minZoom = 0.55;
   return 1 - t * (1 - minZoom);
+}
+
+// LOD-Stufen basierend auf Kamera-Zoom (Bug 3 Fix):
+// LOD wird NUR aktiv, wenn der Spieler tot ist (Zuschauer-Modus).
+// Im aktiven Spiel ist immer volle Qualität.
+function lodLevel(zoom) {
+  if (state && state.player && state.player.alive) return 0;
+  if (zoom > 0.65) return 0;
+  if (zoom > 0.40) return 1;
+  if (zoom > 0.22) return 2;
+  return 3;
 }
 
 // ============================================================
@@ -1530,8 +1584,52 @@ class Worm {
     }
     const totalMass = this.segments.length;
     if (totalMass === 0) return;
-    const dropCount = Math.min(CFG.deathDropCount, Math.max(1, totalMass));
-    const growPerDrop = totalMass / dropCount;
+
+    // Orb-Drop-Massen
+    const orbMasses = [];
+    if (totalMass <= 200) {
+      const dropCount = Math.min(CFG.deathDropCount, Math.max(1, totalMass));
+      const growPerDrop = totalMass / dropCount;
+      for (let i = 0; i < dropCount; i++) orbMasses.push(growPerDrop);
+    } else {
+      let sizes, weights;
+      if (totalMass <= 400) {
+        sizes = [10, 15];
+        weights = [0.55, 0.45];
+      } else if (totalMass <= 600) {
+        sizes = [10, 15, 20];
+        weights = [0.40, 0.35, 0.25];
+      } else {
+        sizes = [10, 15, 20, 25];
+        weights = [0.35, 0.30, 0.20, 0.15];
+      }
+      let remaining = totalMass;
+      const minSize = sizes[0];
+      const maxSize = sizes[sizes.length - 1];
+      while (remaining > 0) {
+        let size;
+        if (remaining <= minSize) {
+          size = remaining;
+        } else {
+          let r = Math.random();
+          let pick = maxSize;
+          let acc = 0;
+          for (let i = 0; i < sizes.length; i++) {
+            acc += weights[i];
+            if (r < acc) { pick = sizes[i]; break; }
+          }
+          if (pick > remaining) {
+            pick = minSize;
+            for (let i = sizes.length - 1; i >= 0; i--) {
+              if (sizes[i] <= remaining) { pick = sizes[i]; break; }
+            }
+          }
+          size = pick;
+        }
+        orbMasses.push(size);
+        remaining -= size;
+      }
+    }
 
     const particleStep = Math.max(1, Math.floor(totalMass / 30));
     for (let i = 0; i < totalMass; i += particleStep) {
@@ -1542,12 +1640,14 @@ class Worm {
         rand(0.6, 1.3), rand(2, 4), 1);
     }
 
-    const segStep = totalMass / dropCount;
-    for (let i = 0; i < dropCount; i++) {
-      const segIdx = Math.min(totalMass - 1, Math.floor(i * segStep));
-      const s = this.segments[segIdx];
-      if (!s) continue;
-      state.foods.push(makeFood(s.x + rand(-8, 8), s.y + rand(-8, 8), this.color, { grow: growPerDrop }));
+    const head = this.segments[0];
+    const spreadRadius = Math.min(200, 20 + Math.sqrt(totalMass) * 8);
+    for (let i = 0; i < orbMasses.length; i++) {
+      const ang = (i / orbMasses.length) * Math.PI * 2 + rand(-0.4, 0.4);
+      const rad = Math.sqrt(Math.random()) * spreadRadius;
+      const ox = head.x + Math.cos(ang) * rad + rand(-12, 12);
+      const oy = head.y + Math.sin(ang) * rad + rand(-12, 12);
+      state.foods.push(makeFood(ox, oy, this.color, { grow: orbMasses[i] }));
     }
     this.segments = [];
   }
@@ -1608,6 +1708,8 @@ function updateParticles(dt) {
   }
 }
 function drawParticles() {
+  const lod = lodLevel(state.camera.zoom);
+  if (lod >= 3) return;
   for (const p of state.particles) {
     const alpha = clamp(p.life / p.maxLife, 0, 1);
     ctx.globalAlpha = alpha;
@@ -1721,6 +1823,7 @@ function createMatch() {
     suddenDeathTime: 0,
     zoneRegrowing: false,
     zoneRegrowT: 0,
+    respawnClosedNotified: false,
     player,
     camera: { x: player.head.x, y: player.head.y, zoom: 1, targetZoom: 1, freeCamActive: false },
     zone: {
@@ -1929,6 +2032,12 @@ function update(dt) {
 
   state.roundElapsed += dt;
 
+  if (!state.respawnClosedNotified && !state.intermission &&
+      !state.zoneRegrowing && state.roundElapsed >= CFG.respawnUntil) {
+    state.respawnClosedNotified = true;
+    showRespawnClosedNotice();
+  }
+
   state.mmElapsed += dt;
   if (state.mmFadeT < 1) {
     state.mmFadeT = Math.min(1, state.mmFadeT + dt / CFG.mmFadeDuration);
@@ -1962,8 +2071,15 @@ function update(dt) {
     worm.update(dt);
     const h = worm.head;
 
+    // Bug 2 Fix: Während Intermission / Zone-Regrow nicht an der Wand sterben,
+    // sondern nur die Position in die Welt clampen
     if (h.x < 0 || h.x > CFG.worldSize || h.y < 0 || h.y > CFG.worldSize) {
-      worm.die('WALL'); continue;
+      if (state.intermission || state.zoneRegrowing) {
+        h.x = clamp(h.x, 0, CFG.worldSize);
+        h.y = clamp(h.y, 0, CFG.worldSize);
+      } else {
+        worm.die('WALL'); continue;
+      }
     }
 
     if (!state.intermission && !state.zoneRegrowing) {
@@ -2032,7 +2148,6 @@ function update(dt) {
     const h = p2.head;
     state.camera.x += (h.x - state.camera.x) * Math.min(1, 8 * dt);
     state.camera.y += (h.y - state.camera.y) * Math.min(1, 8 * dt);
-    // Zoom skaliert mit Wurmgröße → größer = weiter raus
     state.camera.targetZoom = computePlayerZoom(p2);
   } else {
     if (!state.camera.freeCamActive) {
@@ -2097,7 +2212,8 @@ function checkCollisions() {
 
       const otherHR = wormCollisionRadius(other);
       const hh = Math.hypot(other.head.x - h.x, other.head.y - h.y);
-      if (hh < hR + otherHR && worm.segments.length <= other.segments.length) {
+      // Bug 1 Fix: Statt <= jetzt < — bei Gleichstand sterben beide nicht
+      if (hh < hR + otherHR && worm.segments.length < other.segments.length) {
         worm.die(other); dead = true; break;
       }
 
@@ -2258,6 +2374,7 @@ function startNewRound() {
   state.round += 1;
   state.suddenDeathActive = false;
   state.suddenDeathTime = 0;
+  state.respawnClosedNotified = false;
 
   state.mmDisplayed = [];
   state.mmPrev = [];
@@ -2286,6 +2403,13 @@ function triggerDraw() {
   state.zoneRegrowing = true;
   state.zoneRegrowT = 0;
   state.roundElapsed = 0;
+  state.respawnClosedNotified = false;
+
+  // Bug 4 Fix: Minimap-Cache zurücksetzen, damit kein altes Top-3-Flackern
+  state.mmDisplayed = [];
+  state.mmPrev = [];
+  state.mmFadeT = 1;
+  state.mmElapsed = CFG.mmUpdateInterval;
 
   for (let i = 0; i < state.worms.length; i++) {
     const w = state.worms[i];
@@ -2444,8 +2568,10 @@ function render() {
   const wormPad = 500 / zoom;
   for (const w of state.worms) {
     if (!w.alive) continue;
-    if (w.head.x < cam.x - visW / 2 - wormPad || w.head.x > cam.x + visW / 2 + wormPad) continue;
-    if (w.head.y < cam.y - visH / 2 - wormPad || w.head.y > cam.y + visH / 2 + wormPad) continue;
+    const wBodyReach = w.segments.length * CFG.segSpacing + 150;
+    const pad = wormPad + wBodyReach;
+    if (w.head.x < cam.x - visW / 2 - pad || w.head.x > cam.x + visW / 2 + pad) continue;
+    if (w.head.y < cam.y - visH / 2 - pad || w.head.y > cam.y + visH / 2 + pad) continue;
     drawWorm(w, w === state.player, zoom);
   }
   drawParticles();
@@ -2458,14 +2584,16 @@ function render() {
 }
 
 function drawDotGrid(cam, visW, visH) {
-  const step = 90;
+  const lod = lodLevel(state.camera.zoom);
+  const step = lod === 0 ? 90 : lod === 1 ? 180 : lod === 2 ? 360 : 720;
   const gx0 = Math.floor((cam.x - visW / 2) / step) * step;
   const gy0 = Math.floor((cam.y - visH / 2) / step) * step;
   const gx1 = cam.x + visW / 2 + step, gy1 = cam.y + visH / 2 + step;
   ctx.fillStyle = 'rgba(90,130,200,0.20)';
   for (let x = gx0; x < gx1; x += step)
     for (let y = gy0; y < gy1; y += step) ctx.fillRect(x - 1, y - 1, 2, 2);
-  const step2 = 360;
+
+  const step2 = lod === 0 ? 360 : lod === 1 ? 720 : 1440;
   const bx0 = Math.floor((cam.x - visW / 2) / step2) * step2;
   const by0 = Math.floor((cam.y - visH / 2) / step2) * step2;
   ctx.fillStyle = 'rgba(120,170,255,0.35)';
@@ -2501,9 +2629,6 @@ function drawZone(cam, visW, visH, zoom) {
   ctx.lineWidth = 1.5 / zoom; ctx.stroke();
 }
 
-// ============================================================
-// FOOD RENDERING
-// ============================================================
 function drawFoodOrb(px, py, r, color, glow, ring, phase, time) {
   if (r <= 0.15) return;
   const isBig = r > 2.5;
@@ -2582,13 +2707,17 @@ function drawFoodOrb(px, py, r, color, glow, ring, phase, time) {
 
 function drawFood(cam, visW, visH) {
   const t = state.time;
+  const lod = lodLevel(state.camera.zoom);
   const halfW = visW / 2 + 40, halfH = visH / 2 + 40;
   const radius = Math.max(halfW, halfH);
+
+  const minGrow = lod === 0 ? 0 : lod === 1 ? 3 : lod === 2 ? 15 : 25;
 
   forEachFoodNear(cam.x, cam.y, radius, f => {
     if (f.x < cam.x - halfW || f.x > cam.x + halfW) return;
     if (f.y < cam.y - halfH || f.y > cam.y + halfH) return;
     if (f.eating) return;
+    if ((f.grow || 0) < minGrow) return;
 
     const sx = Math.sin(t * f.shakeSpeed + f.phase) * f.shakeAmp;
     const sy = Math.cos(t * f.shakeSpeed * 1.27 + f.phase) * f.shakeAmp;
@@ -2614,7 +2743,7 @@ function drawFood(cam, visW, visH) {
 }
 
 // ============================================================
-// WORM RENDERING — Stacked 3D beads with googly eyes
+// WORM RENDERING
 // ============================================================
 const BEAD_ACCENT = '#f5f5f8';
 
@@ -2625,7 +2754,7 @@ function beadStepFor(bodyR) {
 function drawBead(c, x, y, r, color, outlineColor, zoom) {
   const screenR = r * (zoom || 1);
 
-  if (screenR < 5) {
+  if (screenR < 8) {
     c.beginPath();
     c.arc(x, y, r + 1.0, 0, Math.PI * 2);
     c.fillStyle = outlineColor;
@@ -2725,8 +2854,9 @@ function drawWorm(worm, isPlayer, zoom) {
     ? mixColors(wormAccent, '#ff2040', outsideFlash * 0.85)
     : wormAccent;
 
-  // Boost Glow mit Multi-Layer Additiv-Blending
-  if (isBoosting && zoom > 0.2) {
+  const lod = lodLevel(zoom);
+
+  if (isBoosting && zoom > 0.2 && lod < 3) {
     const bc = worm.boostGlow || '#ffffff';
     const pulse = 0.5 + 0.5 * Math.sin(state.time * Math.PI * 2 / CFG.boostFlashInterval);
     const ease = pulse * pulse * (3 - 2 * pulse);
@@ -2779,7 +2909,10 @@ function drawWorm(worm, isPlayer, zoom) {
     ctx.restore();
   }
 
-  const beadStep = beadStepFor(bodyR);
+  let beadStep = beadStepFor(bodyR);
+  if (lod === 1) beadStep = Math.ceil(beadStep * 1.3);
+  else if (lod === 2) beadStep = Math.ceil(beadStep * 1.9);
+  else if (lod === 3) beadStep = Math.ceil(beadStep * 2.8);
 
   const beadIdxs = [];
   for (let i = beadStep; i < N; i += beadStep) beadIdxs.push(i);
@@ -2799,7 +2932,7 @@ function drawWorm(worm, isPlayer, zoom) {
   const h = segs[0];
   drawBead(ctx, h.x, h.y, headR, baseColor, outlineColor, zoom);
 
-  if (zoom > 0.25) {
+  if (zoom > 0.25 && lod < 2) {
     drawGooglyEyes(ctx, h.x, h.y, headR, worm.angle, outlineColor);
   }
 
@@ -2972,7 +3105,18 @@ const zoneWarn = document.getElementById('zoneWarn');
 const zoneText = document.getElementById('zoneText');
 const suddenDeathEl = document.getElementById('suddenDeath');
 const sdTimerEl = document.getElementById('sdTimer');
+const respawnClosedEl = document.getElementById('respawnClosed');
 const lbListEl = document.getElementById('lbList');
+
+function showRespawnClosedNotice() {
+  if (!respawnClosedEl) return;
+  respawnClosedEl.classList.remove('on');
+  void respawnClosedEl.offsetWidth;
+  respawnClosedEl.classList.add('on');
+  setTimeout(() => {
+    if (respawnClosedEl) respawnClosedEl.classList.remove('on');
+  }, 3700);
+}
 
 function updateHUD() {
   if (!state) return;
@@ -3426,9 +3570,6 @@ function drawCzPreview(t) {
   drawPreviewWorm(czCtx, pts, 13, czTempColor, czTempOutline, czTempBoostGlow, czTempAccent, t);
 }
 
-// ============================================================
-// Shared Preview Worm Renderer
-// ============================================================
 function drawPreviewWorm(c, pts, bodyR, bodyColor, outlineColor, boostGlow, accentColor, t) {
   const N = pts.length;
   if (N < 2) return;
@@ -3602,7 +3743,7 @@ if (menuCustomizeBtn) {
 // INIT
 // ============================================================
 playerOutline = effectiveOutline(playerColor, playerOutline);
-localStorage.setItem(PLAYER_OUTLINE_KEY, playerOutline);
+safeSetItem(PLAYER_OUTLINE_KEY, playerOutline);
 
 setPlayerColor(playerColor, false);
 setPlayerName(playerName, false);
@@ -3670,7 +3811,6 @@ function startMatch() {
   input.hasMouse = false;
   zoneWarn.classList.remove('on'); zoneText.classList.remove('on');
 
-  // Wenn bereits ein Match läuft → in dieses zurückkehren
   if (state && !state.matchOver) {
     state.paused = false;
     state.menuMode = false;
@@ -3691,7 +3831,6 @@ function startMatch() {
     return;
   }
 
-  // Sonst: Neues Match starten
   try {
     state = createMatch();
   } catch (err) {
