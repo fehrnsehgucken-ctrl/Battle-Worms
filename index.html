@@ -638,7 +638,7 @@
     font-size: 20px; font-weight: 900; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.7); }
   .cz-color-wrap { position: relative; border-radius: 12px; overflow: hidden;
     border: 1px solid rgba(120,180,255,0.22); background: rgba(0,0,0,0.25); cursor: pointer; }
-  #czColorInput, #czOutlineInput, #czBoostGlowInput { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; }
+  #czColorInput, #czAccentInput, #czOutlineInput, #czBoostGlowInput { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; }
   .cz-color-preview { display: flex; align-items: center; justify-content: center;
     gap: 12px; padding: 16px; pointer-events: none; }
   .cz-color-dot { width: 32px; height: 32px; border-radius: 50%;
@@ -854,7 +854,7 @@
 
 <div id="suddenDeath">
   <div class="sd-label">⚠ SUDDEN DEATH ⚠</div>
-  <div class="sd-timer" id="sdTimer">30</div>
+  <div class="sd-timer" id="sdTimer">60</div>
 </div>
 
 <div id="victoryBanner">
@@ -864,7 +864,7 @@
 
 <div id="timerHud">
   <div id="timerLabel">STARTS IN</div>
-  <div id="timerValue">4:00</div>
+  <div id="timerValue">6:00</div>
 </div>
 
 <div id="leaderboard">
@@ -945,7 +945,7 @@
       </div>
       <div class="stat">
         <div class="stat-icon">⌛</div>
-        <div class="stat-v">4:00</div>
+        <div class="stat-v">6:00</div>
         <div class="stat-l">Match</div>
       </div>
       <div class="stat">
@@ -984,6 +984,16 @@
       <div class="cz-color-preview">
         <div class="cz-color-dot" id="czColorDot" style="background:#6ccfff;"></div>
         <div class="cz-color-hex" id="czColorHex">#6CCFFF</div>
+      </div>
+    </div>
+
+    <div class="cz-section-title">Accent Color (Beats)</div>
+    <div class="cz-preset-colors" id="czAccentQuick"></div>
+    <div class="cz-color-wrap">
+      <input type="color" id="czAccentInput" value="#f5f5f8">
+      <div class="cz-color-preview">
+        <div class="cz-color-dot" id="czAccentDot" style="background:#f5f5f8;"></div>
+        <div class="cz-color-hex" id="czAccentHex">#F5F5F8</div>
       </div>
     </div>
 
@@ -1039,10 +1049,10 @@ const CFG = {
   worldSize: 16800,
   zoneStart: 6400,
   zoneMin: 478,
-  matchDuration: 4 * 60,
-  respawnUntil: 2.5 * 60,
+  matchDuration: 6 * 60,
+  respawnUntil: 3 * 60,
   intermissionDuration: 5,
-  suddenDeathDuration: 30,
+  suddenDeathDuration: 60,
   zoneRegrowDuration: 5,
   bots: 50,
   food: 19000,
@@ -1103,17 +1113,19 @@ function pickFoodTier() {
 }
 
 // ============================================================
-// PLAYER COLOR / NAME / OUTLINE / BOOST
+// PLAYER COLOR / NAME / OUTLINE / ACCENT / BOOST
 // ============================================================
 const PLAYER_COLOR_KEY = 'battle-worms-color';
 const PLAYER_NAME_KEY = 'battle-worms-name';
 const PLAYER_OUTLINE_KEY = 'battle-worms-outline';
+const PLAYER_ACCENT_KEY = 'battle-worms-accent';
 const PLAYER_BOOST_GLOW_KEY = 'battle-worms-boost-glow';
 const PLAYER_BOOST_POS_KEY = 'battle-worms-boost-pos';
 const PLAYER_BOOST_SIZE_KEY = 'battle-worms-boost-size';
 const DEFAULT_PLAYER_COLOR = '#6ccfff';
 const DEFAULT_PLAYER_NAME = 'You';
 const DEFAULT_PLAYER_OUTLINE = '#ffffff';
+const DEFAULT_PLAYER_ACCENT = '#f5f5f8';
 const DEFAULT_PLAYER_BOOST_GLOW = '#ffffff';
 const DEFAULT_PLAYER_BOOST_POS = 'left';
 const DEFAULT_PLAYER_BOOST_SIZE = 2.5;
@@ -1121,6 +1133,7 @@ const DEFAULT_PLAYER_BOOST_SIZE = 2.5;
 let playerColor = localStorage.getItem(PLAYER_COLOR_KEY) || DEFAULT_PLAYER_COLOR;
 let playerName = localStorage.getItem(PLAYER_NAME_KEY) || DEFAULT_PLAYER_NAME;
 let playerOutline = localStorage.getItem(PLAYER_OUTLINE_KEY) || DEFAULT_PLAYER_OUTLINE;
+let playerAccent = localStorage.getItem(PLAYER_ACCENT_KEY) || DEFAULT_PLAYER_ACCENT;
 let playerBoostGlow = localStorage.getItem(PLAYER_BOOST_GLOW_KEY) || DEFAULT_PLAYER_BOOST_GLOW;
 let playerBoostPos = localStorage.getItem(PLAYER_BOOST_POS_KEY) || DEFAULT_PLAYER_BOOST_POS;
 let playerBoostSize = parseFloat(localStorage.getItem(PLAYER_BOOST_SIZE_KEY) || String(DEFAULT_PLAYER_BOOST_SIZE));
@@ -1157,6 +1170,11 @@ function setPlayerOutline(hex, save) {
   playerOutline = hex;
   if (save) localStorage.setItem(PLAYER_OUTLINE_KEY, hex);
   if (state && state.player && state.player.alive) state.player.outlineColor = hex;
+}
+function setPlayerAccent(hex, save) {
+  playerAccent = hex;
+  if (save) localStorage.setItem(PLAYER_ACCENT_KEY, hex);
+  if (state && state.player && state.player.alive) state.player.accentColor = hex;
 }
 function setPlayerBoostGlow(hex, save) {
   playerBoostGlow = hex;
@@ -1221,6 +1239,7 @@ const PRESET_WORMS = [
   { name: 'Cyan', color: '#3fe8ff' }, { name: 'Obsidian', color: '#1a2238' },
 ];
 const QUICK_OUTLINES = ['#ffffff','#e0e6f5','#c8d6e5','#8ee0ff','#ffd479','#7bffa8','#ff8ba5','#a78bfa'];
+const QUICK_ACCENTS = ['#f5f5f8','#ffffff','#e0e6f5','#c8d6e5','#ffe8b3','#ffc4d0','#c8ffd4','#d4e6ff'];
 const QUICK_BOOST_GLOWS = ['#ffffff','#ffd479','#8ee0ff','#7bffa8','#ff6ec7','#a78bfa','#ff5577','#5de2c4'];
 
 const MM_RANK_COLORS = ['#ffd479', '#a78bfa', '#7fbfff'];
@@ -1382,6 +1401,7 @@ class Worm {
     this.color = o.color;
     this.outlineColor = o.outlineColor || mixColors(this.color, '#000000', 0.65);
     this.boostGlow = o.boostGlow || mixColors(this.color, '#ffffff', 0.6);
+    this.accentColor = o.accentColor || '#f5f5f8';
     this.alive = true;
     this.deathTime = -1; this.spawnTime = o.time || 0;
     this.killer = null;
@@ -1580,7 +1600,7 @@ function makePlayerWorm(x, y, angle) {
   return new Worm({
     id: 'player', name: playerName, isBot: false,
     x, y, color: playerColor, outlineColor: playerOutline,
-    boostGlow: playerBoostGlow, angle,
+    boostGlow: playerBoostGlow, accentColor: playerAccent, angle,
     time: state ? state.roundElapsed : 0,
   });
 }
@@ -1651,6 +1671,7 @@ function createMatch() {
       x: spawn.x, y: spawn.y, angle: spawn.ang,
       color: c,
       boostGlow: mixColors(c, '#ffffff', 0.6),
+      accentColor: '#f5f5f8',
       time: 0,
     }));
   }
@@ -1967,6 +1988,7 @@ function update(dt) {
         id: w.id, name: w.name, isBot: true,
         x: spawn.x, y: spawn.y, angle: spawn.ang,
         color: c, boostGlow: mixColors(c, '#ffffff', 0.6),
+        accentColor: '#f5f5f8',
         time: state.roundElapsed,
       });
     }
@@ -2189,6 +2211,7 @@ function startNewRound() {
       x: spawn.x, y: spawn.y, angle: spawn.ang,
       color: c,
       boostGlow: mixColors(c, '#ffffff', 0.6),
+      accentColor: '#f5f5f8',
       time: 0,
     }));
   }
@@ -2240,6 +2263,7 @@ function triggerDraw() {
       id: w.id, name: w.name, isBot: true,
       x: spawn.x, y: spawn.y, angle: spawn.ang,
       color: c, boostGlow: mixColors(c, '#ffffff', 0.6),
+      accentColor: '#f5f5f8',
       time: 0,
     });
   }
@@ -2611,8 +2635,8 @@ function drawGooglyEyes(c, hx, hy, headR, angle, outlineColor) {
   const perp = angle + Math.PI / 2;
   const eyeBack = headR * 0.16;
   const eyeSide = headR * 0.52;
-  const eyeR    = headR * 0.42;
-  const pupilR  = eyeR * 0.58;
+  const eyeR    = headR * 0.38;
+  const pupilR  = eyeR * 0.55;
 
   for (const sgn of [-1, 1]) {
     const ex = hx + Math.cos(angle) * eyeBack + Math.cos(perp) * eyeSide * sgn;
@@ -2661,24 +2685,62 @@ function drawWorm(worm, isPlayer, zoom) {
   const baseColor = worm.outside
     ? mixColors(worm.color, '#ff2040', outsideFlash * 0.85)
     : worm.color;
+  const wormAccent = worm.accentColor || BEAD_ACCENT;
   const accentColor = worm.outside
-    ? mixColors(BEAD_ACCENT, '#ff2040', outsideFlash * 0.85)
-    : BEAD_ACCENT;
+    ? mixColors(wormAccent, '#ff2040', outsideFlash * 0.85)
+    : wormAccent;
 
+  // === NEUER BOOST GLOW mit Multi-Layer Additiv-Blending ===
   if (isBoosting && zoom > 0.2) {
-    const flashRaw = 0.5 + 0.5 * Math.sin(state.time * Math.PI * 2 / CFG.boostFlashInterval);
-    const flashAmt = Math.pow(flashRaw, 3);
     const bc = worm.boostGlow || '#ffffff';
+    const pulse = 0.5 + 0.5 * Math.sin(state.time * Math.PI * 2 / CFG.boostFlashInterval);
+    const ease = pulse * pulse * (3 - 2 * pulse);
+
+    const glowPath = new Path2D();
+    glowPath.moveTo(segs[0].x, segs[0].y);
+    for (let i = 1; i < N; i++) glowPath.lineTo(segs[i].x, segs[i].y);
 
     ctx.save();
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
+    ctx.globalCompositeOperation = 'lighter';
+
+    const bloomLayers = [
+      { w: bodyR * 2 + 70, a: 0.025 + 0.035 * ease },
+      { w: bodyR * 2 + 52, a: 0.035 + 0.055 * ease },
+      { w: bodyR * 2 + 36, a: 0.055 + 0.075 * ease },
+      { w: bodyR * 2 + 24, a: 0.075 + 0.105 * ease },
+    ];
+    for (const L of bloomLayers) {
+      ctx.strokeStyle = hexAlpha(bc, L.a);
+      ctx.lineWidth = L.w;
+      ctx.stroke(glowPath);
+    }
+
+    ctx.strokeStyle = hexAlpha(bc, 0.14 + 0.16 * ease);
+    ctx.lineWidth = bodyR * 2 + 14;
+    ctx.stroke(glowPath);
+
+    ctx.strokeStyle = hexAlpha(mixColors(bc, '#ffffff', 0.35), 0.22 + 0.22 * ease);
+    ctx.lineWidth = bodyR * 2 + 6;
+    ctx.stroke(glowPath);
+
+    ctx.strokeStyle = hexAlpha(mixColors(bc, '#ffffff', 0.65), 0.30 + 0.35 * ease);
+    ctx.lineWidth = Math.max(2, bodyR * 0.85);
+    ctx.stroke(glowPath);
+
+    const hh = segs[0];
+    const headGlowR = bodyR * 3.5 + 24 + 18 * ease;
+    const hg = ctx.createRadialGradient(hh.x, hh.y, 0, hh.x, hh.y, headGlowR);
+    hg.addColorStop(0,    hexAlpha(mixColors(bc, '#ffffff', 0.35), 0.55 + 0.30 * ease));
+    hg.addColorStop(0.30, hexAlpha(bc, 0.30 + 0.22 * ease));
+    hg.addColorStop(0.65, hexAlpha(bc, 0.10 + 0.10 * ease));
+    hg.addColorStop(1,    hexAlpha(bc, 0));
+    ctx.fillStyle = hg;
     ctx.beginPath();
-    ctx.moveTo(segs[0].x, segs[0].y);
-    for (let i = 1; i < N; i++) ctx.lineTo(segs[i].x, segs[i].y);
-    ctx.strokeStyle = hexAlpha(bc, 0.18 + 0.42 * flashAmt);
-    ctx.lineWidth = bodyR * 2 + 14 + 18 * flashAmt;
-    ctx.stroke();
+    ctx.arc(hh.x, hh.y, headGlowR, 0, Math.PI * 2);
+    ctx.fill();
+
     ctx.restore();
   }
 
@@ -2723,7 +2785,7 @@ function drawWorm(worm, isPlayer, zoom) {
 }
 
 function drawMinimap() {
-  const size = IS_TOUCH ? 81 : 117;
+  const size = IS_TOUCH ? 142 : 205;
   const pad = IS_TOUCH ? 12 : 14;
   const mcx = VW - size / 2 - pad;
   const mcy = size / 2 + pad;
@@ -3122,11 +3184,15 @@ const czClose = document.getElementById('czClose');
 const czSave = document.getElementById('czSave');
 const czReset = document.getElementById('czReset');
 const czPresets = document.getElementById('czPresets');
+const czAccentQuick = document.getElementById('czAccentQuick');
 const czOutlineQuick = document.getElementById('czOutlineQuick');
 const czBoostGlowQuick = document.getElementById('czBoostGlowQuick');
 const czColorInput = document.getElementById('czColorInput');
 const czColorDot = document.getElementById('czColorDot');
 const czColorHex = document.getElementById('czColorHex');
+const czAccentInput = document.getElementById('czAccentInput');
+const czAccentDot = document.getElementById('czAccentDot');
+const czAccentHex = document.getElementById('czAccentHex');
 const czOutlineInput = document.getElementById('czOutlineInput');
 const czOutlineDot = document.getElementById('czOutlineDot');
 const czOutlineHex = document.getElementById('czOutlineHex');
@@ -3143,6 +3209,7 @@ const czBoostSizeVal = document.getElementById('czBoostSizeVal');
 
 let czTempColor = playerColor;
 let czTempOutline = playerOutline;
+let czTempAccent = playerAccent;
 let czTempBoostGlow = playerBoostGlow;
 let czTempBoostPos = playerBoostPos;
 let czTempBoostSize = playerBoostSize;
@@ -3160,6 +3227,13 @@ PRESET_WORMS.forEach(preset => {
     updateCzUI();
   });
   czPresets.appendChild(el);
+});
+QUICK_ACCENTS.forEach(c => {
+  const el = document.createElement('button');
+  el.className = 'cz-quick-color';
+  el.style.background = c;
+  el.addEventListener('click', () => { czTempAccent = c; updateCzUI(); });
+  czAccentQuick.appendChild(el);
 });
 QUICK_OUTLINES.forEach(c => {
   const el = document.createElement('button');
@@ -3189,6 +3263,10 @@ function updateCzUI() {
   czColorInput.value = czTempColor;
   czColorDot.style.background = czTempColor;
   czColorHex.textContent = czTempColor.toUpperCase();
+
+  if (czAccentInput) czAccentInput.value = czTempAccent;
+  if (czAccentDot) czAccentDot.style.background = czTempAccent;
+  if (czAccentHex) czAccentHex.textContent = czTempAccent.toUpperCase();
 
   czOutlineInput.value = czTempOutline;
   czOutlineDot.style.background = czTempOutline;
@@ -3220,6 +3298,7 @@ czColorInput.addEventListener('input', e => {
   czTempOutline = effectiveOutline(czTempColor, czTempOutline);
   updateCzUI();
 });
+czAccentInput.addEventListener('input', e => { czTempAccent = e.target.value; updateCzUI(); });
 czOutlineInput.addEventListener('input', e => {
   const picked = e.target.value;
   const sanitized = effectiveOutline(czTempColor, picked);
@@ -3246,6 +3325,7 @@ czBoostSize.addEventListener('input', e => {
 function openCustomize() {
   czTempColor = playerColor;
   czTempOutline = playerOutline;
+  czTempAccent = playerAccent;
   czTempBoostGlow = playerBoostGlow;
   czTempBoostPos = playerBoostPos;
   czTempBoostSize = playerBoostSize;
@@ -3266,6 +3346,7 @@ czSave.addEventListener('click', () => {
   czTempOutline = effectiveOutline(czTempColor, czTempOutline);
   setPlayerColor(czTempColor, true);
   setPlayerOutline(czTempOutline, true);
+  setPlayerAccent(czTempAccent, true);
   setPlayerBoostGlow(czTempBoostGlow, true);
   setPlayerBoostPos(czTempBoostPos, true);
   setPlayerBoostSize(czTempBoostSize, true);
@@ -3276,6 +3357,7 @@ czSave.addEventListener('click', () => {
 czReset.addEventListener('click', () => {
   czTempColor = DEFAULT_PLAYER_COLOR;
   czTempOutline = DEFAULT_PLAYER_OUTLINE;
+  czTempAccent = DEFAULT_PLAYER_ACCENT;
   czTempBoostGlow = DEFAULT_PLAYER_BOOST_GLOW;
   czTempBoostPos = DEFAULT_PLAYER_BOOST_POS;
   czTempBoostSize = DEFAULT_PLAYER_BOOST_SIZE;
@@ -3306,31 +3388,67 @@ function drawCzPreview(t) {
   for (let i = 0; i < segments; i++)
     pts.push({ x: headX - i * segLen, y: baseY + Math.sin(wave - i * 0.32) * amp });
 
-  drawPreviewWorm(czCtx, pts, 13, czTempColor, czTempOutline, czTempBoostGlow, t);
+  drawPreviewWorm(czCtx, pts, 13, czTempColor, czTempOutline, czTempBoostGlow, czTempAccent, t);
 }
 
 // ============================================================
 // Shared Preview Worm Renderer
 // ============================================================
-function drawPreviewWorm(c, pts, bodyR, bodyColor, outlineColor, boostGlow, t) {
+function drawPreviewWorm(c, pts, bodyR, bodyColor, outlineColor, boostGlow, accentColor, t) {
   const N = pts.length;
   if (N < 2) return;
 
-  const accentColor = BEAD_ACCENT;
+  accentColor = accentColor || BEAD_ACCENT;
 
   if (boostGlow) {
-    const flashRaw = 0.5 + 0.5 * Math.sin(t * Math.PI * 2 / CFG.boostFlashInterval);
-    const flashAmt = Math.pow(flashRaw, 3);
+    const pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 2 / CFG.boostFlashInterval);
+    const ease = pulse * pulse * (3 - 2 * pulse);
+
+    const glowPath = new Path2D();
+    glowPath.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < N; i++) glowPath.lineTo(pts[i].x, pts[i].y);
 
     c.save();
     c.lineCap = 'round';
     c.lineJoin = 'round';
+    c.globalCompositeOperation = 'lighter';
+
+    const bloomLayers = [
+      { w: bodyR * 2 + 60, a: 0.025 + 0.035 * ease },
+      { w: bodyR * 2 + 44, a: 0.035 + 0.055 * ease },
+      { w: bodyR * 2 + 30, a: 0.055 + 0.075 * ease },
+      { w: bodyR * 2 + 20, a: 0.075 + 0.105 * ease },
+    ];
+    for (const L of bloomLayers) {
+      c.strokeStyle = hexAlpha(boostGlow, L.a);
+      c.lineWidth = L.w;
+      c.stroke(glowPath);
+    }
+
+    c.strokeStyle = hexAlpha(boostGlow, 0.14 + 0.16 * ease);
+    c.lineWidth = bodyR * 2 + 12;
+    c.stroke(glowPath);
+
+    c.strokeStyle = hexAlpha(mixColors(boostGlow, '#ffffff', 0.35), 0.22 + 0.22 * ease);
+    c.lineWidth = bodyR * 2 + 5;
+    c.stroke(glowPath);
+
+    c.strokeStyle = hexAlpha(mixColors(boostGlow, '#ffffff', 0.65), 0.30 + 0.35 * ease);
+    c.lineWidth = Math.max(2, bodyR * 0.85);
+    c.stroke(glowPath);
+
+    const hh = pts[0];
+    const headGlowR = bodyR * 3.5 + 20 + 14 * ease;
+    const hg = c.createRadialGradient(hh.x, hh.y, 0, hh.x, hh.y, headGlowR);
+    hg.addColorStop(0,    hexAlpha(mixColors(boostGlow, '#ffffff', 0.35), 0.55 + 0.30 * ease));
+    hg.addColorStop(0.30, hexAlpha(boostGlow, 0.30 + 0.22 * ease));
+    hg.addColorStop(0.65, hexAlpha(boostGlow, 0.10 + 0.10 * ease));
+    hg.addColorStop(1,    hexAlpha(boostGlow, 0));
+    c.fillStyle = hg;
     c.beginPath();
-    c.moveTo(pts[0].x, pts[0].y);
-    for (let i = 1; i < N; i++) c.lineTo(pts[i].x, pts[i].y);
-    c.strokeStyle = hexAlpha(boostGlow, 0.18 + 0.42 * flashAmt);
-    c.lineWidth = bodyR * 2 + 14 + 18 * flashAmt;
-    c.stroke();
+    c.arc(hh.x, hh.y, headGlowR, 0, Math.PI * 2);
+    c.fill();
+
     c.restore();
   }
 
@@ -3399,7 +3517,7 @@ function drawMenuWorm() {
 
   const bodyR = 22;
 
-  drawPreviewWorm(c, pts, bodyR, playerColor, playerOutline, playerBoostGlow, t);
+  drawPreviewWorm(c, pts, bodyR, playerColor, playerOutline, playerBoostGlow, playerAccent, t);
 }
 
 function menuWormLoop() {
@@ -3454,6 +3572,7 @@ localStorage.setItem(PLAYER_OUTLINE_KEY, playerOutline);
 setPlayerColor(playerColor, false);
 setPlayerName(playerName, false);
 setPlayerOutline(playerOutline, false);
+setPlayerAccent(playerAccent, false);
 setPlayerBoostGlow(playerBoostGlow, false);
 applyBoostBtnSettings();
 updateCzUI();
@@ -3515,6 +3634,33 @@ function startMatch() {
   resetInputState();
   input.hasMouse = false;
   zoneWarn.classList.remove('on'); zoneText.classList.remove('on');
+
+  // ============================================================
+  // Wenn bereits ein Match läuft → in dieses zurückkehren
+  // (Respawn wenn möglich, sonst Zuschauer-Modus)
+  // ============================================================
+  if (state && !state.matchOver) {
+    state.paused = false;
+    state.menuMode = false;
+
+    if (state.player && state.player.alive) {
+      state.camera.x = state.player.head.x;
+      state.camera.y = state.player.head.y;
+      state.camera.zoom = 1;
+      state.camera.targetZoom = 1;
+      state.camera.freeCamActive = false;
+    } else {
+      state.camera.freeCamActive = true;
+      state.camera.targetZoom = 1;
+    }
+
+    lastT = performance.now();
+    return;
+  }
+
+  // ============================================================
+  // Sonst: Neues Match starten
+  // ============================================================
   try {
     state = createMatch();
   } catch (err) {
