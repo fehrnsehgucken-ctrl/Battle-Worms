@@ -216,8 +216,19 @@
   }
   #zoneText.on { display:block; animation: zonePulse 0.7s ease-in-out infinite; }
 
+  /* Body in menu - hide all game HUD */
+  body.in-menu #timerHud,
+  body.in-menu #leaderboard,
+  body.in-menu #statsHud,
+  body.in-menu #boostBtn,
+  body.in-menu #zoneWarn,
+  body.in-menu #zoneText,
+  body.in-menu #suddenDeath,
+  body.in-menu #victoryBanner,
+  body.in-menu #deathScreen { display: none !important; }
+
   /* ============================================================
-     ★★★ NEUES START MENÜ ★★★
+     START MENU
      ============================================================ */
   #overlay {
     position:fixed; inset:0; z-index:10; overflow:hidden;
@@ -226,7 +237,25 @@
   }
   #overlay.hidden { display:none; }
 
-  /* Animierte Hintergrund-Blobs */
+  /* Menu transparent mode (when returning from death) */
+  #overlay.from-death {
+    background: radial-gradient(circle at 50% 50%,
+                rgba(6,10,22,0.30) 0%,
+                rgba(3,5,10,0.70) 100%);
+    backdrop-filter: blur(6px) saturate(125%);
+    -webkit-backdrop-filter: blur(6px) saturate(125%);
+  }
+  #overlay.from-death .menu-blob { display: none; }
+  #overlay.from-death .menu-dots { opacity: 0.10; }
+  #overlay.from-death .menu-scanlines { opacity: 0.18; }
+  #overlay.from-death .menu-card {
+    background: linear-gradient(160deg, rgba(18,28,52,0.94), rgba(8,14,28,0.96));
+    box-shadow:
+      0 30px 100px rgba(0,0,0,0.85),
+      0 0 0 1px rgba(140,200,255,0.10) inset,
+      0 1px 0 rgba(255,255,255,0.10) inset;
+  }
+
   .menu-blob {
     position: absolute; border-radius: 50%;
     pointer-events: none;
@@ -264,7 +293,6 @@
     50%     { transform: translate(-40%,-60%) scale(1.3); opacity: 0.8; }
   }
 
-  /* Punkte-Raster */
   .menu-dots {
     position:absolute; inset:0; pointer-events:none; opacity: 0.55;
     background-image: radial-gradient(rgba(140,200,255,0.16) 1px, transparent 1.5px);
@@ -273,7 +301,6 @@
     -webkit-mask-image: radial-gradient(circle at 50% 50%, black 25%, transparent 72%);
   }
 
-  /* Feine Scanlines */
   .menu-scanlines {
     position: absolute; inset: 0; pointer-events: none;
     background: repeating-linear-gradient(
@@ -287,13 +314,11 @@
     mix-blend-mode: overlay;
   }
 
-  /* Vignette */
   .menu-vignette {
     position: absolute; inset: 0; pointer-events: none;
     background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%);
   }
 
-  /* Menu Card */
   .menu-card {
     position:relative; z-index:3;
     padding: clamp(26px, 4vw, 42px) clamp(24px, 5vw, 48px) clamp(26px, 4vw, 40px);
@@ -324,7 +349,6 @@
     to   { opacity: 1; transform: translateY(0) scale(1); }
   }
 
-  /* Hero — Wurm-Vorschau */
   .menu-hero {
     position: relative;
     margin: -14px -8px 8px;
@@ -346,7 +370,6 @@
     z-index: 1;
   }
 
-  /* Titel */
   .menu-title {
     margin: 4px 0 6px;
     font-size: clamp(40px, 10vw, 62px);
@@ -385,7 +408,6 @@
     text-align: center;
   }
 
-  /* Name Input */
   .menu-name-wrap {
     text-align: left;
     margin-bottom: 16px;
@@ -449,7 +471,6 @@
   }
   .menu-name-edit:active { transform: translateY(0) scale(0.96); }
 
-  /* Stat-Karten */
   .menu-stats {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -491,7 +512,6 @@
     font-weight: 700;
   }
 
-  /* Play Button */
   .menu-play {
     width: 100%;
     padding: 18px 0;
@@ -543,7 +563,6 @@
     }
   }
 
-  /* Controls */
   .menu-controls {
     margin-top: 20px;
     color: #56678a;
@@ -729,6 +748,7 @@
     text-shadow: 0 0 10px rgba(108,204,255,0.5);
   }
 
+  /* Death Screen */
   #deathScreen {
     position: fixed; inset: 0; z-index: 7;
     display: none; align-items: flex-end; justify-content: center;
@@ -779,6 +799,32 @@
     opacity: 0.45; cursor: not-allowed; animation: none;
     background: linear-gradient(135deg, #5a6a85, #3a4a65); color: #c8d6e5;
   }
+  #deathScreen .ds-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  #deathScreen .ds-buttons .ds-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 15px 8px;
+    font-size: 14.5px;
+    letter-spacing: 3px;
+  }
+  #deathScreen .ds-btn-menu {
+    background: linear-gradient(160deg, rgba(30,45,80,0.95), rgba(15,22,42,0.95));
+    color: #bfe0ff;
+    border: 1px solid rgba(120,180,255,0.4);
+    animation: none;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+    transition: border-color .2s, background .2s, transform .1s;
+  }
+  #deathScreen .ds-btn-menu:hover {
+    border-color: rgba(140,210,255,0.75);
+    background: linear-gradient(160deg, rgba(45,65,110,0.95), rgba(20,30,55,0.95));
+    transform: translateY(-1px);
+  }
+  #deathScreen .ds-btn-menu:active { transform: translateY(0) scale(0.98); }
   .ds-hint {
     font-size: 10px; color: #8a94b0; letter-spacing: 1.2px;
     margin-top: 10px; text-transform: uppercase; font-weight: 600;
@@ -803,7 +849,8 @@
     font-weight: 700; letter-spacing: 1px; color: #bfe8ff;
     z-index: 8; pointer-events: auto; backdrop-filter: blur(4px);
     box-shadow: 0 0 32px rgba(108,204,255,0.40);
-    transition: background .1s, transform .1s;
+    transition: background .1s, transform .1s, opacity .15s;
+    opacity: 0.5;
     user-select: none;
     -webkit-user-select: none;
   }
@@ -811,6 +858,7 @@
   #boostBtn.active {
     background: radial-gradient(circle at 35% 30%, rgba(200,240,255,0.6), rgba(108,204,255,0.35));
     transform: scale(0.94);
+    opacity: 0.7;
   }
   body.touch #boostBtn { display:flex; }
   body.dead #boostBtn { display: none !important; }
@@ -884,7 +932,10 @@
     </div>
     <div class="ds-label">Killed by</div>
     <div class="ds-name" id="dsName">—</div>
-    <button class="ds-btn" id="dsRespawn">RESPAWN</button>
+    <div class="ds-buttons">
+      <button class="ds-btn" id="dsRespawn">RESPAWN</button>
+      <button class="ds-btn ds-btn-menu" id="dsMenu">MENU</button>
+    </div>
     <div class="ds-hint">Drag to explore · Scroll to zoom</div>
   </div>
 </div>
@@ -897,9 +948,6 @@
   <span class="swatch" id="czBtnSwatch" style="background:#6ccfff;"></span>
 </button>
 
-<!-- ═══════════════════════════════════════════════
-     NEUES START MENÜ
-     ═══════════════════════════════════════════════ -->
 <div id="overlay">
   <div class="menu-blob b1"></div>
   <div class="menu-blob b2"></div>
@@ -909,7 +957,6 @@
   <div class="menu-vignette"></div>
 
   <div class="menu-card">
-    <!-- Hero: lebendiger Wurm-Preview -->
     <div class="menu-hero">
       <canvas id="menuWormCanvas" width="960" height="260"></canvas>
     </div>
@@ -917,7 +964,6 @@
     <h1 class="menu-title"><span class="t1">Battle</span><span class="t2">-Worms</span></h1>
     <p class="menu-sub">Slither-Style · Battle Royale</p>
 
-    <!-- Name Input -->
     <div class="menu-name-wrap">
       <label class="menu-name-label" for="menuNameInput">Your name</label>
       <div class="menu-name-input-wrap">
@@ -926,7 +972,6 @@
       </div>
     </div>
 
-    <!-- Stats -->
     <div class="menu-stats">
       <div class="stat">
         <div class="stat-icon">◈</div>
@@ -945,7 +990,6 @@
       </div>
     </div>
 
-    <!-- Play -->
     <button class="menu-play" id="startBtn" type="button">
       <span class="play-icon">▶</span>
       <span class="play-text">PLAY</span>
@@ -981,10 +1025,10 @@
     <div class="cz-section-title">Outline Color</div>
     <div class="cz-preset-colors" id="czOutlineQuick"></div>
     <div class="cz-color-wrap">
-      <input type="color" id="czOutlineInput" value="#0a0e1a">
+      <input type="color" id="czOutlineInput" value="#ffffff">
       <div class="cz-color-preview">
-        <div class="cz-color-dot" id="czOutlineDot" style="background:#0a0e1a;"></div>
-        <div class="cz-color-hex" id="czOutlineHex">#0A0E1A</div>
+        <div class="cz-color-dot" id="czOutlineDot" style="background:#ffffff;"></div>
+        <div class="cz-color-hex" id="czOutlineHex">#FFFFFF</div>
       </div>
     </div>
 
@@ -1049,7 +1093,7 @@ const CFG = {
   collisionRadius: 9,
   radiusGrowth: 0.50,
   radiusMaxFactor: 2.6,
-  maxParticles: 320,
+  maxParticles: 400,
   deathZoomMargin: 200,
   safeSpawnDist: 350,
   botRespawnDelay: 2.0,
@@ -1067,6 +1111,7 @@ const CFG = {
   zoneDmgIntervalShrink: 1.0,
   zoneDmgIntervalFinal: 0.5,
   boostFlashInterval: 0.5,
+  eatAnimationTime: 0.22,
 };
 
 const BOT_NAMES = ['Rex','Blaze','Venom','Storm','Fang','Nyx','Echo','Ghost','Rogue','Titan',
@@ -1093,7 +1138,7 @@ function pickFoodTier() {
 }
 
 // ============================================================
-// PLAYER COLOR / NAME / OUTLINE / BOOST GLOW / BOOST BTN
+// PLAYER COLOR / NAME / OUTLINE / BOOST
 // ============================================================
 const PLAYER_COLOR_KEY = 'battle-worms-color';
 const PLAYER_NAME_KEY = 'battle-worms-name';
@@ -1103,7 +1148,7 @@ const PLAYER_BOOST_POS_KEY = 'battle-worms-boost-pos';
 const PLAYER_BOOST_SIZE_KEY = 'battle-worms-boost-size';
 const DEFAULT_PLAYER_COLOR = '#6ccfff';
 const DEFAULT_PLAYER_NAME = 'You';
-const DEFAULT_PLAYER_OUTLINE = '#0a0e1a';
+const DEFAULT_PLAYER_OUTLINE = '#ffffff';
 const DEFAULT_PLAYER_BOOST_GLOW = '#ffffff';
 const DEFAULT_PLAYER_BOOST_POS = 'left';
 const DEFAULT_PLAYER_BOOST_SIZE = 2.5;
@@ -1121,6 +1166,17 @@ function setPlayerColor(hex, save) {
   if (save) localStorage.setItem(PLAYER_COLOR_KEY, hex);
   const sw = document.getElementById('czBtnSwatch');
   if (sw) sw.style.background = hex;
+
+  // Wenn Body zu dunkel → Outline auf Weiß zwingen
+  const forced = effectiveOutline(playerColor, playerOutline);
+  if (forced !== playerOutline) {
+    playerOutline = forced;
+    if (save) localStorage.setItem(PLAYER_OUTLINE_KEY, forced);
+  }
+  if (state && state.player && state.player.alive) {
+    state.player.color = hex;
+    state.player.outlineColor = forced;
+  }
 }
 function setPlayerName(name, save) {
   name = (name || '').trim().slice(0, 14) || DEFAULT_PLAYER_NAME;
@@ -1135,6 +1191,8 @@ function setPlayerName(name, save) {
   if (state && state.player && state.player.alive) state.player.name = name;
 }
 function setPlayerOutline(hex, save) {
+  // Zu dunkle Umriss-Farben werden abgelehnt → Weiß
+  hex = effectiveOutline(playerColor, hex);
   playerOutline = hex;
   if (save) localStorage.setItem(PLAYER_OUTLINE_KEY, hex);
   if (state && state.player && state.player.alive) state.player.outlineColor = hex;
@@ -1164,7 +1222,7 @@ function setPlayerBoostSize(size, save) {
 }
 
 // ============================================================
-// LEADERBOARD STORAGE (Siege)
+// LEADERBOARD (Siege)
 // ============================================================
 const LEADERBOARD_KEY = 'battle-worms-leaderboard';
 function getLeaderboard() {
@@ -1201,7 +1259,7 @@ const PRESET_WORMS = [
   { name: 'Toxic', color: '#c9ff44' }, { name: 'Magenta', color: '#ff3fc7' },
   { name: 'Cyan', color: '#3fe8ff' }, { name: 'Obsidian', color: '#1a2238' },
 ];
-const QUICK_OUTLINES = ['#0a0e1a','#000000','#2a2a3a','#ffffff','#e0e6f5','#5a1a2a','#1a3a2a','#3a2a1a'];
+const QUICK_OUTLINES = ['#ffffff','#e0e6f5','#c8d6e5','#8ee0ff','#ffd479','#7bffa8','#ff8ba5','#a78bfa'];
 const QUICK_BOOST_GLOWS = ['#ffffff','#ffd479','#8ee0ff','#7bffa8','#ff6ec7','#a78bfa','#ff5577','#5de2c4'];
 
 const MM_RANK_COLORS = ['#ffd479', '#a78bfa', '#7fbfff'];
@@ -1251,9 +1309,32 @@ function hexAlpha(hex, a) {
   const p = parseHex(hex);
   return `rgba(${p.r},${p.g},${p.b},${a})`;
 }
+
+// --- Dunkelheits-Erkennung für Body & Outline ---
+function colorBrightness(hex) {
+  const p = parseHex(hex);
+  return 0.299 * p.r + 0.587 * p.g + 0.114 * p.b; // 0..255
+}
+const MIN_BODY_BRIGHTNESS    = 80;    // Body darunter = "zu dunkel" → Outline Weiß
+const MIN_OUTLINE_BRIGHTNESS = 80;    // Outline darunter = wird abgelehnt
+const FORCED_OUTLINE_LIGHT   = '#ffffff';
+
+function effectiveOutline(bodyColor, outlineColor) {
+  if (!outlineColor) return FORCED_OUTLINE_LIGHT;
+  if (colorBrightness(bodyColor)    < MIN_BODY_BRIGHTNESS)    return FORCED_OUTLINE_LIGHT;
+  if (colorBrightness(outlineColor) < MIN_OUTLINE_BRIGHTNESS) return FORCED_OUTLINE_LIGHT;
+  return outlineColor;
+}
+
 function computeFitZoom() {
   const m = CFG.deathZoomMargin;
   return Math.min(VW / (CFG.worldSize + m), VH / (CFG.worldSize + m));
+}
+function computeZoneFitZoom() {
+  const z = state.zone;
+  const margin = 400;
+  const dx = z.radius * 2 + margin;
+  return Math.min(VW / dx, VH / dx);
 }
 
 // ============================================================
@@ -1491,6 +1572,8 @@ function makeFood(x, y, forcedColor, opts) {
     shakeAmp: rand(0.4, 1.2) * (r * 0.14),
     shakeSpeed: rand(2, 3.6),
     pulseSpeed: rand(1.4, 2.6),
+    eating: null,
+    _scale: 1,
   };
 }
 function randomFood() { return makeFood(Math.random() * CFG.worldSize, Math.random() * CFG.worldSize); }
@@ -1636,7 +1719,7 @@ function createMatch() {
     mmPrev: [],
     mmFadeT: 1,
     mmElapsed: CFG.mmUpdateInterval,
-    matchOver: false, paused: false,
+    matchOver: false, paused: false, menuMode: false,
   };
 }
 
@@ -1675,6 +1758,7 @@ function botAI(worm, dt) {
 
     let nearestFood = null, nfd2 = Infinity;
     forEachFoodNear(head.x, head.y, 350, f => {
+      if (f.eating) return;
       const dx = f.x - head.x, dy = f.y - head.y;
       const d2 = dx * dx + dy * dy;
       if (d2 < nfd2) { nfd2 = d2; nearestFood = f; }
@@ -1764,6 +1848,7 @@ function scoreDirection(worm, ang, nearby, nearestFood, nearestFoodD) {
   const foodReach = lookAhead * 1.4;
   forEachFoodNear(head.x, head.y, foodReach + 40, f => {
     if (f === nearestFood) return;
+    if (f.eating) return;
     const rx = f.x - head.x, ry = f.y - head.y;
     const proj = rx * dx + ry * dy;
     if (proj < 0 || proj > foodReach) return;
@@ -1902,6 +1987,7 @@ function update(dt) {
     checkCollisions();
   }
   checkFood();
+  updateFoods(dt);
   updateParticles(dt);
 
   if (state.foods.length < CFG.food) {
@@ -2012,31 +2098,69 @@ function checkCollisions() {
   }
 }
 
+// ============================================================
+// FOOD PICKUP (with smooth eat animation)
+// ============================================================
 function checkFood() {
-  const eaten = new Set();
   for (const worm of state.worms) {
     if (!worm.alive) continue;
     const h = worm.head;
     const eatR = wormHeadRadius(worm) + 4;
     forEachFoodNear(h.x, h.y, eatR + 30, f => {
-      if (eaten.has(f)) return;
+      if (f.eating) return;
       const dx = f.x - h.x, dy = f.y - h.y;
       const rr = eatR + f.baseR;
       if (dx * dx + dy * dy < rr * rr) {
-        eaten.add(f);
+        // Start smooth eat animation
+        f.eating = { worm, t: 0, sx: f.x, sy: f.y };
         worm.grow(f.grow);
-        const n = 2 + Math.min(6, Math.ceil(f.grow));
-        for (let k = 0; k < n; k++) {
+        // Sparkle at pickup point
+        for (let k = 0; k < 3; k++) {
           const ang = Math.random() * Math.PI * 2;
-          const sp = rand(0.5, 2);
-          spawnParticle(h.x, h.y, f.color, Math.cos(ang) * sp, Math.sin(ang) * sp,
-            rand(0.3, 0.6), rand(1.5, 2.8), 0.85);
+          const sp = rand(0.4, 1.3);
+          spawnParticle(f.x, f.y, f.color,
+            Math.cos(ang) * sp, Math.sin(ang) * sp,
+            rand(0.25, 0.5), rand(1.1, 2.0), 0.85);
         }
       }
     });
   }
-  if (eaten.size > 0) {
-    state.foods = state.foods.filter(f => !eaten.has(f));
+}
+
+function updateFoods(dt) {
+  const arr = state.foods;
+  const eatTime = CFG.eatAnimationTime;
+  for (let i = arr.length - 1; i >= 0; i--) {
+    const f = arr[i];
+    if (!f.eating) { f._scale = 1; continue; }
+    const e = f.eating;
+    e.t += dt;
+    const p = Math.min(1, e.t / eatTime);
+    // smoothstep easing
+    const ease = p * p * (3 - 2 * p);
+    const target = e.worm && e.worm.alive ? e.worm.head : null;
+    if (target) {
+      f.x = e.sx + (target.x - e.sx) * ease;
+      f.y = e.sy + (target.y - e.sy) * ease;
+    }
+    f._scale = 1 - ease;
+    // Trail sparkles as it flies
+    if (p < 1 && Math.random() < 0.6) {
+      spawnParticle(f.x, f.y, f.color,
+        rand(-0.5, 0.5), rand(-0.5, 0.5),
+        rand(0.18, 0.35), rand(0.9, 1.6), 0.82);
+    }
+    if (p >= 1) {
+      // Tiny pop at end
+      for (let k = 0; k < 4; k++) {
+        const ang = Math.random() * Math.PI * 2;
+        const sp = rand(0.3, 1.1);
+        spawnParticle(f.x, f.y, f.color,
+          Math.cos(ang) * sp, Math.sin(ang) * sp,
+          rand(0.18, 0.35), rand(1.0, 1.8), 0.85);
+      }
+      arr.splice(i, 1);
+    }
   }
 }
 
@@ -2195,6 +2319,7 @@ function hideVictoryBanner() { victoryBannerEl.classList.remove('on'); }
 const deathScreenEl = document.getElementById('deathScreen');
 const dsNameEl = document.getElementById('dsName');
 const dsRespawnBtn = document.getElementById('dsRespawn');
+const dsMenuBtn = document.getElementById('dsMenu');
 const dsNameInput = document.getElementById('dsNameInput');
 
 function showDeathScreen() {
@@ -2209,6 +2334,12 @@ function showDeathScreen() {
   dsNameEl.style.color = color;
   dsNameEl.style.textShadow = `0 0 30px ${hexAlpha(color, 0.7)}, 0 0 8px ${hexAlpha(color, 0.5)}`;
   dsNameInput.value = playerName;
+
+  // Hide respawn button if respawn is closed
+  const respawnOpen = !state.intermission &&
+    (state.roundElapsed < CFG.respawnUntil || state.zoneRegrowing);
+  dsRespawnBtn.style.display = respawnOpen ? '' : 'none';
+
   deathScreenEl.classList.add('on');
   document.body.classList.add('dead');
   resetInputState();
@@ -2222,8 +2353,12 @@ dsRespawnBtn.addEventListener('click', () => {
   if (!state || state.matchOver) return;
   if (state.intermission) return;
   if (state.player.alive) return;
-  if (state.roundElapsed >= CFG.respawnUntil) return;
+  if (state.roundElapsed >= CFG.respawnUntil && !state.zoneRegrowing) return;
   respawnPlayer();
+});
+
+dsMenuBtn.addEventListener('click', () => {
+  goToMenuFromDeath();
 });
 
 dsNameInput.addEventListener('input', e => {
@@ -2235,12 +2370,38 @@ dsNameInput.addEventListener('blur', () => {
   const v = (dsNameInput.value || '').trim() || DEFAULT_PLAYER_NAME;
   dsNameInput.value = v;
   setPlayerName(v, true);
+  updateMenuWinStat();
 });
 dsNameInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); dsNameInput.blur(); }
 });
 dsNameInput.addEventListener('click', e => e.stopPropagation());
 dsNameInput.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+
+// ============================================================
+// RETURN TO MENU (from death)
+// ============================================================
+function goToMenuFromDeath() {
+  if (!state) return;
+  state.paused = true;
+  state.menuMode = true;
+  state.camera.targetZoom = computeZoneFitZoom();
+  state.camera.freeCamActive = true;
+
+  document.body.classList.add('in-menu');
+  const overlay = document.getElementById('overlay');
+  overlay.classList.remove('hidden');
+  overlay.classList.add('from-death');
+  hideDeathScreen();
+  resetInputState();
+
+  // Sync menu UI
+  updateMenuWinStat();
+  const menuNameInput = document.getElementById('menuNameInput');
+  if (menuNameInput && menuNameInput.value !== playerName) {
+    menuNameInput.value = playerName;
+  }
+}
 
 // ============================================================
 // RENDER
@@ -2327,299 +2488,300 @@ function drawZone(cam, visW, visH, zoom) {
   ctx.lineWidth = 1.5 / zoom; ctx.stroke();
 }
 
-function drawFood(cam, visW, visH) {
-  const t = state.time;
-  const halfW = visW / 2 + 30, halfH = visH / 2 + 30;
-  const radius = Math.max(halfW, halfH);
-  forEachFoodNear(cam.x, cam.y, radius, f => {
-    if (f.x < cam.x - halfW || f.x > cam.x + halfW) return;
-    if (f.y < cam.y - halfH || f.y > cam.y + halfH) return;
-    const sx = Math.sin(t * f.shakeSpeed + f.phase) * f.shakeAmp;
-    const sy = Math.cos(t * f.shakeSpeed * 1.27 + f.phase) * f.shakeAmp;
-    const pulse = 1 + Math.sin(t * f.pulseSpeed + f.phase) * 0.14;
-    const r = f.baseR * pulse;
-    const px = f.x + sx, py = f.y + sy;
-    ctx.fillStyle = hexAlpha(f.color, 0.20);
-    ctx.beginPath(); ctx.arc(px, py, r + 2 + f.glow * 1.6, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = hexAlpha(f.color, 0.42);
-    ctx.beginPath(); ctx.arc(px, py, r + 1.2, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = f.color;
-    ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    ctx.beginPath(); ctx.arc(px - r * 0.35, py - r * 0.35, r * 0.35, 0, Math.PI * 2); ctx.fill();
-    if (f.ring > 0) {
-      ctx.strokeStyle = hexAlpha(f.color, 0.55); ctx.lineWidth = 1.2;
-      for (let i = 1; i <= f.ring; i++) {
-        const rr = r + i * 3.2 + Math.sin(t * 3 + f.phase + i) * 0.8;
-        ctx.beginPath(); ctx.arc(px, py, rr, 0, Math.PI * 2); ctx.stroke();
-      }
-    }
-  });
-}
-
 // ============================================================
-// WORM RENDER — 12 Schichten, Bézier-Kurve, Schuppen, Augen
+// FOOD RENDERING — layered glass/candy look + smooth pickup
 // ============================================================
-function drawWorm(worm, isPlayer, zoom) {
-  const segs = worm.segments;
-  if (segs.length < 2) return;
+function drawFoodOrb(px, py, r, color, glow, ring, phase, time) {
+  if (r <= 0.15) return;
 
-  const h = segs[0], N = segs.length;
-  const bodyR = wormBodyRadius(worm);
-  const headR = wormHeadRadius(worm);
-  const outlineColor = worm.outlineColor || '#0a0e1a';
-  const outlineW = CFG.outlineWidth;
+  const isBig = r > 2.5;
 
-  const outsideFlash = worm.outside ? 0.5 + 0.5 * Math.sin(state.time * 20) : 0;
-  const bodyColor = worm.outside
-    ? mixColors(worm.color, '#ff2040', outsideFlash * 0.85)
-    : worm.color;
+  // [1] Outer soft glow halo
+  const glowR = r + 3 + glow * 2.2;
+  const outerGlow = ctx.createRadialGradient(px, py, r * 0.4, px, py, glowR);
+  outerGlow.addColorStop(0, hexAlpha(color, 0.55));
+  outerGlow.addColorStop(0.45, hexAlpha(color, 0.20));
+  outerGlow.addColorStop(1, hexAlpha(color, 0));
+  ctx.fillStyle = outerGlow;
+  ctx.beginPath();
+  ctx.arc(px, py, glowR, 0, Math.PI * 2);
+  ctx.fill();
 
-  const cVoid       = mixColors(bodyColor, '#000000', 0.78);
-  const cShadow     = mixColors(bodyColor, '#000000', 0.52);
-  const cShade      = mixColors(bodyColor, '#000000', 0.28);
-  const cBase       = bodyColor;
-  const cLight      = mixColors(bodyColor, '#ffffff', 0.28);
-  const cHighlight  = mixColors(bodyColor, '#ffffff', 0.58);
-  const cSpecular   = mixColors(bodyColor, '#ffffff', 0.85);
-  const cShine      = mixColors(bodyColor, '#ffffff', 0.98);
+  // [2] Solid orb body
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(px, py, r, 0, Math.PI * 2);
+  ctx.fill();
 
-  const path = new Path2D();
-  path.moveTo(segs[0].x, segs[0].y);
-  if (N >= 3) {
-    for (let i = 1; i < N - 1; i++) {
-      const xc = (segs[i].x + segs[i + 1].x) * 0.5;
-      const yc = (segs[i].y + segs[i + 1].y) * 0.5;
-      path.quadraticCurveTo(segs[i].x, segs[i].y, xc, yc);
-    }
-    path.lineTo(segs[N - 1].x, segs[N - 1].y);
-  } else {
-    path.lineTo(segs[N - 1].x, segs[N - 1].y);
-  }
-
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-
-  if (worm.boosting && worm.alive) {
-    const flashRaw = 0.5 + 0.5 * Math.sin(state.time * Math.PI * 2 / CFG.boostFlashInterval);
-    const flashAmt = Math.pow(flashRaw, 4);
-    const bc = worm.boostGlow || '#ffffff';
-    ctx.strokeStyle = hexAlpha(bc, 0.20 + 0.55 * flashAmt);
-    ctx.lineWidth = bodyR * 2 + outlineW * 2 + 10 + 22 * flashAmt;
-    ctx.stroke(path);
+  // [3] Inner shading
+  if (isBig) {
+    const bodyGrad = ctx.createRadialGradient(
+      px - r * 0.42, py - r * 0.48, r * 0.06,
+      px, py, r * 1.08
+    );
+    bodyGrad.addColorStop(0, hexAlpha(mixColors(color, '#ffffff', 0.85), 0.95));
+    bodyGrad.addColorStop(0.35, hexAlpha(mixColors(color, '#ffffff', 0.30), 0.4));
+    bodyGrad.addColorStop(0.7, 'rgba(0,0,0,0)');
+    bodyGrad.addColorStop(1, hexAlpha(mixColors(color, '#000000', 0.60), 0.55));
+    ctx.fillStyle = bodyGrad;
     ctx.beginPath();
-    ctx.arc(h.x, h.y, headR + outlineW + 8 + 15 * flashAmt, 0, Math.PI * 2);
-    ctx.fillStyle = hexAlpha(bc, 0.12 + 0.5 * flashAmt);
+    ctx.arc(px, py, r, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  ctx.save();
-  ctx.translate(bodyR * 0.16, bodyR * 0.32);
-  ctx.strokeStyle = 'rgba(0,0,0,0.30)';
-  ctx.lineWidth = bodyR * 2 + outlineW * 2 + 2;
-  ctx.stroke(path);
-  ctx.beginPath();
-  ctx.arc(h.x + bodyR * 0.16, h.y + bodyR * 0.32, headR + outlineW + 1, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(0,0,0,0.30)';
-  ctx.fill();
-  ctx.restore();
-
-  ctx.strokeStyle = outlineColor;
-  ctx.lineWidth = bodyR * 2 + outlineW * 2 + 2.5;
-  ctx.stroke(path);
-
-  ctx.save();
-  ctx.translate(bodyR * 0.14, bodyR * 0.24);
-  ctx.strokeStyle = cVoid;
-  ctx.lineWidth = bodyR * 2 + outlineW * 1.6;
-  ctx.stroke(path);
-  ctx.restore();
-
-  ctx.save();
-  ctx.translate(bodyR * 0.06, bodyR * 0.12);
-  ctx.strokeStyle = cShadow;
-  ctx.lineWidth = bodyR * 2 + outlineW * 0.9;
-  ctx.stroke(path);
-  ctx.restore();
-
-  ctx.strokeStyle = cShade;
-  ctx.lineWidth = bodyR * 2 + outlineW * 0.4;
-  ctx.stroke(path);
-
-  ctx.strokeStyle = cBase;
-  ctx.lineWidth = bodyR * 2 - outlineW * 0.4;
-  ctx.stroke(path);
-
-  if (zoom > 0.30 && N > 10) {
-    const scaleStep = Math.max(3, Math.floor(N / 55));
-    const arcPath = new Path2D();
-    for (let i = scaleStep; i < N - 1; i += scaleStep) {
-      const s = segs[i];
-      const prev = segs[Math.max(0, i - 2)];
-      const next = segs[Math.min(N - 1, i + 1)];
-      let dx = next.x - prev.x;
-      let dy = next.y - prev.y;
-      const dl = Math.hypot(dx, dy) || 1;
-      dx /= dl; dy /= dl;
-      const px = -dy, py = dx;
-      const r = bodyR * 0.94;
-      const x0 = s.x + px * r;
-      const y0 = s.y + py * r;
-      const x1 = s.x - px * r;
-      const y1 = s.y - py * r;
-      const bulge = r * 0.25;
-      const cx = (x0 + x1) * 0.5 - dx * bulge;
-      const cy = (y0 + y1) * 0.5 - dy * bulge;
-      arcPath.moveTo(x0, y0);
-      arcPath.quadraticCurveTo(cx, cy, x1, y1);
-    }
-    ctx.save();
-    ctx.strokeStyle = hexAlpha(cShadow, 0.55);
-    ctx.lineWidth = Math.max(1.0, bodyR * 0.12);
-    ctx.lineCap = 'round';
-    ctx.stroke(arcPath);
-    ctx.restore();
-    ctx.save();
-    ctx.translate(0, -bodyR * 0.10);
-    ctx.strokeStyle = hexAlpha(cHighlight, 0.30);
-    ctx.lineWidth = Math.max(0.8, bodyR * 0.07);
-    ctx.stroke(arcPath);
-    ctx.restore();
-  }
-
-  ctx.save();
-  ctx.translate(0, bodyR * 0.42);
-  ctx.strokeStyle = hexAlpha(cLight, 0.35);
-  ctx.lineWidth = bodyR * 0.55;
-  ctx.stroke(path);
-  ctx.restore();
-
-  ctx.save();
-  ctx.translate(-bodyR * 0.10, -bodyR * 0.22);
-  ctx.strokeStyle = hexAlpha(cLight, 0.62);
-  ctx.lineWidth = bodyR * 1.10;
-  ctx.stroke(path);
-  ctx.restore();
-
-  ctx.save();
-  ctx.translate(-bodyR * 0.20, -bodyR * 0.38);
-  ctx.strokeStyle = hexAlpha(cHighlight, 0.85);
-  ctx.lineWidth = bodyR * 0.50;
-  ctx.stroke(path);
-  ctx.restore();
-
-  ctx.save();
-  ctx.translate(-bodyR * 0.28, -bodyR * 0.50);
-  ctx.strokeStyle = hexAlpha(cSpecular, 0.92);
-  ctx.lineWidth = Math.max(1.0, bodyR * 0.16);
-  ctx.stroke(path);
-  ctx.restore();
-
-  // Head
-  ctx.beginPath();
-  ctx.arc(h.x, h.y, headR + outlineW + 1.4, 0, Math.PI * 2);
-  ctx.fillStyle = outlineColor;
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(h.x, h.y, headR + outlineW * 0.55, 0, Math.PI * 2);
-  ctx.fillStyle = cShadow;
-  ctx.fill();
-
-  const headGrad = ctx.createRadialGradient(
-    h.x - headR * 0.42, h.y - headR * 0.48, headR * 0.08,
-    h.x, h.y, headR * 1.15
+  // [4] Specular highlight
+  const specR = r * 0.55;
+  const specGrad = ctx.createRadialGradient(
+    px - r * 0.32, py - r * 0.38, 0,
+    px - r * 0.32, py - r * 0.38, specR
   );
-  headGrad.addColorStop(0, cShine);
-  headGrad.addColorStop(0.20, mixColors(bodyColor, '#ffffff', 0.55));
-  headGrad.addColorStop(0.55, bodyColor);
-  headGrad.addColorStop(1, cShadow);
+  specGrad.addColorStop(0, 'rgba(255,255,255,0.98)');
+  specGrad.addColorStop(0.5, 'rgba(255,255,255,0.4)');
+  specGrad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = specGrad;
   ctx.beginPath();
-  ctx.arc(h.x, h.y, headR, 0, Math.PI * 2);
-  ctx.fillStyle = headGrad;
+  ctx.arc(px - r * 0.32, py - r * 0.38, specR, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.beginPath();
-  ctx.arc(h.x - headR * 0.38, h.y - headR * 0.44, headR * 0.34, 0, Math.PI * 2);
-  ctx.fillStyle = hexAlpha(cSpecular, 0.55);
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(h.x, h.y + headR * 0.35, headR * 0.55, 0, Math.PI);
-  ctx.fillStyle = hexAlpha(cShadow, 0.35);
-  ctx.fill();
-
-  // Eyes
-  const eyeBack = headR * 0.20, eyeSide = headR * 0.62;
-  const eyeR = headR * 0.48, pupilR = eyeR * 0.55, irisR = eyeR * 0.72;
-  const perp = worm.angle + Math.PI / 2;
-  const irisColor = mixColors(bodyColor, '#000000', 0.55);
-  const irisRim   = mixColors(bodyColor, '#ffffff', 0.15);
-
-  for (const sgn of [-1, 1]) {
-    const ex = h.x + Math.cos(worm.angle) * eyeBack + Math.cos(perp) * eyeSide * sgn;
-    const ey = h.y + Math.sin(worm.angle) * eyeBack + Math.sin(perp) * eyeSide * sgn;
-
+  // [5] Pin highlight
+  if (r > 1.3) {
+    ctx.fillStyle = 'rgba(255,255,255,0.99)';
     ctx.beginPath();
-    ctx.arc(ex, ey, eyeR + 1.8, 0, Math.PI * 2);
-    ctx.fillStyle = outlineColor;
+    ctx.arc(px - r * 0.42, py - r * 0.45, Math.max(0.55, r * 0.14), 0, Math.PI * 2);
     ctx.fill();
+  }
 
-    const scleraGrad = ctx.createRadialGradient(
-      ex - eyeR * 0.35, ey - eyeR * 0.35, eyeR * 0.05,
-      ex, ey, eyeR
-    );
-    scleraGrad.addColorStop(0, '#ffffff');
-    scleraGrad.addColorStop(0.6, '#f0f4ff');
-    scleraGrad.addColorStop(1, '#cfd8e8');
+  // [6] Rim light
+  if (isBig) {
+    ctx.strokeStyle = hexAlpha(mixColors(color, '#ffffff', 0.55), 0.55);
+    ctx.lineWidth = Math.max(0.7, r * 0.10);
     ctx.beginPath();
-    ctx.arc(ex, ey, eyeR, 0, Math.PI * 2);
-    ctx.fillStyle = scleraGrad;
-    ctx.fill();
-
-    const px = ex + Math.cos(worm.angle) * eyeR * 0.30;
-    const py = ey + Math.sin(worm.angle) * eyeR * 0.30;
-
-    const irisGrad = ctx.createRadialGradient(
-      px - irisR * 0.22, py - irisR * 0.22, irisR * 0.08,
-      px, py, irisR
-    );
-    irisGrad.addColorStop(0, irisRim);
-    irisGrad.addColorStop(0.55, irisColor);
-    irisGrad.addColorStop(1, mixColors(irisColor, '#000000', 0.4));
-    ctx.beginPath();
-    ctx.arc(px, py, irisR, 0, Math.PI * 2);
-    ctx.fillStyle = irisGrad;
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(px, py, pupilR, 0, Math.PI * 2);
-    ctx.fillStyle = '#07080f';
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(px - pupilR * 0.48, py - pupilR * 0.48, pupilR * 0.50, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.98)';
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(px + pupilR * 0.38, py + pupilR * 0.38, pupilR * 0.22, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(px + irisR * 0.42, py - irisR * 0.42, irisR * 0.13, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.75)';
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(ex, ey, eyeR * 0.98, Math.PI * 1.12, Math.PI * 1.88);
-    ctx.strokeStyle = hexAlpha(outlineColor, 0.55);
-    ctx.lineWidth = Math.max(1.2, eyeR * 0.15);
-    ctx.lineCap = 'round';
+    ctx.arc(px, py, r * 0.86, Math.PI * 0.10, Math.PI * 0.90);
     ctx.stroke();
   }
 
+  // [7] Concentric rings
+  if (ring > 0) {
+    for (let i = 1; i <= ring; i++) {
+      const rr = r + i * 3.6 + Math.sin(time * 2.4 + phase + i * 1.1) * 0.9;
+      const ringAlpha = 0.55 - i * 0.12;
+      if (ringAlpha <= 0) continue;
+      ctx.strokeStyle = hexAlpha(color, ringAlpha);
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.arc(px, py, rr, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+}
+
+function drawFood(cam, visW, visH) {
+  const t = state.time;
+  const halfW = visW / 2 + 40, halfH = visH / 2 + 40;
+  const radius = Math.max(halfW, halfH);
+
+  // Pass 1: normal orbs
+  forEachFoodNear(cam.x, cam.y, radius, f => {
+    if (f.x < cam.x - halfW || f.x > cam.x + halfW) return;
+    if (f.y < cam.y - halfH || f.y > cam.y + halfH) return;
+    if (f.eating) return;
+
+    const sx = Math.sin(t * f.shakeSpeed + f.phase) * f.shakeAmp;
+    const sy = Math.cos(t * f.shakeSpeed * 1.27 + f.phase) * f.shakeAmp;
+    const pulse = 1 + Math.sin(t * f.pulseSpeed + f.phase) * 0.12;
+    const r = f.baseR * pulse;
+    const px = f.x + sx, py = f.y + sy;
+
+    drawFoodOrb(px, py, r, f.color, f.glow, f.ring, f.phase, t);
+  });
+
+  // Pass 2: eating orbs
+  for (let i = 0; i < state.foods.length; i++) {
+    const f = state.foods[i];
+    if (!f.eating) continue;
+    if (f.x < cam.x - halfW || f.x > cam.x + halfW) continue;
+    if (f.y < cam.y - halfH || f.y > cam.y + halfH) continue;
+    const scale = Math.max(0, f._scale);
+    if (scale < 0.02) continue;
+    const pulse = 1 + Math.sin(t * f.pulseSpeed + f.phase) * 0.08;
+    const r = f.baseR * pulse * scale;
+    const eatBright = 1 + (1 - scale) * 0.6;
+    drawFoodOrb(f.x, f.y, r, f.color, f.glow * eatBright, 0, f.phase, t);
+  }
+}
+
+// ============================================================
+// WORM RENDERING — Stacked 3D beads with googly eyes
+// ============================================================
+
+const BEAD_ACCENT = '#f5f5f8';
+
+function beadStepFor(bodyR) {
+  // Physikalischer Abstand der Perlen ≈ 1.55 * Radius
+  return Math.max(2, Math.round((bodyR * 1.55) / CFG.segSpacing));
+}
+
+function drawBead(c, x, y, r, color, outlineColor, zoom) {
+  const screenR = r * (zoom || 1);
+
+  // Für kleine Perlen (weit weg) nur flacher Kreis – Performance
+  if (screenR < 5) {
+    c.beginPath();
+    c.arc(x, y, r + 1.0, 0, Math.PI * 2);
+    c.fillStyle = outlineColor;
+    c.fill();
+    c.beginPath();
+    c.arc(x, y, r, 0, Math.PI * 2);
+    c.fillStyle = color;
+    c.fill();
+    return;
+  }
+
+  // Dunkler Außenrand
+  c.beginPath();
+  c.arc(x, y, r + 1.2, 0, Math.PI * 2);
+  c.fillStyle = outlineColor;
+  c.fill();
+
+  // 3D-Kugel mit Radialverlauf (Licht von oben links)
+  const light = mixColors(color, '#ffffff', 0.78);
+  const dark  = mixColors(color, '#000000', 0.50);
+
+  const grad = c.createRadialGradient(
+    x - r * 0.38, y - r * 0.42, r * 0.05,
+    x + r * 0.05, y + r * 0.12, r * 1.15
+  );
+  grad.addColorStop(0,    light);
+  grad.addColorStop(0.50, color);
+  grad.addColorStop(1,    dark);
+
+  c.beginPath();
+  c.arc(x, y, r, 0, Math.PI * 2);
+  c.fillStyle = grad;
+  c.fill();
+
+  // Specular Highlight
+  if (screenR > 6) {
+    c.beginPath();
+    c.arc(x - r * 0.34, y - r * 0.40, r * 0.22, 0, Math.PI * 2);
+    c.fillStyle = 'rgba(255,255,255,0.85)';
+    c.fill();
+  }
+}
+
+function drawGooglyEyes(c, hx, hy, headR, angle, outlineColor) {
+  const perp = angle + Math.PI / 2;
+  const eyeBack = headR * 0.16;
+  const eyeSide = headR * 0.52;
+  const eyeR    = headR * 0.42;
+  const pupilR  = eyeR * 0.58;
+
+  for (const sgn of [-1, 1]) {
+    const ex = hx + Math.cos(angle) * eyeBack + Math.cos(perp) * eyeSide * sgn;
+    const ey = hy + Math.sin(angle) * eyeBack + Math.sin(perp) * eyeSide * sgn;
+
+    // Augenumriss
+    c.beginPath();
+    c.arc(ex, ey, eyeR + 1.4, 0, Math.PI * 2);
+    c.fillStyle = outlineColor;
+    c.fill();
+
+    // Weiße Augapfel-Kugel
+    c.beginPath();
+    c.arc(ex, ey, eyeR, 0, Math.PI * 2);
+    c.fillStyle = '#ffffff';
+    c.fill();
+
+    // Pupille (schaut nach vorne)
+    const px = ex + Math.cos(angle) * eyeR * 0.28;
+    const py = ey + Math.sin(angle) * eyeR * 0.28;
+    c.beginPath();
+    c.arc(px, py, pupilR, 0, Math.PI * 2);
+    c.fillStyle = '#080812';
+    c.fill();
+
+    // Großer Glanzpunkt
+    c.beginPath();
+    c.arc(px - pupilR * 0.42, py - pupilR * 0.42, pupilR * 0.40, 0, Math.PI * 2);
+    c.fillStyle = 'rgba(255,255,255,0.98)';
+    c.fill();
+
+    // Kleiner Sekundär-Glanz
+    c.beginPath();
+    c.arc(px + pupilR * 0.35, py + pupilR * 0.35, pupilR * 0.18, 0, Math.PI * 2);
+    c.fillStyle = 'rgba(255,255,255,0.65)';
+    c.fill();
+  }
+}
+
+function drawWorm(worm, isPlayer bead, zoom) {
+  const segs = worm.segments;
+  const N = segs.length;
+  if (N < 1) return;
+
+  const bodyR = wormBodyRadius(worm);
+  const headR = wormHeadRadius(worm);
+  const outlineColor = worm.outlineColor || '#0a0e1a';
+  const isBoosting = worm.boosting && worm.alive;
+
+  // Zone-Out-Flash
+  const outsideFlash = worm.outside ? 0.5 + 0.5 * Math.sin(state.time * 20) : 0;
+  const baseColor = worm.outside
+    ? mixColors(worm.color, '#ff2040', outsideFlash * 0.85)
+    : worm.color;
+  const accentColor = wormIdxs.outside
+    ?[ mixColors(BEAD_ACCENT, '#beff2040', outsideFlash * ad0.85)
+    : BEAD_ACCENT;
+
+  // Boost-Glow als Halo hinter den Perlen
+  if (isBoosting && zoom > 0.2) {
+    const flashRaw = 0.5 + 0.5 * Math.sin(state.time * Math.PI * 2 / CFG.boostFlashInterval);
+    const flashAmt = Math.pow(flashRaw, 3);
+    const bc = worm.boostGlow || '#ffffff';
+
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(segs[0].x, segs[0].y);
+    for (let i = 1; i < N; i++) ctx.lineTo(segs[i].x, segs[i].y);
+    ctx.strokeStyle = hexAlpha(bc, 0.18 + 0.42 * flashAmt);
+    ctx.lineWidth = bodyR * 2 + 14 + 18 * flashAmt;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  const beadStep = beadStepFor(bodyR);
+
+  // Perlen-Positionen (Kopf = Index 0 wird separat gezeichnet)
+  const beadIdxs = [];
+  for (let i = beadStep; i < N; i += beadStep) beadIdxs.push(i);
+  if (N - 1 >= beadStep && (beadIdxs.length === 0 || beadIdxs[beadIdxs.length - 1] !== N - 1)) {
+    const last =Idxs.length - 1];
+    if (last === undefined || N - 1 - last >= beadStep * 0.5) beadIdxs.push(N - 1);
+  }
+
+  // Von Schwanz zu Kopf zeichnen (Kopf überdeckt)
+  for (let k = beadIdxs.length - 1; k >= 0; k--) {
+    const i = beadIdxs[k];
+    const s = segs[i];
+    const beadIdx = Math.round(i / beadStep);
+    const color = (beadIdx % 4 === 3) ? accentColor : baseColor;
+    drawBead(ctx, s.x, s.y, bodyR, color, outlineColor, zoom);
+  }
+
+  // Kopf-Perl
+  const h = segs[0];
+  drawBead(ctx, h.x, h.y, headR, baseColor, outlineColor, zoom);
+
+  // Augen
+  if (zoom > 0.25) {
+    drawGooglyEyes(ctx, h.x, h.y, headR, worm.angle, outlineColor);
+  }
+
+  // Namens-Label (nur Bots)
   if (!isPlayer && zoom > 0.32) {
-    const labelY = h.y - headR - 7;
+    const labelY = h.y - headR - 8;
     const fs = Math.max(10, 11 / Math.sqrt(zoom));
     ctx.font = `bold ${fs}px system-ui`;
     ctx.textAlign = 'center';
@@ -2739,24 +2901,39 @@ function drawMinimap() {
 function drawJoystick() {
   if (!IS_TOUCH || !input.joyActive) return;
   if (deathScreenEl.classList.contains('on')) return;
+
+  const JOY_ALPHA = 0.25; // 75% Transparenz
+
+  ctx.save();
+  ctx.globalAlpha = JOY_ALPHA;
+
   const bx = input.joyBaseX, by = input.joyBaseY, R = input.joyRadius;
+
+  // Äußerer Ring – Basis
   const grd = ctx.createRadialGradient(bx, by, R * 0.3, bx, by, R);
   grd.addColorStop(0, 'rgba(120,200,255,0.02)');
   grd.addColorStop(1, 'rgba(120,200,255,0.10)');
   ctx.fillStyle = grd;
   ctx.beginPath(); ctx.arc(bx, by, R, 0, Math.PI * 2); ctx.fill();
+
   ctx.strokeStyle = 'rgba(140,210,255,0.6)'; ctx.lineWidth = 2;
   ctx.beginPath(); ctx.arc(bx, by, R, 0, Math.PI * 2); ctx.stroke();
+
+  // Stick
   const dx = input.joyX - bx, dy = input.joyY - by;
   const d = Math.hypot(dx, dy);
   let sx = dx, sy = dy;
   if (d > R) { sx = dx / d * R; sy = dy / d * R; }
+
   const sg = ctx.createRadialGradient(bx + sx - 6, by + sy - 6, 2, bx + sx, by + sy, R * 0.45);
   sg.addColorStop(0, 'rgba(220,245,255,0.95)');
   sg.addColorStop(1, 'rgba(108,204,255,0.55)');
   ctx.fillStyle = sg;
   ctx.beginPath(); ctx.arc(bx + sx, by + sy, R * 0.42, 0, Math.PI * 2); ctx.fill();
+
   ctx.strokeStyle = 'rgba(220,245,255,0.95)'; ctx.lineWidth = 2; ctx.stroke();
+
+  ctx.restore();
 }
 
 // ============================================================
@@ -2907,8 +3084,12 @@ canvas.addEventListener('wheel', e => {
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 
 window.addEventListener('keydown', e => {
-  if (e.code === 'Space' && !document.body.classList.contains('dead')) {
-    input.boost = true; e.preventDefault();
+  if (e.code === 'Space') {
+    const tag = (document.activeElement && document.activeElement.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (!document.body.classList.contains('dead')) {
+      input.boost = true; e.preventDefault();
+    }
   }
 });
 window.addEventListener('keyup', e => {
@@ -3050,14 +3231,21 @@ PRESET_WORMS.forEach(preset => {
   el.className = 'cz-preset';
   el.style.background = preset.color;
   el.dataset.color = preset.color;
-  el.addEventListener('click', () => { czTempColor = preset.color; updateCzUI(); });
+  el.addEventListener('click', () => {
+    czTempColor = preset.color;
+    czTempOutline = effectiveOutline(czTempColor, czTempOutline);
+    updateCzUI();
+  });
   czPresets.appendChild(el);
 });
 QUICK_OUTLINES.forEach(c => {
   const el = document.createElement('button');
   el.className = 'cz-quick-color';
   el.style.background = c;
-  el.addEventListener('click', () => { czTempOutline = c; updateCzUI(); });
+  el.addEventListener('click', () => {
+    czTempOutline = effectiveOutline(czTempColor, c);
+    updateCzUI();
+  });
   czOutlineQuick.appendChild(el);
 });
 QUICK_BOOST_GLOWS.forEach(c => {
@@ -3069,6 +3257,10 @@ QUICK_BOOST_GLOWS.forEach(c => {
 });
 
 function updateCzUI() {
+  // Sicherheitsnetz: Outline immer gültig halten
+  const sanitizedOutline = effectiveOutline(czTempColor, czTempOutline);
+  if (sanitizedOutline !== czTempOutline) czTempOutline = sanitizedOutline;
+
   [...czPresets.children].forEach(el => {
     el.classList.toggle('selected', el.dataset.color.toLowerCase() === czTempColor.toLowerCase());
   });
@@ -3101,8 +3293,20 @@ function updateCzUI() {
 
   if (czNameInput && czNameInput.value !== czTempName) czNameInput.value = czTempName;
 }
-czColorInput.addEventListener('input', e => { czTempColor = e.target.value; updateCzUI(); });
-czOutlineInput.addEventListener('input', e => { czTempOutline = e.target.value; updateCzUI(); });
+czColorInput.addEventListener('input', e => {
+  czTempColor = e.target.value;
+  // Body könnte jetzt zu dunkel sein → Outline prüfen
+  czTempOutline = effectiveOutline(czTempColor, czTempOutline);
+  updateCzUI();
+});
+czOutlineInput.addEventListener('input', e => {
+  const picked = e.target.value;
+  const sanitized = effectiveOutline(czTempColor, picked);
+  czTempOutline = sanitized;
+  // Falls abgelehnt: Picker-Feld zurücksetzen auf Weiß
+  if (e.target.value !== sanitized) e.target.value = sanitized;
+  updateCzUI();
+});
 czBoostGlowInput.addEventListener('input', e => { czTempBoostGlow = e.target.value; updateCzUI(); });
 czNameInput.addEventListener('input', e => {
   czTempName = e.target.value.replace(/\s{2,}/g, ' ').slice(0, 14);
@@ -3140,6 +3344,7 @@ function closeCustomize() {
 customizeBtn.addEventListener('click', openCustomize);
 czClose.addEventListener('click', closeCustomize);
 czSave.addEventListener('click', () => {
+  czTempOutline = effectiveOutline(czTempColor, czTempOutline);
   setPlayerColor(czTempColor, true);
   setPlayerOutline(czTempOutline, true);
   setPlayerBoostGlow(czTempBoostGlow, true);
@@ -3186,239 +3391,62 @@ function drawCzPreview(t) {
 }
 
 // ============================================================
-// Shared Preview Worm Renderer (12 layers, curved scales, cartoon eyes)
+// Shared Preview Worm Renderer
 // ============================================================
 function drawPreviewWorm(c, pts, bodyR, bodyColor, outlineColor, boostGlow, t) {
-  const outlineW = CFG.outlineWidth;
-  c.lineCap = 'round'; c.lineJoin = 'round';
+  const N = pts.length;
+  if (N < 2) return;
 
-  const cVoid      = mixColors(bodyColor, '#000000', 0.78);
-  const cShadow    = mixColors(bodyColor, '#000000', 0.52);
-  const cShade     = mixColors(bodyColor, '#000000', 0.28);
-  const cBase      = bodyColor;
-  const cLight     = mixColors(bodyColor, '#ffffff', 0.28);
-  const cHighlight = mixColors(bodyColor, '#ffffff', 0.58);
-  const cSpecular  = mixColors(bodyColor, '#ffffff', 0.85);
-  const cShine     = mixColors(bodyColor, '#ffffff', 0.98);
+  const accentColor = BEAD_ACCENT;
 
-  const path = new Path2D();
-  path.moveTo(pts[0].x, pts[0].y);
-  for (let i = 1; i < pts.length - 1; i++) {
-    const xc = (pts[i].x + pts[i + 1].x) * 0.5;
-    const yc = (pts[i].y + pts[i + 1].y) * 0.5;
-    path.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
-  }
-  path.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+  // Boost-Glow hinter den Perlen
+  if (boostGlow) {
+    const flashRaw = 0.5 + 0.5 * Math.sin(t * Math.PI * 2 / CFG.boostFlashInterval);
+    const flashAmt = Math.pow(flashRaw, 3);
 
-  const flashRaw = 0.5 + 0.5 * Math.sin(t * Math.PI * 2 / CFG.boostFlashInterval);
-  const flashAmt = Math.pow(flashRaw, 4);
-  c.strokeStyle = hexAlpha(boostGlow, 0.20 + 0.55 * flashAmt);
-  c.lineWidth = bodyR * 2 + outlineW * 2 + 10 + 22 * flashAmt;
-  c.stroke(path);
-
-  const headPt = pts[0];
-  const angle = Math.atan2(headPt.y - pts[1].y, headPt.x - pts[1].x);
-  const hr = bodyR + 1;
-  c.beginPath();
-  c.arc(headPt.x, headPt.y, hr + outlineW + 8 + 15 * flashAmt, 0, Math.PI * 2);
-  c.fillStyle = hexAlpha(boostGlow, 0.12 + 0.5 * flashAmt);
-  c.fill();
-
-  // Ground shadow
-  c.save();
-  c.translate(bodyR * 0.16, bodyR * 0.32);
-  c.strokeStyle = 'rgba(0,0,0,0.30)';
-  c.lineWidth = bodyR * 2 + outlineW * 2 + 2;
-  c.stroke(path);
-  c.beginPath();
-  c.arc(headPt.x + bodyR * 0.16, headPt.y + bodyR * 0.32, hr + outlineW + 1, 0, Math.PI * 2);
-  c.fillStyle = 'rgba(0,0,0,0.30)';
-  c.fill();
-  c.restore();
-
-  // Outer outline
-  c.strokeStyle = outlineColor;
-  c.lineWidth = bodyR * 2 + outlineW * 2 + 2.5;
-  c.stroke(path);
-
-  // Void
-  c.save();
-  c.translate(bodyR * 0.14, bodyR * 0.24);
-  c.strokeStyle = cVoid;
-  c.lineWidth = bodyR * 2 + outlineW * 1.6;
-  c.stroke(path);
-  c.restore();
-
-  // Shadow
-  c.save();
-  c.translate(bodyR * 0.06, bodyR * 0.12);
-  c.strokeStyle = cShadow;
-  c.lineWidth = bodyR * 2 + outlineW * 0.9;
-  c.stroke(path);
-  c.restore();
-
-  // Shade
-  c.strokeStyle = cShade;
-  c.lineWidth = bodyR * 2 + outlineW * 0.4;
-  c.stroke(path);
-
-  // Base
-  c.strokeStyle = cBase;
-  c.lineWidth = bodyR * 2 - outlineW * 0.4;
-  c.stroke(path);
-
-  // Curved scales
-  const scaleStep = Math.max(3, Math.floor(pts.length / 12));
-  const arcPath = new Path2D();
-  for (let i = scaleStep; i < pts.length - 1; i += scaleStep) {
-    const s = pts[i];
-    const prev = pts[Math.max(0, i - 2)];
-    const next = pts[Math.min(pts.length - 1, i + 1)];
-    let dx = next.x - prev.x, dy = next.y - prev.y;
-    const dl = Math.hypot(dx, dy) || 1;
-    dx /= dl; dy /= dl;
-    const px = -dy, py = dx;
-    const r = bodyR * 0.94;
-    const x0 = s.x + px * r, y0 = s.y + py * r;
-    const x1 = s.x - px * r, y1 = s.y - py * r;
-    const bulge = r * 0.25;
-    const cx = (x0 + x1) * 0.5 - dx * bulge;
-    const cy = (y0 + y1) * 0.5 - dy * bulge;
-    arcPath.moveTo(x0, y0);
-    arcPath.quadraticCurveTo(cx, cy, x1, y1);
-  }
-  c.save();
-  c.strokeStyle = hexAlpha(cShadow, 0.55);
-  c.lineWidth = Math.max(1.0, bodyR * 0.12);
-  c.stroke(arcPath);
-  c.restore();
-  c.save();
-  c.translate(0, -bodyR * 0.10);
-  c.strokeStyle = hexAlpha(cHighlight, 0.30);
-  c.lineWidth = Math.max(0.8, bodyR * 0.07);
-  c.stroke(arcPath);
-  c.restore();
-
-  // Belly light
-  c.save();
-  c.translate(0, bodyR * 0.42);
-  c.strokeStyle = hexAlpha(cLight, 0.35);
-  c.lineWidth = bodyR * 0.55;
-  c.stroke(path);
-  c.restore();
-
-  // Light
-  c.save();
-  c.translate(-bodyR * 0.10, -bodyR * 0.22);
-  c.strokeStyle = hexAlpha(cLight, 0.62);
-  c.lineWidth = bodyR * 1.10;
-  c.stroke(path);
-  c.restore();
-
-  // Highlight
-  c.save();
-  c.translate(-bodyR * 0.20, -bodyR * 0.38);
-  c.strokeStyle = hexAlpha(cHighlight, 0.85);
-  c.lineWidth = bodyR * 0.50;
-  c.stroke(path);
-  c.restore();
-
-  // Specular
-  c.save();
-  c.translate(-bodyR * 0.28, -bodyR * 0.50);
-  c.strokeStyle = hexAlpha(cSpecular, 0.92);
-  c.lineWidth = Math.max(1.0, bodyR * 0.16);
-  c.stroke(path);
-  c.restore();
-
-  // Head
-  c.beginPath(); c.arc(headPt.x, headPt.y, hr + outlineW + 1.4, 0, Math.PI * 2);
-  c.fillStyle = outlineColor; c.fill();
-  c.beginPath(); c.arc(headPt.x, headPt.y, hr + outlineW * 0.55, 0, Math.PI * 2);
-  c.fillStyle = cShadow; c.fill();
-
-  const headGrad = c.createRadialGradient(
-    headPt.x - hr * 0.42, headPt.y - hr * 0.48, hr * 0.08,
-    headPt.x, headPt.y, hr * 1.15
-  );
-  headGrad.addColorStop(0, cShine);
-  headGrad.addColorStop(0.20, mixColors(bodyColor, '#ffffff', 0.55));
-  headGrad.addColorStop(0.55, bodyColor);
-  headGrad.addColorStop(1, cShadow);
-  c.beginPath(); c.arc(headPt.x, headPt.y, hr, 0, Math.PI * 2);
-  c.fillStyle = headGrad; c.fill();
-
-  c.beginPath();
-  c.arc(headPt.x - hr * 0.38, headPt.y - hr * 0.44, hr * 0.34, 0, Math.PI * 2);
-  c.fillStyle = hexAlpha(cSpecular, 0.55);
-  c.fill();
-
-  c.beginPath();
-  c.arc(headPt.x, headPt.y + hr * 0.35, hr * 0.55, 0, Math.PI);
-  c.fillStyle = hexAlpha(cShadow, 0.35);
-  c.fill();
-
-  // Eyes
-  const eyeBack = hr * 0.20, eyeSide = hr * 0.62;
-  const eyeR = hr * 0.48, pupilR = eyeR * 0.55, irisR = eyeR * 0.72;
-  const perp = angle + Math.PI / 2;
-  const irisColor = mixColors(bodyColor, '#000000', 0.55);
-  const irisRim   = mixColors(bodyColor, '#ffffff', 0.15);
-
-  for (const sgn of [-1, 1]) {
-    const ex = headPt.x + Math.cos(angle) * eyeBack + Math.cos(perp) * eyeSide * sgn;
-    const ey = headPt.y + Math.sin(angle) * eyeBack + Math.sin(perp) * eyeSide * sgn;
-
-    c.beginPath(); c.arc(ex, ey, eyeR + 1.8, 0, Math.PI * 2);
-    c.fillStyle = outlineColor; c.fill();
-
-    const scleraGrad = c.createRadialGradient(
-      ex - eyeR * 0.35, ey - eyeR * 0.35, eyeR * 0.05,
-      ex, ey, eyeR
-    );
-    scleraGrad.addColorStop(0, '#ffffff');
-    scleraGrad.addColorStop(0.6, '#f0f4ff');
-    scleraGrad.addColorStop(1, '#cfd8e8');
-    c.beginPath(); c.arc(ex, ey, eyeR, 0, Math.PI * 2);
-    c.fillStyle = scleraGrad; c.fill();
-
-    const px = ex + Math.cos(angle) * eyeR * 0.30;
-    const py = ey + Math.sin(angle) * eyeR * 0.30;
-
-    const irisGrad = c.createRadialGradient(
-      px - irisR * 0.22, py - irisR * 0.22, irisR * 0.08,
-      px, py, irisR
-    );
-    irisGrad.addColorStop(0, irisRim);
-    irisGrad.addColorStop(0.55, irisColor);
-    irisGrad.addColorStop(1, mixColors(irisColor, '#000000', 0.4));
-    c.beginPath(); c.arc(px, py, irisR, 0, Math.PI * 2);
-    c.fillStyle = irisGrad; c.fill();
-
-    c.beginPath(); c.arc(px, py, pupilR, 0, Math.PI * 2);
-    c.fillStyle = '#07080f'; c.fill();
-
-    c.beginPath();
-    c.arc(px - pupilR * 0.48, py - pupilR * 0.48, pupilR * 0.50, 0, Math.PI * 2);
-    c.fillStyle = 'rgba(255,255,255,0.98)'; c.fill();
-    c.beginPath();
-    c.arc(px + pupilR * 0.38, py + pupilR * 0.38, pupilR * 0.22, 0, Math.PI * 2);
-    c.fillStyle = 'rgba(255,255,255,0.55)'; c.fill();
-    c.beginPath();
-    c.arc(px + irisR * 0.42, py - irisR * 0.42, irisR * 0.13, 0, Math.PI * 2);
-    c.fillStyle = 'rgba(255,255,255,0.75)'; c.fill();
-
-    c.beginPath();
-    c.arc(ex, ey, eyeR * 0.98, Math.PI * 1.12, Math.PI * 1.88);
-    c.strokeStyle = hexAlpha(outlineColor, 0.55);
-    c.lineWidth = Math.max(1.2, eyeR * 0.15);
+    c.save();
     c.lineCap = 'round';
+    c.lineJoin = 'round';
+    c.beginPath();
+    c.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < N; i++) c.lineTo(pts[i].x, pts[i].y);
+    c.strokeStyle = hexAlpha(boostGlow, 0.18 + 0.42 * flashAmt);
+    c.lineWidth = bodyR * 2 + 14 + 18 * flashAmt;
     c.stroke();
+    c.restore();
   }
+
+  // Durchschnittlicher Abstand zwischen Punkten bestimmt Perlen-Schritt
+  const avgDist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y) || 1;
+  const beadStep = Math.max(1, Math.round((bodyR * 1.55) / avgDist));
+
+  const beadIdxs = [];
+  for (let i = beadStep; i < N; i += beadStep) beadIdxs.push(i);
+  if (N - 1 >= beadStep && (beadIdxs.length === 0 || beadIdxs[beadIdxs.length - 1] !== N - 1)) {
+    const last = beadIdxs[beadIdxs.length - 1];
+    if (last === undefined || N - 1 - last >= beadStep * 0.5) beadIdxs.push(N - 1);
+  }
+
+  // Von Schwanz zu Kopf
+  for (let k = beadIdxs.length - 1; k >= 0; k--) {
+    const i = beadIdxs[k];
+    const s = pts[i];
+    const beadIdx = Math.round(i / beadStep);
+    const color = (beadIdx % 4 === 3) ? accentColor : bodyColor;
+    drawBead(c, s.x, s.y, bodyR, color, outlineColor, 1);
+  }
+
+  // Kopf
+  const h = pts[0];
+  drawBead(c, h.x, h.y, bodyR + 1, bodyColor, outlineColor, 1);
+
+  // Augen
+  const angle = Math.atan2(h.y - pts[1].y, h.x - pts[1].x);
+  drawGooglyEyes(c, h.x, h.y, bodyR + 1, angle, outlineColor);
 }
 
 // ============================================================
-// MENU WORM PREVIEW (Hero)
+// MENU WORM PREVIEW
 // ============================================================
 const menuWormCanvas = document.getElementById('menuWormCanvas');
 const menuWormCtx = menuWormCanvas ? menuWormCanvas.getContext('2d') : null;
@@ -3439,12 +3467,10 @@ function drawMenuWorm() {
   const wave = t * 1.4;
 
   const segments = 46;
-  const segLen = 16;
+  const segLen = 9;
   const baseY = H / 2 + 6;
   const amp = 32;
 
-  // Worm swims across with a small wrap effect
-  const travelOffset = (t * 60) % (W + 400) - 200;
   const headX = W * 0.5 + 60 + Math.sin(t * 0.7) * 24;
   const headYOffset = Math.sin(t * 0.9) * 6;
 
@@ -3479,7 +3505,7 @@ if (menuWormCanvas) {
 }
 
 // ============================================================
-// MENU INPUTS (Name + Customize)
+// MENU INPUTS
 // ============================================================
 const menuNameInput = document.getElementById('menuNameInput');
 const menuCustomizeBtn = document.getElementById('menuCustomizeBtn');
@@ -3501,14 +3527,12 @@ if (menuNameInput) {
     if (e.key === 'Enter') { e.preventDefault(); menuNameInput.blur(); }
   });
   menuNameInput.addEventListener('keydown', e => {
-    // Prevent Space from triggering boost
     if (e.code === 'Space') e.stopPropagation();
   }, true);
 }
 
 if (menuCustomizeBtn) {
   menuCustomizeBtn.addEventListener('click', () => {
-    // Save current name first
     const v = (menuNameInput.value || '').trim() || DEFAULT_PLAYER_NAME;
     setPlayerName(v, true);
     openCustomize();
@@ -3516,8 +3540,12 @@ if (menuCustomizeBtn) {
 }
 
 // ============================================================
-// INIT PLAYER
+// INIT
 // ============================================================
+// Sicherstellen, dass gespeicherte Werte den neuen Regeln entsprechen
+playerOutline = effectiveOutline(playerColor, playerOutline);
+localStorage.setItem(PLAYER_OUTLINE_KEY, playerOutline);
+
 setPlayerColor(playerColor, false);
 setPlayerName(playerName, false);
 setPlayerOutline(playerOutline, false);
@@ -3535,30 +3563,47 @@ function loop(t) {
   if (!isFinite(dt) || dt < 0) dt = 0.016;
   if (dt > 0.05) dt = 0.05;
   lastT = t;
+
   if (state && !state.paused) {
     try { update(dt); } catch (err) { console.error('[update]', err); }
     try { render(); } catch (err) { console.error('[render]', err); }
     try { updateHUD(); } catch (err) { console.error('[updateHUD]', err); }
     const p = state.player;
     const respawnOpen = state.roundElapsed < CFG.respawnUntil || state.zoneRegrowing;
-    const shouldShow = p && !p.alive && respawnOpen && !state.matchOver && !state.intermission;
+    const shouldShow = p && !p.alive && !state.matchOver && !state.intermission;
     const isShown = deathScreenEl.classList.contains('on');
     if (shouldShow && !isShown) showDeathScreen();
     else if (!shouldShow && isShown) hideDeathScreen();
+    else if (shouldShow && isShown) {
+      const btnVisible = dsRespawnBtn.style.display !== 'none';
+      if (respawnOpen && !btnVisible) dsRespawnBtn.style.display = '';
+      else if (!respawnOpen && btnVisible) dsRespawnBtn.style.display = 'none';
+    }
   } else if (state && state.paused) {
+    if (state.menuMode) {
+      state.camera.x += (state.zone.x - state.camera.x) * Math.min(1, 3 * dt);
+      state.camera.y += (state.zone.y - state.camera.y) * Math.min(1, 3 * dt);
+      state.camera.zoom += (state.camera.targetZoom - state.camera.zoom) * Math.min(1, 2 * dt);
+    }
     try { render(); } catch (err) { console.error('[render]', err); }
   }
+
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 
+// ============================================================
+// START MATCH
+// ============================================================
 function startMatch() {
-  // Save name from menu
   if (menuNameInput) {
     const v = (menuNameInput.value || '').trim() || DEFAULT_PLAYER_NAME;
     setPlayerName(v, true);
   }
-  document.getElementById('overlay').classList.add('hidden');
+  const overlay = document.getElementById('overlay');
+  overlay.classList.add('hidden');
+  overlay.classList.remove('from-death');
+  document.body.classList.remove('in-menu');
   hideDeathScreen();
   hideVictoryBanner();
   suddenDeathEl.classList.remove('on');
