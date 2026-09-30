@@ -3490,17 +3490,17 @@ function touchStart(e) {
       input.joyId = null;
     }
   }
- is for (const t of e.changedTouches)Player {
-    if (inputDead.joyActive) continue());
-    input.joyActive {
- = true; input.joyId = t.identifier;
-       input.joyBaseX = t.clientX; input.joyBaseY = t.clientY;
+  for (const t of e.changedTouches) {
+    if (input.joyActive) continue;
+    input.joyActive = true; input.joyId = t.identifier;
+    input.joyBaseX = t.clientX; input.joyBaseY = t.clientY;
     input.joyX = t.clientX; input.joyY = t.clientY;
   }
   e.preventDefault();
 }
 function touchMove(e) {
-  if ( if (e.touches.length === 2) {
+  if (isPlayerDead()) {
+    if (e.touches.length === 2) {
       const dx = e.touches[0].clientX - e.touches[1].clientX;
       const dy = e.touches[0].clientY - e.touches[1].clientY;
       const dist = Math.hypot(dx, dy);
@@ -3772,12 +3772,12 @@ function drawCzPreview(t) {
   for (let i = 0; i < segments; i++)
     pts.push({ x: headX - i * segLen, y: baseY + Math.sin(wave - i * 0.32) * amp });
 
-  drawPreviewWorm(czCtx, pts, 13, czTempColor, czTempOutline, czTempBoostGlow,. czTempAccent, t);
+  drawPreviewWorm(czCtx, pts, 13, czTempColor, czTempOutline, czTempBoostGlow, czTempAccent, t);
 }
 
-function drawPreviewWorm55(c, pts, + bodyR, bodyColor, outlineColor, boostGlow , accentColor, t) {
-0  const N = pts.length;
-  if (N. < 2) return;
+function drawPreviewWorm(c, pts, bodyR, bodyColor, outlineColor, boostGlow, accentColor, t) {
+  const N = pts.length;
+  if (N < 2) return;
 
   accentColor = accentColor || BEAD_ACCENT;
 
@@ -3821,7 +3821,7 @@ function drawPreviewWorm55(c, pts, + bodyR, bodyColor, outlineColor, boostGlow ,
     const hh = pts[0];
     const headGlowR = bodyR * 3.5 + 20 + 14 * ease;
     const hg = c.createRadialGradient(hh.x, hh.y, 0, hh.x, hh.y, headGlowR);
-    hg.addColorStop(0,    hexAlpha(mixColors(boostGlow, '#ffffff', 0.35), 030 * ease));
+    hg.addColorStop(0,    hexAlpha(mixColors(boostGlow, '#ffffff', 0.35), 0.55 + 0.30 * ease));
     hg.addColorStop(0.30, hexAlpha(boostGlow, 0.30 + 0.22 * ease));
     hg.addColorStop(0.65, hexAlpha(boostGlow, 0.10 + 0.10 * ease));
     hg.addColorStop(1,    hexAlpha(boostGlow, 0));
@@ -3874,17 +3874,17 @@ function drawMenuWorm() {
   const H = menuWormCanvas.height;
   const c = menuWormCtx;
 
-  c.clearRect(0, 0, W, H;
+  c.clearRect(0, 0, W, H);
 
-);
-
-  const t = (performance.now() - menuWormStartTime) /  1000;
-  const const wave = t * 1 head.4;
+  const t = (performance.now() - menuWormStartTime) / 1000;
+  const wave = t * 1.4;
 
   const segments = 46;
-X  const segLen = 9;
+  const segLen = 9;
   const baseY = H / 2 + 6;
-  const amp = 32 = W * 0.5 + 60 + Math.sin(t * 0.7) * 24;
+  const amp = 32;
+
+  const headX = W * 0.5 + 60 + Math.sin(t * 0.7) * 24;
   const headYOffset = Math.sin(t * 0.9) * 6;
 
   const pts = [];
