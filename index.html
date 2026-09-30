@@ -1107,9 +1107,9 @@ const CFG = {
   bots: 80,
   food: 19000,
   segSpacing: 1,
-  speed: 2.3,
-  boostSpeed: 5.0,
-  turnRate: 0.07,
+  speed: 2.6,
+  boostSpeed: 5.6,
+  turnRate: 0.085,
   turnSizePenalty: 0.60,
   turnScaleRef: 1040,
   startSegments: 20,
@@ -1404,9 +1404,9 @@ function computePlayerZoom(worm) {
 
 function lodLevel(zoom) {
   if (state && state.player && state.player.alive) return 0;
-  if (zoom > 0.65) return 0;
-  if (zoom > 0.40) return 1;
-  if (zoom > 0.22) return 2;
+  if (zoom > 0.45) return 0;
+  if (zoom > 0.25) return 1;
+  if (zoom > 0.12) return 2;
   return 3;
 }
 
@@ -2790,7 +2790,7 @@ function render() {
 
 function drawDotGrid(cam, visW, visH) {
   const lod = lodLevel(state.camera.zoom);
-  const step = lod === 0 ? 90 : lod === 1 ? 180 : lod === 2 ? 360 : 720;
+  const step = lod === 0 ? 90 : lod === 1 ? 120 : lod === 2 ? 180 : 360;
   const gx0 = Math.floor((cam.x - visW / 2) / step) * step;
   const gy0 = Math.floor((cam.y - visH / 2) / step) * step;
   const gx1 = cam.x + visW / 2 + step, gy1 = cam.y + visH / 2 + step;
@@ -2798,7 +2798,7 @@ function drawDotGrid(cam, visW, visH) {
   for (let x = gx0; x < gx1; x += step)
     for (let y = gy0; y < gy1; y += step) ctx.fillRect(x - 1, y - 1, 2, 2);
 
-  const step2 = lod === 0 ? 360 : lod === 1 ? 720 : 1440;
+  const step2 = lod === 0 ? 360 : lod === 1 ? 540 : lod === 2 ? 720 : 1080;
   const bx0 = Math.floor((cam.x - visW / 2) / step2) * step2;
   const by0 = Math.floor((cam.y - visH / 2) / step2) * step2;
   ctx.fillStyle = 'rgba(120,170,255,0.35)';
@@ -2916,7 +2916,7 @@ function drawFood(cam, visW, visH) {
   const halfW = visW / 2 + 40, halfH = visH / 2 + 40;
   const radius = Math.max(halfW, halfH);
 
-  const minGrow = lod === 0 ? 0 : lod === 1 ? 3 : lod === 2 ? 15 : 25;
+  const minGrow = lod === 0 ? 0 : lod === 1 ? 0 : lod === 2 ? 5 : 15;
 
   forEachFoodNear(cam.x, cam.y, radius, f => {
     if (f.x < cam.x - halfW || f.x > cam.x + halfW) return;
@@ -3115,9 +3115,9 @@ function drawWorm(worm, isPlayer, zoom) {
   }
 
   let beadStep = beadStepFor(bodyR);
-  if (lod === 1) beadStep = Math.ceil(beadStep * 1.3);
-  else if (lod === 2) beadStep = Math.ceil(beadStep * 1.9);
-  else if (lod === 3) beadStep = Math.ceil(beadStep * 2.8);
+  if (lod === 1) beadStep = Math.ceil(beadStep * 1.15);
+  else if (lod === 2) beadStep = Math.ceil(beadStep * 1.5);
+  else if (lod === 3) beadStep = Math.ceil(beadStep * 2.0);
 
   const beadIdxs = [];
   for (let i = beadStep; i < N; i += beadStep) beadIdxs.push(i);
