@@ -1106,16 +1106,16 @@ const CFG = {
   zoneRegrowDuration: 5,
   bots: 80,
   food: 19000,
-  segSpacing: 4,
+  segSpacing: 2,
   speed: 2.3,
   boostSpeed: 5.0,
   turnRate: 0.07,
   turnSizePenalty: 0.60,
-  turnScaleRef: 260,
+  turnScaleRef: 520,
   startSegments: 20,
   headRadius: 11,
   bodyRadius: 10,
-  collisionRadius: 9,
+  collisionRadius: 7,
   radiusGrowth: 0.50,
   radiusMaxFactor: 2.6,
   maxParticles: 400,
@@ -1124,7 +1124,7 @@ const CFG = {
   botRespawnDelay: 2.0,
   botRespawnJitter: 2.0,
   deathDropCount: 40,
-  maxOrbGrow: 25,
+  maxOrbGrow: 15,
   outlineWidth: 2.2,
   zoneOffCenterMax: 0.30,
   foodGridCell: 600,
@@ -1495,11 +1495,10 @@ class Worm {
     this._growFrac = 0;
     this._rank = 0;
 
-    // Spawn-Wachstum: startet mit 1 Segment (nur Kopf) und wächst
-    // innerhalb von 0.35s sichtbar auf die Zielmasse heran.
+    // Spawn-Wachstum: startet mit 1 Segment (nur Kopf) und wächst sichtbar
     this.segments = [{ x: o.x, y: o.y }];
     this._targetSegments = o.startLen ?? CFG.startSegments;
-    this._spawnDuration = 0.35;
+    this._spawnDuration = this.isBot ? 3.0 : 1.0;
     this._spawnGrowRate = Math.max(1, this._targetSegments / this._spawnDuration);
     this._spawnDone = false;
 
@@ -1518,7 +1517,6 @@ class Worm {
   update(dt) {
     if (!this.alive) return;
 
-    // Spawn-Wachstum: Körper wächst sichtbar vom Kopf nach hinten heraus
     if (!this._spawnDone) {
       if (this.segments.length < this._targetSegments) {
         const toAdd = Math.min(
@@ -1602,7 +1600,6 @@ class Worm {
     const totalMass = this.segments.length;
     if (totalMass === 0) return;
 
-    // Orb-Drop-Massen
     const orbMasses = [];
     if (totalMass <= 200) {
       const dropCount = Math.min(CFG.deathDropCount, Math.max(1, totalMass));
@@ -1611,14 +1608,11 @@ class Worm {
     } else {
       let sizes, weights;
       if (totalMass <= 400) {
-        sizes = [10, 15];
+        sizes = [5, 10];
         weights = [0.55, 0.45];
-      } else if (totalMass <= 600) {
-        sizes = [10, 15, 20];
-        weights = [0.40, 0.35, 0.25];
       } else {
-        sizes = [10, 15, 20, 25];
-        weights = [0.35, 0.30, 0.20, 0.15];
+        sizes = [5, 10, 15];
+        weights = [0.40, 0.35, 0.25];
       }
       let remaining = totalMass;
       const minSize = sizes[0];
@@ -1657,7 +1651,6 @@ class Worm {
         rand(0.6, 1.3), rand(2, 4), 1);
     }
 
-    // Orbs entlang des toten Körpers verteilen (nicht kreisförmig um den Kopf)
     const segCount = this.segments.length;
     for (let i = 0; i < orbMasses.length; i++) {
       let bx, by;
@@ -1665,7 +1658,6 @@ class Worm {
         bx = this.segments[0].x;
         by = this.segments[0].y;
       } else {
-        // Zufällige Position entlang des Körpers (zwischen Segmenten interpoliert)
         const t = Math.random();
         const fIdx = t * (segCount - 1);
         const i0 = Math.floor(fIdx);
@@ -2102,7 +2094,6 @@ function update(dt) {
     worm.update(dt);
     const h = worm.head;
 
-    // Während Intermission / Zone-Regrow nicht an der Wand sterben, sondern nur clampen
     if (h.x < 0 || h.x > CFG.worldSize || h.y < 0 || h.y > CFG.worldSize) {
       if (state.intermission || state.zoneRegrowing) {
         h.x = clamp(h.x, 0, CFG.worldSize);
@@ -2242,7 +2233,6 @@ function checkCollisions() {
 
       const otherHR = wormCollisionRadius(other);
       const hh = Math.hypot(other.head.x - h.x, other.head.y - h.y);
-      // Bei Gleichstand sterben beide nicht (fair für Spieler)
       if (hh < hR + otherHR && worm.segments.length < other.segments.length) {
         worm.die(other); dead = true; break;
       }
@@ -2435,7 +2425,6 @@ function triggerDraw() {
   state.roundElapsed = 0;
   state.respawnClosedNotified = false;
 
-  // Minimap-Cache zurücksetzen, damit kein altes Top-3-Flackern
   state.mmDisplayed = [];
   state.mmPrev = [];
   state.mmFadeT = 1;
