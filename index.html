@@ -756,7 +756,6 @@
     text-shadow: 0 0 10px rgba(108,204,255,0.5);
   }
 
-  /* Simplified Graphics Toggle */
   .cz-toggle-wrap {
     display: flex; align-items: center; gap: 14px;
     padding: 14px 18px;
@@ -1168,7 +1167,7 @@ const CFG = {
   food: 19000,
   segSpacing: 1,
   speed: 2.5,
-  boostSpeed: 5.4,
+  boostSpeed: 5.2,
   turnRate: 0.08,
   turnSizePenalty: 0.60,
   turnScaleRef: 1040,
@@ -1239,7 +1238,7 @@ function safeGetItem(key) {
 }
 
 // ============================================================
-// PLAYER COLOR / NAME / OUTLINE / ACCENT / BOOST / GRAPHICS
+// PLAYER SETTINGS
 // ============================================================
 const PLAYER_COLOR_KEY = 'battle-worms-color';
 const PLAYER_NAME_KEY = 'battle-worms-name';
@@ -1266,7 +1265,6 @@ let playerBoostPos = safeGetItem(PLAYER_BOOST_POS_KEY) || DEFAULT_PLAYER_BOOST_P
 let playerBoostSize = parseFloat(safeGetItem(PLAYER_BOOST_SIZE_KEY) || String(DEFAULT_PLAYER_BOOST_SIZE));
 if (!isFinite(playerBoostSize)) playerBoostSize = DEFAULT_PLAYER_BOOST_SIZE;
 
-// Simplified Graphics: default ON (true). If stored value exists, use it.
 let simplifiedGraphics;
 const storedSimplified = safeGetItem(PLAYER_SIMPLIFIED_KEY);
 if (storedSimplified === null) simplifiedGraphics = true;
@@ -1475,7 +1473,6 @@ function computePlayerZoom(worm) {
   return 1 - t * (1 - minZoom);
 }
 
-// LOD: If simplifiedGraphics is false → always highest quality
 function lodLevel(zoom) {
   if (!simplifiedGraphics) return 0;
   if (state && state.player && state.player.alive) return 0;
@@ -1977,7 +1974,7 @@ function computeRanks() {
 }
 
 // ============================================================
-// BOT AI — Smart State Machine
+// BOT AI
 // ============================================================
 function botAI(worm, dt) {
   const head = worm.head, ai = worm.ai;
@@ -2998,7 +2995,8 @@ function drawFood(cam, visW, visH) {
   const halfW = visW / 2 + 40, halfH = visH / 2 + 40;
   const radius = Math.max(halfW, halfH);
 
-  const minGrow = lod === 0 ? 0 : lod === 1 ? 0 : lod === 2 ? 5 : 15;
+  // 10-mass orbs are ALWAYS shown (minGrow max = 10)
+  const minGrow = lod === 0 ? 0 : lod === 1 ? 0 : lod === 2 ? 5 : 10;
 
   forEachFoodNear(cam.x, cam.y, radius, f => {
     if (f.x < cam.x - halfW || f.x > cam.x + halfW) return;
@@ -3030,7 +3028,7 @@ function drawFood(cam, visW, visH) {
 }
 
 // ============================================================
-// BOOST GLOW RENDERER (Kometenschweif, sehr performant)
+// BOOST GLOW — auf ganzen Körper sichtbar, trotzdem performant
 // ============================================================
 function drawBoostGlow(segs, N, bodyR, boostColor, time) {
   const hh = segs[0];
@@ -3042,7 +3040,7 @@ function drawBoostGlow(segs, N, bodyR, boostColor, time) {
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
 
-  // === 1) Großer weicher Glow-Ball um den Kopf (1 Gradient, sehr günstig) ===
+  // === 1) Großer weicher Glow-Ball am Kopf ===
   const headGlowR = bodyR * 4.5 + 30 + 25 * ease;
   const hg = ctx.createRadialGradient(hh.x, hh.y, 0, hh.x, hh.y, headGlowR);
   hg.addColorStop(0,    hexAlpha(mixColors(boostColor, '#ffffff', 0.7), 0.70 + 0.30 * ease));
@@ -3055,28 +3053,30 @@ function drawBoostGlow(segs, N, bodyR, boostColor, time) {
   ctx.arc(hh.x, hh.y, headGlowR, 0, Math.PI * 2);
   ctx.fill();
 
-  // === 2) Kometenschweif — nur erste ~25 Segmente (statt ganzer Wurm) ===
-  const trailLen = Math.min(N, 25);
-  const trailPath = new Path2D();
-  trailPath.moveTo(segs[0].x, segs[0].y);
-  for (let i = 1; i < trailLen; i++) {
-    trailPath.lineTo(segs[i].x, segs[i].y);
-  }
+  // === 2) Ganzer Körper: 3 Layer mit abgestufter Breite ===
+  const glowPath = new Path2D();
+  glowPath.moveTo(segs[0].x, segs[0].y);
+  for (let i = 1; i < N; i++) glowPath.lineTo(segs[i].x, segs[i].y);
 
-  // Weicher äußerer Glow
-  ctx.strokeStyle = hexAlpha(boostColor, 0.18 + 0.22 * ease);
-  ctx.lineWidth = bodyR * 2 + 16;
-  ctx.stroke(trailPath);
+  // Weicher äußerer Halo (breit, niedrige Alpha)
+  ctx.strokeStyle = hexAlpha(boostColor, 0.10 + 0.12 * ease);
+  ctx.lineWidth = bodyR * 2 + 20;
+  ctx.stroke(glowPath);
 
-  // Mittlerer innerer Glow
-  ctx.strokeStyle = hexAlpha(mixColors(boostColor, '#ffffff', 0.35), 0.35 + 0.30 * ease);
-  ctx.lineWidth = bodyR * 2 + 5;
-  ctx.stroke(trailPath);
+  // Mittlerer Glow (mittlere Breite, sichtbarer)
+  ctx.strokeStyle = hexAlpha(mixColors(boostColor, '#ffffff', 0.30), 0.28 + 0.24 * ease);
+  ctx.lineWidth = bodyR * 2 + 7;
+  ctx.stroke(glowPath);
 
-  // Heißer weißer Kern
-  ctx.strokeStyle = hexAlpha(mixColors(boostColor, '#ffffff', 0.85), 0.55 + 0.35 * ease);
-  ctx.lineWidth = Math.max(2, bodyR * 0.85);
-  ctx.stroke(trailPath);
+  // Innerer heißer Kern (schmal, hell)
+  ctx.strokeStyle = hexAlpha(mixColors(boostColor, '#ffffff', 0.85), 0.42 + 0.30 * ease);
+  ctx.lineWidth = Math.max(2, bodyR * 0.75);
+  ctx.stroke(glowPath);
+
+  // Zusätzlich: dünne weiße Linie direkt entlang des Körpers für "heißer Draht"-Effekt
+  ctx.strokeStyle = hexAlpha('#ffffff', 0.55 + 0.30 * ease);
+  ctx.lineWidth = Math.max(1.2, bodyR * 0.22);
+  ctx.stroke(glowPath);
 
   ctx.restore();
 }
@@ -3877,7 +3877,6 @@ function drawPreviewWorm(c, pts, bodyR, bodyColor, outlineColor, boostGlow, acce
 
   accentColor = accentColor || BEAD_ACCENT;
 
-  // Preview boost glow (simpler, direct on the preview context)
   if (boostGlow) {
     const hh = pts[0];
     const pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 2 / CFG.boostFlashInterval);
@@ -3901,23 +3900,26 @@ function drawPreviewWorm(c, pts, bodyR, bodyColor, outlineColor, boostGlow, acce
     c.arc(hh.x, hh.y, headGlowR, 0, Math.PI * 2);
     c.fill();
 
-    // Comet tail
-    const trailLen = Math.min(N, 15);
-    const trailPath = new Path2D();
-    trailPath.moveTo(pts[0].x, pts[0].y);
-    for (let i = 1; i < trailLen; i++) trailPath.lineTo(pts[i].x, pts[i].y);
+    // Whole-body glow (full preview length)
+    const glowPath = new Path2D();
+    glowPath.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < N; i++) glowPath.lineTo(pts[i].x, pts[i].y);
 
-    c.strokeStyle = hexAlpha(boostGlow, 0.18 + 0.22 * ease);
-    c.lineWidth = bodyR * 2 + 12;
-    c.stroke(trailPath);
+    c.strokeStyle = hexAlpha(boostGlow, 0.10 + 0.12 * ease);
+    c.lineWidth = bodyR * 2 + 16;
+    c.stroke(glowPath);
 
-    c.strokeStyle = hexAlpha(mixColors(boostGlow, '#ffffff', 0.35), 0.35 + 0.30 * ease);
-    c.lineWidth = bodyR * 2 + 4;
-    c.stroke(trailPath);
+    c.strokeStyle = hexAlpha(mixColors(boostGlow, '#ffffff', 0.30), 0.28 + 0.24 * ease);
+    c.lineWidth = bodyR * 2 + 6;
+    c.stroke(glowPath);
 
-    c.strokeStyle = hexAlpha(mixColors(boostGlow, '#ffffff', 0.85), 0.55 + 0.35 * ease);
-    c.lineWidth = Math.max(2, bodyR * 0.85);
-    c.stroke(trailPath);
+    c.strokeStyle = hexAlpha(mixColors(boostGlow, '#ffffff', 0.85), 0.42 + 0.30 * ease);
+    c.lineWidth = Math.max(2, bodyR * 0.75);
+    c.stroke(glowPath);
+
+    c.strokeStyle = hexAlpha('#ffffff', 0.55 + 0.30 * ease);
+    c.lineWidth = Math.max(1.2, bodyR * 0.22);
+    c.stroke(glowPath);
 
     c.restore();
   }
