@@ -756,6 +756,54 @@
     text-shadow: 0 0 10px rgba(108,204,255,0.5);
   }
 
+  /* Simplified Graphics Toggle */
+  .cz-toggle-wrap {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(120,180,255,0.22);
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+  .cz-toggle-label { flex: 1; min-width: 0; }
+  .cz-toggle-title {
+    font-size: 13px; font-weight: 800; color: #d8ecff;
+    letter-spacing: 0.4px; margin-bottom: 3px;
+  }
+  .cz-toggle-desc {
+    font-size: 10.5px; color: #7a8db5; font-weight: 500;
+    line-height: 1.3;
+  }
+  .cz-toggle-switch {
+    position: relative; display: inline-block;
+    width: 54px; height: 32px; flex-shrink: 0; cursor: pointer;
+  }
+  .cz-toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .cz-toggle-slider {
+    position: absolute; inset: 0;
+    background: rgba(120,180,255,0.12);
+    border: 1px solid rgba(120,180,255,0.30);
+    border-radius: 32px;
+    transition: background .25s, border-color .25s;
+  }
+  .cz-toggle-slider::before {
+    content: ''; position: absolute;
+    width: 22px; height: 22px;
+    left: 4px; top: 4px;
+    background: linear-gradient(180deg, #a0b8d8, #7088aa);
+    border-radius: 50%;
+    transition: transform .28s cubic-bezier(.2,.9,.3,1.4), background .25s, box-shadow .25s;
+  }
+  .cz-toggle-switch input:checked + .cz-toggle-slider {
+    background: linear-gradient(135deg, rgba(74,181,255,0.55), rgba(108,204,255,0.55));
+    border-color: rgba(142,224,255,0.85);
+  }
+  .cz-toggle-switch input:checked + .cz-toggle-slider::before {
+    transform: translateX(22px);
+    background: linear-gradient(180deg, #ffffff, #d8f4ff);
+    box-shadow: 0 0 16px rgba(255,255,255,0.9), 0 0 4px rgba(108,204,255,0.6);
+  }
+
   #deathScreen {
     position: fixed; inset: 0; z-index: 7;
     display: none; align-items: flex-end; justify-content: center;
@@ -925,7 +973,7 @@
 <div id="statsHud">
   <div class="stat-box">
     <div class="stat-label">Mass</div>
-    <div class="stat-value" id="ui-mass">20</div>
+    <div class="stat-value" id="ui-mass">100</div>
   </div>
   <div class="stat-box">
     <div class="stat-label">Rank</div>
@@ -1084,6 +1132,18 @@
       <span class="cz-slider-value" id="czBoostSizeVal">2.5×</span>
     </div>
 
+    <div class="cz-section-title">Performance</div>
+    <div class="cz-toggle-wrap">
+      <div class="cz-toggle-label">
+        <div class="cz-toggle-title">Simplified Graphics</div>
+        <div class="cz-toggle-desc">Reduces detail when zoomed out. Turn OFF for full quality always.</div>
+      </div>
+      <label class="cz-toggle-switch">
+        <input type="checkbox" id="czSimplified">
+        <span class="cz-toggle-slider"></span>
+      </label>
+    </div>
+
     <div class="cz-actions">
       <button class="cz-btn ghost" id="czReset">Reset</button>
       <button class="cz-btn primary" id="czSave">Save</button>
@@ -1107,12 +1167,14 @@ const CFG = {
   bots: 80,
   food: 19000,
   segSpacing: 1,
-  speed: 2.6,
-  boostSpeed: 5.6,
-  turnRate: 0.085,
+  speed: 2.5,
+  boostSpeed: 5.4,
+  turnRate: 0.08,
   turnSizePenalty: 0.60,
   turnScaleRef: 1040,
-  startSegments: 20,
+  startSegments: 100,
+  minBoostMass: 100,
+  minAliveMass: 30,
   headRadius: 11,
   bodyRadius: 10,
   collisionRadius: 7,
@@ -1177,7 +1239,7 @@ function safeGetItem(key) {
 }
 
 // ============================================================
-// PLAYER COLOR / NAME / OUTLINE / ACCENT / BOOST
+// PLAYER COLOR / NAME / OUTLINE / ACCENT / BOOST / GRAPHICS
 // ============================================================
 const PLAYER_COLOR_KEY = 'battle-worms-color';
 const PLAYER_NAME_KEY = 'battle-worms-name';
@@ -1186,6 +1248,7 @@ const PLAYER_ACCENT_KEY = 'battle-worms-accent';
 const PLAYER_BOOST_GLOW_KEY = 'battle-worms-boost-glow';
 const PLAYER_BOOST_POS_KEY = 'battle-worms-boost-pos';
 const PLAYER_BOOST_SIZE_KEY = 'battle-worms-boost-size';
+const PLAYER_SIMPLIFIED_KEY = 'battle-worms-simplified';
 const DEFAULT_PLAYER_COLOR = '#6ccfff';
 const DEFAULT_PLAYER_NAME = 'You';
 const DEFAULT_PLAYER_OUTLINE = '#ffffff';
@@ -1202,6 +1265,12 @@ let playerBoostGlow = safeGetItem(PLAYER_BOOST_GLOW_KEY) || DEFAULT_PLAYER_BOOST
 let playerBoostPos = safeGetItem(PLAYER_BOOST_POS_KEY) || DEFAULT_PLAYER_BOOST_POS;
 let playerBoostSize = parseFloat(safeGetItem(PLAYER_BOOST_SIZE_KEY) || String(DEFAULT_PLAYER_BOOST_SIZE));
 if (!isFinite(playerBoostSize)) playerBoostSize = DEFAULT_PLAYER_BOOST_SIZE;
+
+// Simplified Graphics: default ON (true). If stored value exists, use it.
+let simplifiedGraphics;
+const storedSimplified = safeGetItem(PLAYER_SIMPLIFIED_KEY);
+if (storedSimplified === null) simplifiedGraphics = true;
+else simplifiedGraphics = storedSimplified === 'true';
 
 function setPlayerColor(hex, save) {
   playerColor = hex;
@@ -1243,6 +1312,10 @@ function setPlayerBoostGlow(hex, save) {
   playerBoostGlow = hex;
   if (save) safeSetItem(PLAYER_BOOST_GLOW_KEY, hex);
   if (state && state.player && state.player.alive) state.player.boostGlow = hex;
+}
+function setPlayerSimplified(val, save) {
+  simplifiedGraphics = !!val;
+  if (save) safeSetItem(PLAYER_SIMPLIFIED_KEY, String(simplifiedGraphics));
 }
 function applyBoostBtnSettings() {
   const btn = document.getElementById('boostBtn');
@@ -1392,7 +1465,7 @@ function wormHeadRadius(worm) { return CFG.headRadius * wormRadiusMult(worm); }
 function wormCollisionRadius(worm) { return CFG.collisionRadius * wormRadiusMult(worm); }
 
 function randomBotStartLen() {
-  return Math.floor(rand(30, 151));
+  return Math.floor(rand(200, 401));
 }
 
 function computePlayerZoom(worm) {
@@ -1402,7 +1475,9 @@ function computePlayerZoom(worm) {
   return 1 - t * (1 - minZoom);
 }
 
+// LOD: If simplifiedGraphics is false → always highest quality
 function lodLevel(zoom) {
+  if (!simplifiedGraphics) return 0;
   if (state && state.player && state.player.alive) return 0;
   if (zoom > 0.45) return 0;
   if (zoom > 0.25) return 1;
@@ -1578,7 +1653,7 @@ class Worm {
         cur.x += dx * t; cur.y += dy * t;
       }
     }
-    if (this.boosting && this.segments.length > 12) {
+    if (this.boosting && this.segments.length > CFG.minBoostMass) {
       this.boostDrain += dt;
       if (this.boostDrain > 0.18) {
         this.boostDrain = 0;
@@ -2032,16 +2107,16 @@ function botAI(worm, dt) {
 
   let wantBoost = false;
 
-  if (ai.state === 'FLEE' && mass > 15) {
+  if (ai.state === 'FLEE' && mass > CFG.minBoostMass) {
     wantBoost = true;
-  } else if (ai.state === 'HUNT' && ai.targetPrey && mass > 22) {
+  } else if (ai.state === 'HUNT' && ai.targetPrey && mass > CFG.minBoostMass) {
     const preyD = Math.hypot(ai.targetPrey.head.x - worm.head.x, ai.targetPrey.head.y - worm.head.y);
     if (preyD < 200) wantBoost = true;
-  } else if (ai.state === 'KILL_STEAL' && mass > 30) {
+  } else if (ai.state === 'KILL_STEAL' && mass > CFG.minBoostMass) {
     wantBoost = true;
-  } else if (ai.lastSafety < -25 && mass > 12) {
+  } else if (ai.lastSafety < -25 && mass > CFG.minBoostMass) {
     wantBoost = true;
-  } else if (t >= ai.nextBoostCheck && mass > 22 && Math.random() < 0.35) {
+  } else if (t >= ai.nextBoostCheck && mass > CFG.minBoostMass && Math.random() < 0.35) {
     wantBoost = true;
     ai.nextBoostCheck = t + 2.0 + Math.random() * 4.0;
   }
@@ -2051,7 +2126,7 @@ function botAI(worm, dt) {
     ai.boostCooldownUntil = ai.boostUntil + 0.8 + Math.random() * 1.2;
   }
 
-  worm.boosting = t < ai.boostUntil && mass > 12;
+  worm.boosting = t < ai.boostUntil && mass > CFG.minBoostMass;
 }
 
 function scoreDirection(worm, ang, nearby, nearbyFoods, prey, threat, killSteal, futureZone) {
@@ -2280,6 +2355,12 @@ function update(dt) {
     worm.update(dt);
     const h = worm.head;
 
+    if (!state.intermission && !state.zoneRegrowing &&
+        worm._spawnDone && worm.segments.length < CFG.minAliveMass) {
+      worm.die(null);
+      continue;
+    }
+
     if (h.x < 0 || h.x > CFG.worldSize || h.y < 0 || h.y > CFG.worldSize) {
       if (state.intermission || state.zoneRegrowing) {
         h.x = clamp(h.x, 0, CFG.worldSize);
@@ -2402,7 +2483,7 @@ function playerControl(worm) {
     const dx = wx - h.x, dy = wy - h.y;
     if (Math.hypot(dx, dy) > 6) worm.targetAngle = Math.atan2(dy, dx);
   }
-  worm.boosting = input.boost && worm.segments.length > 12;
+  worm.boosting = input.boost && worm.segments.length > CFG.minBoostMass;
 }
 
 function checkCollisions() {
@@ -2673,6 +2754,7 @@ function showDeathScreen() {
   if (k === 'ZONE') { name = 'The Zone'; color = '#ff5577'; }
   else if (k === 'WALL') { name = 'The Wall'; color = '#7a8db5'; }
   else if (k && k.name) { name = k.name; color = k.color || '#ffffff'; }
+  else if (k === null) { name = 'Starvation'; color = '#ffb066'; }
   else { name = 'Unknown'; color = '#ffffff'; }
   dsNameEl.textContent = name;
   dsNameEl.style.color = color;
@@ -2948,6 +3030,58 @@ function drawFood(cam, visW, visH) {
 }
 
 // ============================================================
+// BOOST GLOW RENDERER (Kometenschweif, sehr performant)
+// ============================================================
+function drawBoostGlow(segs, N, bodyR, boostColor, time) {
+  const hh = segs[0];
+  const pulse = 0.5 + 0.5 * Math.sin(time * Math.PI * 2 / CFG.boostFlashInterval);
+  const ease = pulse * pulse * (3 - 2 * pulse);
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  // === 1) Großer weicher Glow-Ball um den Kopf (1 Gradient, sehr günstig) ===
+  const headGlowR = bodyR * 4.5 + 30 + 25 * ease;
+  const hg = ctx.createRadialGradient(hh.x, hh.y, 0, hh.x, hh.y, headGlowR);
+  hg.addColorStop(0,    hexAlpha(mixColors(boostColor, '#ffffff', 0.7), 0.70 + 0.30 * ease));
+  hg.addColorStop(0.18, hexAlpha(boostColor, 0.55 + 0.30 * ease));
+  hg.addColorStop(0.45, hexAlpha(boostColor, 0.22 + 0.18 * ease));
+  hg.addColorStop(0.75, hexAlpha(boostColor, 0.06 + 0.06 * ease));
+  hg.addColorStop(1,    hexAlpha(boostColor, 0));
+  ctx.fillStyle = hg;
+  ctx.beginPath();
+  ctx.arc(hh.x, hh.y, headGlowR, 0, Math.PI * 2);
+  ctx.fill();
+
+  // === 2) Kometenschweif — nur erste ~25 Segmente (statt ganzer Wurm) ===
+  const trailLen = Math.min(N, 25);
+  const trailPath = new Path2D();
+  trailPath.moveTo(segs[0].x, segs[0].y);
+  for (let i = 1; i < trailLen; i++) {
+    trailPath.lineTo(segs[i].x, segs[i].y);
+  }
+
+  // Weicher äußerer Glow
+  ctx.strokeStyle = hexAlpha(boostColor, 0.18 + 0.22 * ease);
+  ctx.lineWidth = bodyR * 2 + 16;
+  ctx.stroke(trailPath);
+
+  // Mittlerer innerer Glow
+  ctx.strokeStyle = hexAlpha(mixColors(boostColor, '#ffffff', 0.35), 0.35 + 0.30 * ease);
+  ctx.lineWidth = bodyR * 2 + 5;
+  ctx.stroke(trailPath);
+
+  // Heißer weißer Kern
+  ctx.strokeStyle = hexAlpha(mixColors(boostColor, '#ffffff', 0.85), 0.55 + 0.35 * ease);
+  ctx.lineWidth = Math.max(2, bodyR * 0.85);
+  ctx.stroke(trailPath);
+
+  ctx.restore();
+}
+
+// ============================================================
 // WORM RENDERING
 // ============================================================
 const BEAD_ACCENT = '#f5f5f8';
@@ -3062,56 +3196,7 @@ function drawWorm(worm, isPlayer, zoom) {
   const lod = lodLevel(zoom);
 
   if (isBoosting && zoom > 0.2 && lod < 3) {
-    const bc = worm.boostGlow || '#ffffff';
-    const pulse = 0.5 + 0.5 * Math.sin(state.time * Math.PI * 2 / CFG.boostFlashInterval);
-    const ease = pulse * pulse * (3 - 2 * pulse);
-
-    const glowPath = new Path2D();
-    glowPath.moveTo(segs[0].x, segs[0].y);
-    for (let i = 1; i < N; i++) glowPath.lineTo(segs[i].x, segs[i].y);
-
-    ctx.save();
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.globalCompositeOperation = 'lighter';
-
-    const bloomLayers = [
-      { w: bodyR * 2 + 70, a: 0.025 + 0.035 * ease },
-      { w: bodyR * 2 + 52, a: 0.035 + 0.055 * ease },
-      { w: bodyR * 2 + 36, a: 0.055 + 0.075 * ease },
-      { w: bodyR * 2 + 24, a: 0.075 + 0.105 * ease },
-    ];
-    for (const L of bloomLayers) {
-      ctx.strokeStyle = hexAlpha(bc, L.a);
-      ctx.lineWidth = L.w;
-      ctx.stroke(glowPath);
-    }
-
-    ctx.strokeStyle = hexAlpha(bc, 0.14 + 0.16 * ease);
-    ctx.lineWidth = bodyR * 2 + 14;
-    ctx.stroke(glowPath);
-
-    ctx.strokeStyle = hexAlpha(mixColors(bc, '#ffffff', 0.35), 0.22 + 0.22 * ease);
-    ctx.lineWidth = bodyR * 2 + 6;
-    ctx.stroke(glowPath);
-
-    ctx.strokeStyle = hexAlpha(mixColors(bc, '#ffffff', 0.65), 0.30 + 0.35 * ease);
-    ctx.lineWidth = Math.max(2, bodyR * 0.85);
-    ctx.stroke(glowPath);
-
-    const hh = segs[0];
-    const headGlowR = bodyR * 3.5 + 24 + 18 * ease;
-    const hg = ctx.createRadialGradient(hh.x, hh.y, 0, hh.x, hh.y, headGlowR);
-    hg.addColorStop(0,    hexAlpha(mixColors(bc, '#ffffff', 0.35), 0.55 + 0.30 * ease));
-    hg.addColorStop(0.30, hexAlpha(bc, 0.30 + 0.22 * ease));
-    hg.addColorStop(0.65, hexAlpha(bc, 0.10 + 0.10 * ease));
-    hg.addColorStop(1,    hexAlpha(bc, 0));
-    ctx.fillStyle = hg;
-    ctx.beginPath();
-    ctx.arc(hh.x, hh.y, headGlowR, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
+    drawBoostGlow(segs, N, bodyR, worm.boostGlow || '#ffffff', state.time);
   }
 
   let beadStep = beadStepFor(bodyR);
@@ -3590,6 +3675,7 @@ const czPosLeft = document.getElementById('czPosLeft');
 const czPosRight = document.getElementById('czPosRight');
 const czBoostSize = document.getElementById('czBoostSize');
 const czBoostSizeVal = document.getElementById('czBoostSizeVal');
+const czSimplifiedInput = document.getElementById('czSimplified');
 
 let czTempColor = playerColor;
 let czTempOutline = playerOutline;
@@ -3598,6 +3684,7 @@ let czTempBoostGlow = playerBoostGlow;
 let czTempBoostPos = playerBoostPos;
 let czTempBoostSize = playerBoostSize;
 let czTempName = playerName;
+let czTempSimplified = simplifiedGraphics;
 let czAnimId = null, czStartTime = 0;
 
 PRESET_WORMS.forEach(preset => {
@@ -3676,6 +3763,7 @@ function updateCzUI() {
   if (czBoostSizeVal) czBoostSizeVal.textContent = czTempBoostSize.toFixed(1) + '×';
 
   if (czNameInput && czNameInput.value !== czTempName) czNameInput.value = czTempName;
+  if (czSimplifiedInput) czSimplifiedInput.checked = czTempSimplified;
 }
 czColorInput.addEventListener('input', e => {
   czTempColor = e.target.value;
@@ -3695,6 +3783,11 @@ czNameInput.addEventListener('input', e => {
   czTempName = e.target.value.replace(/\s{2,}/g, ' ').slice(0, 14);
   if (czTempName !== e.target.value) e.target.value = czTempName;
 });
+if (czSimplifiedInput) {
+  czSimplifiedInput.addEventListener('change', e => {
+    czTempSimplified = e.target.checked;
+  });
+}
 
 czPosLeft.addEventListener('click', () => { czTempBoostPos = 'left'; updateCzUI(); });
 czPosRight.addEventListener('click', () => { czTempBoostPos = 'right'; updateCzUI(); });
@@ -3714,6 +3807,7 @@ function openCustomize() {
   czTempBoostPos = playerBoostPos;
   czTempBoostSize = playerBoostSize;
   czTempName = playerName;
+  czTempSimplified = simplifiedGraphics;
   czNameInput.value = playerName;
   updateCzUI();
   customizeEl.classList.add('on');
@@ -3735,6 +3829,7 @@ czSave.addEventListener('click', () => {
   setPlayerBoostPos(czTempBoostPos, true);
   setPlayerBoostSize(czTempBoostSize, true);
   setPlayerName(czTempName, true);
+  setPlayerSimplified(czTempSimplified, true);
   updateMenuWinStat();
   closeCustomize();
 });
@@ -3746,6 +3841,7 @@ czReset.addEventListener('click', () => {
   czTempBoostPos = DEFAULT_PLAYER_BOOST_POS;
   czTempBoostSize = DEFAULT_PLAYER_BOOST_SIZE;
   czTempName = DEFAULT_PLAYER_NAME;
+  czTempSimplified = true;
   updateCzUI();
 });
 window.addEventListener('keydown', e => {
@@ -3781,54 +3877,47 @@ function drawPreviewWorm(c, pts, bodyR, bodyColor, outlineColor, boostGlow, acce
 
   accentColor = accentColor || BEAD_ACCENT;
 
+  // Preview boost glow (simpler, direct on the preview context)
   if (boostGlow) {
+    const hh = pts[0];
     const pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 2 / CFG.boostFlashInterval);
     const ease = pulse * pulse * (3 - 2 * pulse);
 
-    const glowPath = new Path2D();
-    glowPath.moveTo(pts[0].x, pts[0].y);
-    for (let i = 1; i < N; i++) glowPath.lineTo(pts[i].x, pts[i].y);
-
     c.save();
+    c.globalCompositeOperation = 'lighter';
     c.lineCap = 'round';
     c.lineJoin = 'round';
-    c.globalCompositeOperation = 'lighter';
 
-    const bloomLayers = [
-      { w: bodyR * 2 + 60, a: 0.025 + 0.035 * ease },
-      { w: bodyR * 2 + 44, a: 0.035 + 0.055 * ease },
-      { w: bodyR * 2 + 30, a: 0.055 + 0.075 * ease },
-      { w: bodyR * 2 + 20, a: 0.075 + 0.105 * ease },
-    ];
-    for (const L of bloomLayers) {
-      c.strokeStyle = hexAlpha(boostGlow, L.a);
-      c.lineWidth = L.w;
-      c.stroke(glowPath);
-    }
-
-    c.strokeStyle = hexAlpha(boostGlow, 0.14 + 0.16 * ease);
-    c.lineWidth = bodyR * 2 + 12;
-    c.stroke(glowPath);
-
-    c.strokeStyle = hexAlpha(mixColors(boostGlow, '#ffffff', 0.35), 0.22 + 0.22 * ease);
-    c.lineWidth = bodyR * 2 + 5;
-    c.stroke(glowPath);
-
-    c.strokeStyle = hexAlpha(mixColors(boostGlow, '#ffffff', 0.65), 0.30 + 0.35 * ease);
-    c.lineWidth = Math.max(2, bodyR * 0.85);
-    c.stroke(glowPath);
-
-    const hh = pts[0];
-    const headGlowR = bodyR * 3.5 + 20 + 14 * ease;
+    // Head glow ball
+    const headGlowR = bodyR * 4.5 + 24 + 20 * ease;
     const hg = c.createRadialGradient(hh.x, hh.y, 0, hh.x, hh.y, headGlowR);
-    hg.addColorStop(0,    hexAlpha(mixColors(boostGlow, '#ffffff', 0.35), 0.55 + 0.30 * ease));
-    hg.addColorStop(0.30, hexAlpha(boostGlow, 0.30 + 0.22 * ease));
-    hg.addColorStop(0.65, hexAlpha(boostGlow, 0.10 + 0.10 * ease));
+    hg.addColorStop(0,    hexAlpha(mixColors(boostGlow, '#ffffff', 0.7), 0.70 + 0.30 * ease));
+    hg.addColorStop(0.20, hexAlpha(boostGlow, 0.55 + 0.30 * ease));
+    hg.addColorStop(0.50, hexAlpha(boostGlow, 0.22 + 0.18 * ease));
+    hg.addColorStop(0.80, hexAlpha(boostGlow, 0.06 + 0.06 * ease));
     hg.addColorStop(1,    hexAlpha(boostGlow, 0));
     c.fillStyle = hg;
     c.beginPath();
     c.arc(hh.x, hh.y, headGlowR, 0, Math.PI * 2);
     c.fill();
+
+    // Comet tail
+    const trailLen = Math.min(N, 15);
+    const trailPath = new Path2D();
+    trailPath.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < trailLen; i++) trailPath.lineTo(pts[i].x, pts[i].y);
+
+    c.strokeStyle = hexAlpha(boostGlow, 0.18 + 0.22 * ease);
+    c.lineWidth = bodyR * 2 + 12;
+    c.stroke(trailPath);
+
+    c.strokeStyle = hexAlpha(mixColors(boostGlow, '#ffffff', 0.35), 0.35 + 0.30 * ease);
+    c.lineWidth = bodyR * 2 + 4;
+    c.stroke(trailPath);
+
+    c.strokeStyle = hexAlpha(mixColors(boostGlow, '#ffffff', 0.85), 0.55 + 0.35 * ease);
+    c.lineWidth = Math.max(2, bodyR * 0.85);
+    c.stroke(trailPath);
 
     c.restore();
   }
