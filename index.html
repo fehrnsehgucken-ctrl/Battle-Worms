@@ -1106,17 +1106,17 @@ const CFG = {
   zoneRegrowDuration: 5,
   bots: 80,
   food: 19000,
-  segSpacing: 2,
+  segSpacing: 1,
   speed: 2.3,
   boostSpeed: 5.0,
   turnRate: 0.07,
   turnSizePenalty: 0.60,
-  turnScaleRef: 520,
+  turnScaleRef: 1040,
   startSegments: 20,
   headRadius: 11,
   bodyRadius: 10,
   collisionRadius: 7,
-  radiusGrowth: 0.50,
+  radiusGrowth: 0.25,
   radiusMaxFactor: 2.6,
   maxParticles: 400,
   deathZoomMargin: 200,
@@ -1169,7 +1169,7 @@ function pickFoodTier() {
 // ============================================================
 function safeSetItem(key, value) {
   try { localStorage.setItem(key, value); }
-  catch (e) { /* Speicher voll oder blockiert — still ignorieren */ }
+  catch (e) { /* ignore */ }
 }
 function safeGetItem(key) {
   try { return localStorage.getItem(key); }
@@ -1410,6 +1410,21 @@ function lodLevel(zoom) {
   return 3;
 }
 
+function predictZone(timeAhead) {
+  if (!state) return { x: CFG.worldSize/2, y: CFG.worldSize/2, r: CFG.zoneStart };
+  const z = state.zone;
+  if (state.intermission || state.zoneRegrowing) {
+    return { x: z.cx0, y: z.cy0, r: CFG.zoneStart };
+  }
+  const elapsed = state.zoneShrinkT * CFG.matchDuration;
+  const futureT = Math.min(1, (elapsed + timeAhead) / CFG.matchDuration);
+  return {
+    x: lerp(z.cx0, z.cx1, futureT),
+    y: lerp(z.cy0, z.cy1, futureT),
+    r: lerp(CFG.zoneStart, CFG.zoneMin, futureT)
+  };
+}
+
 // ============================================================
 // FOOD SPATIAL GRID
 // ============================================================
@@ -1495,7 +1510,6 @@ class Worm {
     this._growFrac = 0;
     this._rank = 0;
 
-    // Spawn-Wachstum: startet mit 1 Segment (nur Kopf) und wächst sichtbar
     this.segments = [{ x: o.x, y: o.y }];
     this._targetSegments = o.startLen ?? CFG.startSegments;
     this._spawnDuration = this.isBot ? 3.0 : 1.0;
@@ -1506,11 +1520,20 @@ class Worm {
       aggression: Math.random(),
       foodFocus: 0.6 + Math.random() * 0.9,
       caution: 0.7 + Math.random() * 0.7,
-      retargetAt: 0, desiredAngle: this.angle,
-      lastSafety: 0, wanderAngle: this.angle,
+      retargetAt: 0,
+      desiredAngle: this.angle,
+      lastSafety: 0,
       boostUntil: 0,
       boostCooldownUntil: 0,
       nextBoostCheck: null,
+      state: 'FEED',
+      targetPrey: null,
+      targetThreat: null,
+      futureZone: null,
+      mistakeNoise: 4 + Math.random() * 14,
+      mistakeChance: 0.02 + Math.random() * 0.05,
+      stateChangeResist: 0.10 + Math.random() * 0.20,
+      skill: 0.75 + Math.random() * 0.35,
     } : null;
   }
   get head() { return this.segments[0]; }
@@ -1879,44 +1902,125 @@ function computeRanks() {
 }
 
 // ============================================================
-// BOT AI
+// BOT AI — Smart State Machine
 // ============================================================
 function botAI(worm, dt) {
   const head = worm.head, ai = worm.ai;
   ai.retargetAt -= dt;
+
   if (ai.retargetAt <= 0) {
-    ai.retargetAt = 0.10 + Math.random() * 0.10;
+    ai.retargetAt = 0.08 + Math.random() * 0.18;
 
     const nearby = [];
     for (const other of state.worms) {
       if (other === worm || !other.alive) continue;
       const d = Math.hypot(other.head.x - head.x, other.head.y - head.y);
-      const reach = 400 + other.segments.length * CFG.segSpacing;
+      const reach = 550 + other.segments.length * CFG.segSpacing;
       if (d < reach) nearby.push({ worm: other, dist: d });
     }
 
-    let nearestFood = null, nfd2 = Infinity;
-    forEachFoodNear(head.x, head.y, 350, f => {
+    const nearbyFoods = [];
+    let nearestFood = null, nfd2 = Infinity, nearestFoodScore = -1;
+    forEachFoodNear(head.x, head.y, 400, f => {
       if (f.eating) return;
+      nearbyFoods.push(f);
       const dx = f.x - head.x, dy = f.y - head.y;
       const d2 = dx * dx + dy * dy;
-      if (d2 < nfd2) { nfd2 = d2; nearestFood = f; }
+      const quality = (f.grow || 1) / Math.max(1, Math.sqrt(d2));
+      if (quality > nearestFoodScore) {
+        nearestFoodScore = quality;
+        nearestFood = f;
+        nfd2 = d2;
+      }
     });
     const nearestFoodD = Math.sqrt(nfd2);
 
-    const N = 21, spread = Math.PI * 2;
+    const futureZone = predictZone(2.5);
+    ai.futureZone = futureZone;
+
+    const mass = worm.segments.length;
+    const skill = ai.skill || 1;
+
+    let threat = null, threatDist = Infinity;
+    for (const { worm: other, dist } of nearby) {
+      if (other.segments.length > mass * 1.15 && dist < 400) {
+        if (dist < threatDist) { threat = other; threatDist = dist; }
+      }
+    }
+
+    let prey = null, preyDist = Infinity;
+    for (const { worm: other, dist } of nearby) {
+      if (other.segments.length < mass * 0.7 && dist < 500) {
+        if (dist < preyDist) { prey = other; preyDist = dist; }
+      }
+    }
+
+    let killSteal = null;
+    if (skill > 0.85) {
+      for (const { worm: a, dist: da } of nearby) {
+        if (a.segments.length < mass * 0.8) continue;
+        for (const { worm: b, dist: db } of nearby) {
+          if (b === a || b.segments.length < mass * 0.8) continue;
+          if (da > 350 || db > 350) continue;
+          const abDist = Math.hypot(a.head.x - b.head.x, a.head.y - b.head.y);
+          if (abDist < 90) {
+            killSteal = { x: (a.head.x + b.head.x) / 2, y: (a.head.y + b.head.y) / 2 };
+            break;
+          }
+        }
+        if (killSteal) break;
+      }
+    }
+
+    let dangerAngles = 0;
+    const angleMap = new Array(8).fill(0);
+    for (const { worm: other, dist } of nearby) {
+      if (dist > 200) continue;
+      const ang = Math.atan2(other.head.y - head.y, other.head.x - head.x);
+      const sector = Math.floor(((ang + Math.PI) / (Math.PI * 2)) * 8) % 8;
+      angleMap[sector] = 1;
+    }
+    for (let i = 0; i < 8; i++) dangerAngles += angleMap[i];
+    const surrounded = dangerAngles >= 6 && mass < 150;
+
+    let newState = 'FEED';
+    if (surrounded || (ai.lastSafety < -50 && threat)) {
+      newState = 'FLEE';
+    } else if (killSteal) {
+      newState = 'KILL_STEAL';
+    } else if (prey && preyDist < 280 && mass > 40 && ai.aggression > 0.4) {
+      newState = 'HUNT';
+    } else if (threat && threatDist < 250) {
+      newState = 'FLEE';
+    }
+
+    if (Math.random() > ai.stateChangeResist) {
+      ai.state = newState;
+    }
+
+    const N = 25, spread = Math.PI * 2;
     let bestScore = -Infinity, bestAngle = worm.angle, bestSafety = 0;
+
     for (let i = 0; i < N; i++) {
       const offset = (i / (N - 1) - 0.5) * spread;
       const ang = worm.angle + offset;
-      const { total, safety } = scoreDirection(worm, ang, nearby, nearestFood, nearestFoodD);
-      const turnCost = Math.abs(offset) * 2;
-      const s = total - turnCost;
+      const { total, safety } = scoreDirection(worm, ang, nearby, nearbyFoods, prey, threat, killSteal, futureZone);
+      const turnCost = Math.abs(offset) * 1.8;
+      const noise = (Math.random() - 0.5) * ai.mistakeNoise;
+      const s = total - turnCost + noise;
       if (s > bestScore) { bestScore = s; bestAngle = ang; bestSafety = safety; }
     }
+
+    if (Math.random() < ai.mistakeChance) {
+      bestAngle = Math.random() * Math.PI * 2;
+    }
+
     ai.desiredAngle = bestAngle;
     ai.lastSafety = bestSafety;
+    ai.targetPrey = prey;
+    ai.targetThreat = threat;
   }
+
   worm.targetAngle = ai.desiredAngle;
 
   const t = state.time;
@@ -1926,95 +2030,177 @@ function botAI(worm, dt) {
     ai.nextBoostCheck = t + 1.5 + Math.random() * 3.0;
   }
 
-  const panic = ai.lastSafety < -30 && mass > 12;
+  let wantBoost = false;
 
-  if (panic && t >= ai.boostCooldownUntil) {
-    ai.boostUntil = t + 0.40 + Math.random() * 0.40;
-    ai.boostCooldownUntil = ai.boostUntil + 0.7 + Math.random() * 0.6;
-  } else if (t >= ai.nextBoostCheck && mass > 22 && t >= ai.boostCooldownUntil) {
-    ai.boostUntil = t + 0.7 + Math.random() * 1.0;
-    ai.boostCooldownUntil = ai.boostUntil + 1.0 + Math.random() * 1.5;
-    ai.nextBoostCheck = ai.boostCooldownUntil + 2.0 + Math.random() * 3.0;
+  if (ai.state === 'FLEE' && mass > 15) {
+    wantBoost = true;
+  } else if (ai.state === 'HUNT' && ai.targetPrey && mass > 22) {
+    const preyD = Math.hypot(ai.targetPrey.head.x - worm.head.x, ai.targetPrey.head.y - worm.head.y);
+    if (preyD < 200) wantBoost = true;
+  } else if (ai.state === 'KILL_STEAL' && mass > 30) {
+    wantBoost = true;
+  } else if (ai.lastSafety < -25 && mass > 12) {
+    wantBoost = true;
+  } else if (t >= ai.nextBoostCheck && mass > 22 && Math.random() < 0.35) {
+    wantBoost = true;
+    ai.nextBoostCheck = t + 2.0 + Math.random() * 4.0;
   }
 
-  worm.boosting = t < ai.boostUntil;
+  if (wantBoost && t >= ai.boostCooldownUntil) {
+    ai.boostUntil = t + 0.3 + Math.random() * 0.5;
+    ai.boostCooldownUntil = ai.boostUntil + 0.8 + Math.random() * 1.2;
+  }
+
+  worm.boosting = t < ai.boostUntil && mass > 12;
 }
 
-function scoreDirection(worm, ang, nearby, nearestFood, nearestFoodD) {
+function scoreDirection(worm, ang, nearby, nearbyFoods, prey, threat, killSteal, futureZone) {
   const head = worm.head, ai = worm.ai;
   const dx = Math.cos(ang), dy = Math.sin(ang);
-  const lookAhead = 160;
-  let safety = 0, food = 0, attack = 0;
+
+  const skill = ai.skill || 1;
+  const lookAhead = 220 + 130 * skill;
+
+  let safety = 0, food = 0, attack = 0, preyScore = 0, threatScore = 0, stealScore = 0;
   const myR = wormBodyRadius(worm);
 
-  for (let t = 25; t <= lookAhead; t += 25) {
+  const wallSamples = 7;
+  for (let s = 1; s <= wallSamples; s++) {
+    const t = (s / wallSamples) * lookAhead;
     const px = head.x + dx * t, py = head.y + dy * t;
-    const w = 1 - t / (lookAhead + 40);
+    const w = 1 - t / (lookAhead + 80);
     const wallDist = Math.min(px, py, CFG.worldSize - px, CFG.worldSize - py);
-    if (wallDist < 70) safety -= (70 - wallDist) * 0.8 * w;
-    const zd = Math.hypot(px - state.zone.x, py - state.zone.y);
-    const outsideBy = zd - state.zone.radius;
-    if (outsideBy > -90) safety -= (outsideBy + 90) * 1.6 * w;
+    if (wallDist < 110) safety -= (110 - wallDist) * 1.0 * w;
+
+    const zd = Math.hypot(px - futureZone.x, py - futureZone.y);
+    const outsideBy = zd - futureZone.r;
+    if (outsideBy > -130) safety -= (outsideBy + 130) * 2.2 * w;
   }
 
   for (const { worm: other } of nearby) {
     const hdx = other.head.x - head.x, hdy = other.head.y - head.y;
-    if (hdx * hdx + hdy * hdy > (lookAhead + 200) ** 2) continue;
+    if (hdx * hdx + hdy * hdy > (lookAhead + 400) ** 2) continue;
     const otherR = wormBodyRadius(other);
-    const dangerR = myR + otherR + 4;
+    const dangerR = myR + otherR + 5;
     const dangerR2 = dangerR * dangerR;
-    for (let i = 0; i < other.segments.length; i += 2) {
+
+    const predictDist = 30;
+    const pvx = Math.cos(other.angle) * predictDist;
+    const pvy = Math.sin(other.angle) * predictDist;
+
+    const isBigger = other.segments.length > worm.segments.length;
+    const dangerMult = isBigger ? 1.6 : 0.9;
+
+    for (let i = 0; i < other.segments.length; i += 3) {
       const seg = other.segments[i];
-      const rx = seg.x - head.x, ry = seg.y - head.y;
+      const rx = seg.x + pvx - head.x;
+      const ry = seg.y + pvy - head.y;
       const proj = rx * dx + ry * dy;
       if (proj < 0 || proj > lookAhead) continue;
       const perp = rx * dy - ry * dx;
       if (perp * perp < dangerR2) {
         const w = 1 - proj / lookAhead;
-        safety -= w * w * 380 * ai.caution;
+        safety -= w * w * 420 * ai.caution * dangerMult;
+      }
+    }
+
+    const otherHeadAngle = other.angle;
+    const distToUs = Math.hypot(other.head.x - head.x, other.head.y - head.y);
+    if (distToUs < 250 && isBigger) {
+      const towardUs = Math.cos(otherHeadAngle) * (head.x - other.head.x) +
+                       Math.sin(otherHeadAngle) * (head.y - other.head.y);
+      if (towardUs > 0 && distToUs < 150) {
+        safety -= 60;
       }
     }
   }
 
-  if (nearestFood && nearestFoodD < 170) {
-    const fAng = Math.atan2(nearestFood.y - head.y, nearestFood.x - head.x);
-    const delta = angleDiff(ang, fAng);
-    const align = Math.max(0, Math.cos(delta));
-    const prox = 1 - nearestFoodD / 170;
-    food += align * align * prox * 90;
-  }
-
-  const foodReach = lookAhead * 1.4;
-  forEachFoodNear(head.x, head.y, foodReach + 40, f => {
-    if (f === nearestFood) return;
-    if (f.eating) return;
+  for (let i = 0; i < nearbyFoods.length; i++) {
+    const f = nearbyFoods[i];
     const rx = f.x - head.x, ry = f.y - head.y;
     const proj = rx * dx + ry * dy;
-    if (proj < 0 || proj > foodReach) return;
+    if (proj < 0 || proj > lookAhead) continue;
     const perp = Math.abs(rx * dy - ry * dx);
-    if (perp > 55) return;
-    const w = 1 - proj / foodReach;
-    food += w * 12 * ai.foodFocus * (f.grow || 1);
-  });
+    if (perp > 70) continue;
+    const w = 1 - proj / lookAhead;
+    const quality = (f.grow || 1);
+    food += w * 12 * ai.foodFocus * quality;
+  }
 
-  if (ai.aggression > 0.45) {
+  if (prey && ai.state === 'HUNT') {
+    const predict = 35;
+    const pvx = Math.cos(prey.angle) * predict;
+    const pvy = Math.sin(prey.angle) * predict;
+    const ex = prey.head.x + pvx;
+    const ey = prey.head.y + pvy;
+    const rx = ex - head.x, ry = ey - head.y;
+    const proj = rx * dx + ry * dy;
+    if (proj > 0 && proj < lookAhead) {
+      const perp = Math.abs(rx * dy - ry * dx);
+      if (perp < 65) {
+        const w = 1 - proj / lookAhead;
+        preyScore += w * 55 * ai.aggression;
+      }
+    }
+
+    const sizeAdv = worm.segments.length / Math.max(prey.segments.length, 1);
+    if (sizeAdv > 1.3) {
+      const headPred = 45;
+      const hpx = prey.head.x + Math.cos(prey.angle) * headPred;
+      const hpy = prey.head.y + Math.sin(prey.angle) * headPred;
+      const rx2 = hpx - head.x, ry2 = hpy - head.y;
+      const proj2 = rx2 * dx + ry2 * dy;
+      if (proj2 > 0 && proj2 < lookAhead * 1.3) {
+        const perp2 = Math.abs(rx2 * dy - ry2 * dx);
+        if (perp2 < 55) {
+          const w = 1 - proj2 / (lookAhead * 1.3);
+          preyScore += w * 70 * ai.aggression;
+        }
+      }
+    }
+  }
+
+  if (ai.state === 'FLEE' && threat) {
+    const rx = threat.head.x - head.x, ry = threat.head.y - head.y;
+    const awayAng = Math.atan2(-ry, -rx);
+    const delta = angleDiff(ang, awayAng);
+    const align = Math.max(0, Math.cos(delta));
+    threatScore += align * align * 110;
+  }
+
+  if (ai.state === 'KILL_STEAL' && killSteal) {
+    const rx = killSteal.x - head.x, ry = killSteal.y - head.y;
+    const stealAng = Math.atan2(ry, rx);
+    const delta = angleDiff(ang, stealAng);
+    const align = Math.max(0, Math.cos(delta));
+    const dist = Math.hypot(rx, ry);
+    if (dist < 400) {
+      stealScore += align * align * 75;
+    }
+  }
+
+  if (ai.aggression > 0.5) {
     for (const { worm: other, dist } of nearby) {
-      if (dist > 450) continue;
+      if (dist > 500) continue;
       const sizeAdv = worm.segments.length / Math.max(other.segments.length, 1);
-      if (sizeAdv < 0.85) continue;
-      const predict = 25;
+      if (sizeAdv < 0.9) continue;
+      const predict = 35;
       const ex = other.head.x + Math.cos(other.angle) * predict;
       const ey = other.head.y + Math.sin(other.angle) * predict;
       const rx = ex - head.x, ry = ey - head.y;
       const proj = rx * dx + ry * dy;
       if (proj < 0 || proj > lookAhead * 1.2) continue;
       const perp = Math.abs(rx * dy - ry * dx);
-      if (perp > 50) continue;
+      if (perp > 60) continue;
       const w = 1 - proj / (lookAhead * 1.2);
-      attack += w * 30 * ai.aggression * Math.min(sizeAdv, 2);
+      attack += w * 32 * ai.aggression * Math.min(sizeAdv, 2);
     }
   }
-  return { total: safety + food + attack, safety };
+
+  return {
+    total: safety + food + attack + preyScore + threatScore + stealScore,
+    safety
+  };
 }
 
 // ============================================================
@@ -3304,17 +3490,17 @@ function touchStart(e) {
       input.joyId = null;
     }
   }
-  for (const t of e.changedTouches) {
-    if (input.joyActive) continue;
-    input.joyActive = true; input.joyId = t.identifier;
-    input.joyBaseX = t.clientX; input.joyBaseY = t.clientY;
+ is for (const t of e.changedTouches)Player {
+    if (inputDead.joyActive) continue());
+    input.joyActive {
+ = true; input.joyId = t.identifier;
+       input.joyBaseX = t.clientX; input.joyBaseY = t.clientY;
     input.joyX = t.clientX; input.joyY = t.clientY;
   }
   e.preventDefault();
 }
 function touchMove(e) {
-  if (isPlayerDead()) {
-    if (e.touches.length === 2) {
+  if ( if (e.touches.length === 2) {
       const dx = e.touches[0].clientX - e.touches[1].clientX;
       const dy = e.touches[0].clientY - e.touches[1].clientY;
       const dist = Math.hypot(dx, dy);
@@ -3586,12 +3772,12 @@ function drawCzPreview(t) {
   for (let i = 0; i < segments; i++)
     pts.push({ x: headX - i * segLen, y: baseY + Math.sin(wave - i * 0.32) * amp });
 
-  drawPreviewWorm(czCtx, pts, 13, czTempColor, czTempOutline, czTempBoostGlow, czTempAccent, t);
+  drawPreviewWorm(czCtx, pts, 13, czTempColor, czTempOutline, czTempBoostGlow,. czTempAccent, t);
 }
 
-function drawPreviewWorm(c, pts, bodyR, bodyColor, outlineColor, boostGlow, accentColor, t) {
-  const N = pts.length;
-  if (N < 2) return;
+function drawPreviewWorm55(c, pts, + bodyR, bodyColor, outlineColor, boostGlow , accentColor, t) {
+0  const N = pts.length;
+  if (N. < 2) return;
 
   accentColor = accentColor || BEAD_ACCENT;
 
@@ -3635,7 +3821,7 @@ function drawPreviewWorm(c, pts, bodyR, bodyColor, outlineColor, boostGlow, acce
     const hh = pts[0];
     const headGlowR = bodyR * 3.5 + 20 + 14 * ease;
     const hg = c.createRadialGradient(hh.x, hh.y, 0, hh.x, hh.y, headGlowR);
-    hg.addColorStop(0,    hexAlpha(mixColors(boostGlow, '#ffffff', 0.35), 0.55 + 0.30 * ease));
+    hg.addColorStop(0,    hexAlpha(mixColors(boostGlow, '#ffffff', 0.35), 030 * ease));
     hg.addColorStop(0.30, hexAlpha(boostGlow, 0.30 + 0.22 * ease));
     hg.addColorStop(0.65, hexAlpha(boostGlow, 0.10 + 0.10 * ease));
     hg.addColorStop(1,    hexAlpha(boostGlow, 0));
@@ -3688,17 +3874,17 @@ function drawMenuWorm() {
   const H = menuWormCanvas.height;
   const c = menuWormCtx;
 
-  c.clearRect(0, 0, W, H);
+  c.clearRect(0, 0, W, H;
 
-  const t = (performance.now() - menuWormStartTime) / 1000;
-  const wave = t * 1.4;
+);
+
+  const t = (performance.now() - menuWormStartTime) /  1000;
+  const const wave = t * 1 head.4;
 
   const segments = 46;
-  const segLen = 9;
+X  const segLen = 9;
   const baseY = H / 2 + 6;
-  const amp = 32;
-
-  const headX = W * 0.5 + 60 + Math.sin(t * 0.7) * 24;
+  const amp = 32 = W * 0.5 + 60 + Math.sin(t * 0.7) * 24;
   const headYOffset = Math.sin(t * 0.9) * 6;
 
   const pts = [];
